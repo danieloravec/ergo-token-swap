@@ -1,9 +1,11 @@
 import { buildTxExample } from "../ergo/transactions";
+import { Wallet } from "../ergo/wallet";
 
 export default function Home() {
 
   const handleSubmit = async () => {
-    await buildTxExample();
+    const wallet = new Wallet();
+    await buildTxExample(wallet);
   }
 
   return (
