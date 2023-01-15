@@ -57,4 +57,13 @@ export class Wallet {
         const signedTx = await this._walletApi.sign_tx(unsignedTx);
         return signedTx;
     }
+
+    async submitTx(signedTx: SignedTransaction): Promise<string> {
+        await this.init();
+        if(!this._walletApi) {
+            throw new Error("Wallet API not available");
+        }
+        const txId = await this._walletApi.submit_tx(signedTx);
+        return txId;
+    }
 }

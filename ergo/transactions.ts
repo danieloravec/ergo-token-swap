@@ -28,11 +28,13 @@ export async function buildTxExample(wallet: Wallet) {
 
     const unsignedTransaction = new TransactionBuilder(creationHeight)
         .from(inputs)
-        .to(new OutputBuilder(BigInt(1000000), "9hg68j4rq5N11CpGgRNgK8LbykYTAnJ4f4xQ1y4sPRcwMRUS6tQ"))
+        .to(new OutputBuilder(BigInt(100000000), "9ez4QZZnrhRnXcFa4xupxtSU1cnkq7FaGPbRx2ygxe6ZGg5wBLR"))
         .sendChangeTo(address)
         .payMinFee()
-        .build();
+        .build("EIP-12");
 
     const signedTransaction = await wallet.signTx(unsignedTransaction);
-    console.log(`signedTransaction: ${JSON.stringify(signedTransaction)}`);
+
+    const txId = await wallet.submitTx(signedTransaction);
+    console.log(`txId: ${txId}`);
 }
