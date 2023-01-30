@@ -6,10 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next build && next start",
-    "lint": "next lint"
+    "lint": "eslint './**/*.{ts,tsx}'",
+    "prepare": "cd .. && husky install web/.husky"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "*.{js,jsx,ts,tsx,css,scss,md}": "prettier --write --ignore-unknown"
   },
   "dependencies": {
     "@fleet-sdk/core": "^0.1.0-alpha.4",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "install": "^0.13.0",
     "next": "13.0.0",
     "npm": "^8.19.2",
@@ -20,8 +31,18 @@
     "@types/node": "18.11.7",
     "@types/react": "18.0.24",
     "@types/react-dom": "18.0.8",
-    "eslint": "8.26.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint": "^8.0.1",
     "eslint-config-next": "13.0.0",
-    "typescript": "4.8.4"
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard-with-typescript": "^33.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-react": "^7.32.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "prettier": "2.8.3",
+    "typescript": "*"
   }
 }
