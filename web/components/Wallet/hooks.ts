@@ -17,19 +17,30 @@ export const useWalletStore = create<{wallet?: Wallet, address?: string, setWall
 );
 
 export const useWalletConnect = () => {
-    const {setWallet, setAddress} = useWalletStore();
+    const {wallet, setWallet, setAddress} = useWalletStore();
 
     const connect = async () => {
-        const newWallet = new Wallet();
-        await newWallet.init();
-        const address = await newWallet.getAddress();
-        setWallet(newWallet);
-        setAddress(address);
+        try {
+            const newWallet = new Wallet();
+            await newWallet.init();
+            const address = await newWallet.getAddress();
+            setWallet(newWallet);
+            setAddress(address);
+        } catch (err) {
+            console.log("User denied wallet connection");
+            disconnect();
+        }
     };
 
     const disconnect = () => {
         setWallet(undefined);
+        setAddress(undefined);
     }
 
-    return {connect, disconnect};
+    const reconnect = async () => {
+        disconnect();
+        await connect();
+    }
+
+    return {connect, disconnect, reconnect};
 }
