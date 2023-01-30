@@ -1,6 +1,6 @@
 import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
 import { type Box, type Amount } from '@fleet-sdk/core';
-import { type Wallet } from './wallet';
+import { type Wallet } from '@ergo/wallet';
 
 export async function explorerRequest(endpoint: string): Promise<any> {
   const res = await fetch(`https://api.ergoplatform.com/api/v0${endpoint}`);

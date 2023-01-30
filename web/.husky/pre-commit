@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-cd web && yarn lint-staged
+cd web && yarn lint-staged --allow-empty
