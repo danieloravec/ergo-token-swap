@@ -1,3 +1,33 @@
 {
-  "extends": "next/core-web-vitals"
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "standard-with-typescript",
+        "prettier"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx"],
+            "parserOptions": {
+                "project": ["./tsconfig.json"]
+            }
+        }
+    ],
+    "plugins": [
+        "react",
+        "unused-imports"
+    ],
+    "rules": {
+        "react/self-closing-comp": "error",
+        "react/jsx-curly-brace-presence": "error",
+        "react/jsx-boolean-value": "error",
+        "unused-imports/no-unused-imports": "error"
+    },
+    "parser": "@typescript-eslint/parser"
 }
