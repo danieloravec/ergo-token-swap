@@ -1,5 +1,5 @@
 import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
-import { type Box, type Amount } from '@fleet-sdk/core/build/lib/module/types';
+import { type Box, type Amount } from '@fleet-sdk/core';
 import { type Wallet } from './wallet';
 
 export async function explorerRequest(endpoint: string): Promise<any> {
