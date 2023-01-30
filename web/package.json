@@ -19,13 +19,14 @@
     "*.{js,jsx,ts,tsx,css,scss,md}": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "@fleet-sdk/core": "^0.1.0-alpha.4",
+    "@fleet-sdk/core": "^0.1.0-alpha.19",
     "eslint-plugin-unused-imports": "^2.0.0",
     "install": "^0.13.0",
     "next": "13.0.0",
     "npm": "^8.19.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
     "@types/node": "18.11.7",

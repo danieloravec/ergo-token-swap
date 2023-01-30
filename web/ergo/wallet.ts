@@ -9,6 +9,7 @@ export class Wallet {
         if(this._walletApi !== undefined) {
             return;
         }
+
         const walletInjector =
           typeof window !== "undefined"
             ? window.ergoConnector?.nautilus
@@ -17,13 +18,13 @@ export class Wallet {
         if (!walletInjector) {
           throw new Error("WALLET_NOT_INSTALLED");
         }
-    
+
         const walletApiInjected = await walletInjector.connect();
-        if(!walletApiInjected) {
+        if (!walletApiInjected) {
             throw new Error("Problem connecting to wallet");
         }
         this._walletApi = await walletInjector.getContext();
-        if(!this._walletApi) {
+        if (!this._walletApi) {
             throw new Error("Wallet API not available");
         }
     }
