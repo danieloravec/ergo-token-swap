@@ -1,10 +1,20 @@
 import { useWalletConnect, useWalletStore} from "@components/Wallet/hooks";
+import {useEffect, useState} from "react";
+import {Wallet} from "@ergo/wallet";
 
 export function ConnectWalletButton() {
-    const { wallet, address } = useWalletStore();
+    // const { wallet, address } = useWalletStore();
+    const [displayAddress, setDisplayAddress] = useState<string | undefined>(undefined);
+    const [connectedWallet, setConnectedWallet] = useState<Wallet | undefined>(undefined);
+    const {wallet, address} = useWalletStore();
     const { connect, disconnect } = useWalletConnect();
 
-    return wallet === undefined ? (
+    useEffect(() => {
+        setDisplayAddress(address);
+        setConnectedWallet(wallet);
+    });
+
+    return connectedWallet === undefined ? (
         <div>
             <button onClick={connect}>
                 Connect wallet
@@ -13,7 +23,7 @@ export function ConnectWalletButton() {
         ) : (
         <div>
             <button onClick={disconnect}>
-                {address}
+                {displayAddress}
             </button>
         </div>
     );
