@@ -16,7 +16,8 @@
     "incremental": true,
     "paths": {
       "@ergo/*": ["ergo/*"],
-      "@components/*": ["components/*"]
+      "@components/*": ["components/*"],
+      "@config": ["config.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

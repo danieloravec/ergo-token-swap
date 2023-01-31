@@ -1,9 +1,10 @@
 import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
 import { type Box, type Amount } from '@fleet-sdk/core';
 import { type Wallet } from '@ergo/wallet';
+import { config } from '@config';
 
 export async function explorerRequest(endpoint: string): Promise<any> {
-  const res = await fetch(`https://api.ergoplatform.com/api/v0${endpoint}`);
+  const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
   return await res.json();
 }
 
