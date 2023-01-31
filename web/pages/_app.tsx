@@ -1,16 +1,15 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import {useWalletConnect} from "@components/Wallet/hooks";
-import {useEffect} from "react";
+import '../styles/globals.css';
+import type { AppProps } from 'next/app';
+import { useWalletConnect } from '@components/Wallet/hooks';
+import { useEffect } from 'react';
 
-export default function App({ Component, pageProps }: AppProps) {
-  const {reconnect} = useWalletConnect();
+export default function App({ Component, pageProps }: AppProps): JSX.Element {
+  const { reconnect } = useWalletConnect();
   useEffect(() => {
-    const load = async () => {
-        await reconnect();
+    const load = async (): Promise<void> => {
+      await reconnect();
     };
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void load();
   }, []);
-  return <Component {...pageProps} />
+  return <Component {...pageProps} />;
 }
