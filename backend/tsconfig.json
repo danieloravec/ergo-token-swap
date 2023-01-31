@@ -9,10 +9,15 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
+      "@config": ["./src/config.ts"],
+      "@db/*": ["./src/db/*"],
+      "@api/*": ["./src/api/*"],
       "*": [
         "node_modules/*"
       ]
-    }
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src/**/*"
