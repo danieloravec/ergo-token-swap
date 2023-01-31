@@ -60,6 +60,7 @@ Session.init({
     },
 }, {
     timestamps: true,
+    underscored: true,
     sequelize: sequelizeConnection,
 })
 

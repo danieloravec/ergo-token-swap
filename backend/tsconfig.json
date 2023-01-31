@@ -9,9 +9,9 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@config": ["./src/config.ts"],
-      "@db/*": ["./src/db/*"],
-      "@api/*": ["./src/api/*"],
+      "@config": ["src/config.ts"],
+      "@db/*": ["src/db/*"],
+      "@api/*": ["src/api/*"],
       "*": [
         "node_modules/*"
       ]
@@ -20,6 +20,7 @@
     "emitDecoratorMetadata": true
   },
   "include": [
+    "src/*",
     "src/**/*"
   ]
 }

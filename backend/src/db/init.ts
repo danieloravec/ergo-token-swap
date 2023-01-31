@@ -1,4 +1,4 @@
-import Session from '@db/models/Session';
+import Session from '@db/models/session';
 
 const dbInit = () => {
     Session.sync();

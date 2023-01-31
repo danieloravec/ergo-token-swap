@@ -8,7 +8,6 @@ interface ConfigType {
     dbName: string;
     dbUser: string;
     dbHost: string;
-    dbDialect: string;
     dbPassword: string;
 }
 export const config: ConfigType = {
@@ -17,6 +16,5 @@ export const config: ConfigType = {
     dbName: process.env.DB_NAME as string,
     dbUser: process.env.DB_USER as string,
     dbHost: process.env.DB_HOST as string,
-    dbDialect: process.env.DB_DRIVER as string,
     dbPassword: process.env.DB_PASSWORD as string,
 };
