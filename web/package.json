@@ -11,7 +11,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "cd web && yarn lint-staged --allow-empty"
     }
   },
   "lint-staged": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "@fleet-sdk/core": "^0.1.0-alpha.19",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "fs": "^0.0.1-security",
     "install": "^0.13.0",
     "next": "13.0.0",
     "npm": "^8.19.2",

@@ -1,5 +1,9 @@
-import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
-import { type Box, type Amount } from '@fleet-sdk/core';
+import {
+  OutputBuilder,
+  TransactionBuilder,
+  type Box,
+  type Amount,
+} from '@fleet-sdk/core';
 import { type Wallet } from '@ergo/wallet';
 import { config } from '@config';
 

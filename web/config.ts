@@ -3,5 +3,5 @@ interface ConfigType {
 }
 
 export const config: ConfigType = {
-  blockchainApiUrl: process.env.BLOCKCHAIN_API_URL ?? '',
+  blockchainApiUrl: process.env.NEXT_PUBLIC_BLOCKCHAIN_API_URL as string,
 };
