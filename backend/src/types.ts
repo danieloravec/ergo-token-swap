@@ -16,3 +16,10 @@ export const SessionCreateBodySchema: Schema = {
         creatorAddr: 'string',
     },
 };
+
+export const SessionEnterBodySchema: Schema = {
+    fields: {
+        secret: 'string',
+        guestAddr: 'string',
+    },
+};

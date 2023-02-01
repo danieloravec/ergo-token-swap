@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional } from 'sequelize'
+import {DataTypes, Model, Optional} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
 interface SessionAttributes {
@@ -12,8 +12,12 @@ interface SessionAttributes {
     txId?: string;
     submittedAt?: Date;
 }
-export interface SessionInput extends Optional<SessionAttributes, 'id'> {}
-export interface SessionOuput extends Required<SessionAttributes> {}
+
+export interface SessionInput extends Optional<SessionAttributes, 'id'> {
+}
+
+export interface SessionOuput extends Required<SessionAttributes> {
+}
 
 class Session extends Model<SessionAttributes, SessionInput> implements SessionAttributes {
     public id!: number
@@ -45,21 +49,29 @@ Session.init({
         allowNull: false,
     },
     txPartial: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
     },
     txPartialAddedOn: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+    },
+    guestAddr: {
+        type: DataTypes.STRING,
     },
     txId: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
     },
     submittedAt: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
     },
 }, {
     timestamps: true,
     underscored: true,
     sequelize: sequelizeConnection,
+    indexes: [
+        {
+            fields: ['secret'],
+        },
+    ],
 })
 
 export default Session;
