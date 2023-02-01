@@ -10,6 +10,7 @@ interface ConfigType {
     dbUser: string;
     dbHost: string;
     dbPassword: string;
+    debug: boolean;
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
@@ -19,4 +20,5 @@ export const config: ConfigType = {
     dbUser: process.env.DB_USER as string,
     dbHost: process.env.DB_HOST as string,
     dbPassword: process.env.DB_PASSWORD as string,
+    debug: process.env.DEBUG === 'true',
 };
