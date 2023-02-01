@@ -3,7 +3,6 @@ import {
   type UnsignedTransaction,
   type SignedTransaction,
 } from '@fleet-sdk/common/src/types';
-import { config } from '@config';
 
 interface WalletAuthApi {
   connect: () => Promise<boolean>;
@@ -12,19 +11,28 @@ interface WalletAuthApi {
   getContext: () => Promise<WalletApi | undefined>;
 }
 
+export type SupportedWalletName = 'nautilus' | 'safew';
+
 export class Wallet {
   _walletApi?: WalletApi;
+  _walletName?: SupportedWalletName;
+
+  constructor(walletName: SupportedWalletName) {
+    this._walletName = walletName;
+  }
 
   async init(): Promise<void> {
-    console.log('VVV'); // TODO remove
-    console.log(config); // TODO remove
     if (this._walletApi !== undefined) {
       return;
     }
 
     const walletInjector =
       typeof window !== 'undefined'
-        ? (window.ergoConnector?.nautilus as WalletAuthApi)
+        ? this._walletName === 'nautilus'
+          ? (window.ergoConnector?.nautilus as WalletAuthApi)
+          : this._walletName === 'safew'
+          ? (window.ergoConnector?.safew as WalletAuthApi)
+          : undefined
         : undefined;
 
     if (walletInjector === undefined) {
