@@ -3,6 +3,7 @@ import {randomBytes} from 'crypto';
 import {config} from '@config';
 import Session from '@db/models/session';
 import * as utils from '@utils';
+import * as types from '@types';
 import {ErgoAddress} from '@fleet-sdk/core';
 
 const app = express();
@@ -13,7 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/session/create', async (req, res) => {
-    const bodyIsValid = await utils.validateObject(req.body, utils.SessionCreateBodySchema);
+    const bodyIsValid = await utils.validateObject(req.body, types.SessionCreateBodySchema);
     if(!bodyIsValid) {
         res.status(400);
         res.send('Invalid body');
