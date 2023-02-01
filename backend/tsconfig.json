@@ -10,6 +10,7 @@
     "baseUrl": ".",
     "paths": {
       "@config": ["src/config.ts"],
+      "@utils": ["src/utils.ts"],
       "@db/*": ["src/db/*"],
       "@api/*": ["src/api/*"],
       "*": [
