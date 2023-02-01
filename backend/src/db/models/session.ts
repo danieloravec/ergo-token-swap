@@ -70,6 +70,7 @@ Session.init({
     indexes: [
         {
             fields: ['secret'],
+            unique: true,
         },
     ],
 })
