@@ -1,0 +1,10 @@
+Session
+    - id (surrogate key, sequential)
+    - secret (randomized secret, likely unique)
+    - created_at
+    - creator_addr
+    - guest_addr
+    - tx_partial
+    - tx_partial_added_on
+    - tx_id
+    - submitted_at
