@@ -17,14 +17,12 @@ export interface SessionOuput extends Required<SessionAttributes> {}
 
 class Session extends Model<SessionAttributes, SessionInput> implements SessionAttributes {
     public id!: number
-    creatorAddr: string;
+    creatorAddr!: string;
     guestAddr: string;
-    secret: string;
+    secret!: string;
     submittedAt: Date;
     txId: string;
     txPartial: string;
-
-    // timestamps!
     public readonly createdAt!: Date;
     txPartialAddedOn: string;
 }

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 interface ConfigType {
+    blockchainApiUrl: string;
     backendPort: string;
     dbPort: string;
     dbName: string;
@@ -11,6 +12,7 @@ interface ConfigType {
     dbPassword: string;
 }
 export const config: ConfigType = {
+    blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
     backendPort: process.env.BACKEND_PORT as string,
     dbPort: process.env.DB_PORT as string,
     dbName: process.env.DB_NAME as string,
