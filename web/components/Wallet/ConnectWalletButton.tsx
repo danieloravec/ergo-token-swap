@@ -1,6 +1,7 @@
 import { useWalletConnect, useWalletStore } from '@components/Wallet/hooks';
 import { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
+import { buildTxWasmExample } from '@ergo/transactions';
 
 export function ConnectWalletButton(): JSX.Element {
   const [displayAddress, setDisplayAddress] = useState<string | undefined>(
@@ -10,7 +11,7 @@ export function ConnectWalletButton(): JSX.Element {
     undefined
   );
   const { wallet, address } = useWalletStore();
-  const { connect, disconnect } = useWalletConnect();
+  const { connect } = useWalletConnect();
 
   const shortenString = (str: string, maxLength: number): string => {
     if (str.length <= maxLength) {
@@ -35,7 +36,6 @@ export function ConnectWalletButton(): JSX.Element {
     <div>
       <button
         onClick={() => {
-          console.log('here');
           void (async () => {
             await connect('nautilus'); // TODO take this from user input
           })();
@@ -46,7 +46,15 @@ export function ConnectWalletButton(): JSX.Element {
     </div>
   ) : (
     <div>
-      <button onClick={disconnect}>{displayAddress}</button>
+      <button
+        onClick={() => {
+          void (async () => {
+            await buildTxWasmExample(wallet as Wallet);
+          })();
+        }}
+      >
+        {displayAddress}
+      </button>
     </div>
   );
 }

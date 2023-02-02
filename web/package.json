@@ -19,14 +19,20 @@
     "*.{js,jsx,ts,tsx,css,scss,md}": "prettier --write --ignore-unknown"
   },
   "dependencies": {
+    "@craco/craco": "^7.0.0",
     "@fleet-sdk/core": "^0.1.0-alpha.19",
+    "ergo-lib-wasm-browser": "^0.22.0",
+    "ergo-lib-wasm-nodejs": "^0.22.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "fs": "^0.0.1-security",
+    "html-webpack-plugin": "^5.5.0",
     "install": "^0.13.0",
     "next": "13.0.0",
     "npm": "^8.19.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "text-encoder": "^0.0.4",
+    "text-encoding": "^0.7.0",
     "zustand": "^4.3.2"
   },
   "devDependencies": {
