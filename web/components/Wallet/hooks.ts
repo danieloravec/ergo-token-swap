@@ -1,46 +1,66 @@
-import {create} from 'zustand'
-import {persist} from 'zustand/middleware'
-import {Wallet} from "@ergo/wallet";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { type SupportedWalletName, Wallet } from '@ergo/wallet';
 
-export const useWalletStore = create<{wallet?: Wallet, address?: string, setWallet: (w?: Wallet) => void, setAddress: (addr?: string) => void}>()(
-    persist(
-        (set, get) => ({
-            wallet: undefined,
-            address: undefined,
-            setWallet: (w?: Wallet) => set({wallet: w}),
-            setAddress: (addr?: string) => set({address: addr})
-        }),
-        {
-            name: 'wallet-storage',
-        }
-    )
+export const useWalletStore = create<{
+  walletName?: SupportedWalletName;
+  wallet?: Wallet;
+  address?: string;
+  setWalletName: (wn?: SupportedWalletName) => void;
+  setWallet: (w?: Wallet) => void;
+  setAddress: (addr?: string) => void;
+}>()(
+  persist(
+    (set, get) => ({
+      walletName: undefined,
+      wallet: undefined,
+      address: undefined,
+      setWalletName: (wn?: SupportedWalletName) => {
+        set({ walletName: wn });
+      },
+      setWallet: (w?: Wallet) => {
+        set({ wallet: w });
+      },
+      setAddress: (addr?: string) => {
+        set({ address: addr });
+      },
+    }),
+    {
+      name: 'wallet-storage',
+    }
+  )
 );
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useWalletConnect = () => {
-    const {wallet, setWallet, setAddress} = useWalletStore();
+  const { walletName, setWalletName, setWallet, setAddress } = useWalletStore();
 
-    const connect = async () => {
-        try {
-            const newWallet = new Wallet();
-            await newWallet.init();
-            const address = await newWallet.getAddress();
-            setWallet(newWallet);
-            setAddress(address);
-        } catch (err) {
-            console.log("User denied wallet connection");
-            disconnect();
-        }
-    };
-
-    const disconnect = () => {
-        setWallet(undefined);
-        setAddress(undefined);
+  const connect = async (walletName: SupportedWalletName): Promise<void> => {
+    try {
+      const newWallet = new Wallet(walletName);
+      await newWallet.init();
+      const address = await newWallet.getAddress();
+      setWalletName(walletName);
+      setWallet(newWallet);
+      setAddress(address);
+    } catch (err) {
+      console.log('User denied wallet connection');
+      disconnect();
     }
+  };
 
-    const reconnect = async () => {
-        disconnect();
-        await connect();
+  const disconnect = (): void => {
+    setWalletName(undefined);
+    setWallet(undefined);
+    setAddress(undefined);
+  };
+
+  const reconnect = async (): Promise<void> => {
+    if (walletName !== undefined) {
+      disconnect();
+      await connect(walletName);
     }
+  };
 
-    return {connect, disconnect, reconnect};
-}
+  return { connect, disconnect, reconnect };
+};
