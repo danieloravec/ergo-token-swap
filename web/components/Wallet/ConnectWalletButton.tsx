@@ -1,6 +1,7 @@
 import { useWalletConnect, useWalletStore } from '@components/Wallet/hooks';
 import { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
+import { Button } from '@components/Button';
 
 export function ConnectWalletButton(): JSX.Element {
   const [displayAddress, setDisplayAddress] = useState<string | undefined>(
@@ -32,21 +33,16 @@ export function ConnectWalletButton(): JSX.Element {
   }, [address, wallet]);
 
   return connectedWallet === undefined ? (
-    <div>
-      <button
-        onClick={() => {
-          console.log('here');
-          void (async () => {
-            await connect('nautilus'); // TODO take this from user input
-          })();
-        }}
-      >
-        Connect wallet
-      </button>
-    </div>
+    <Button
+      onClick={() => {
+        void (async () => {
+          await connect('nautilus'); // TODO take this from user input
+        })();
+      }}
+    >
+      Connect wallet
+    </Button>
   ) : (
-    <div>
-      <button onClick={disconnect}>{displayAddress}</button>
-    </div>
+    <Button onClick={disconnect}>{displayAddress}</Button>
   );
 }

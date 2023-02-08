@@ -17,7 +17,8 @@
     "paths": {
       "@ergo/*": ["ergo/*"],
       "@components/*": ["components/*"],
-      "@config": ["config.ts"]
+      "@config": ["config.ts"],
+      "@themes/*": ["themes/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
