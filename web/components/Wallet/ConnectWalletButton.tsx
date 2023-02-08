@@ -35,7 +35,6 @@ export function ConnectWalletButton(): JSX.Element {
   return connectedWallet === undefined ? (
     <Button
       onClick={() => {
-        console.log('here');
         void (async () => {
           await connect('nautilus'); // TODO take this from user input
         })();

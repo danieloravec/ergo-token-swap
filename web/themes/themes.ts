@@ -1,4 +1,4 @@
-export type SupportedThemeName = 'light';
+export type SupportedThemeName = 'light' | 'dark';
 
 export interface Theme {
   name: SupportedThemeName;
@@ -20,6 +20,17 @@ export const LightTheme: Theme = {
   },
 };
 
+export const DarkTheme: Theme = {
+  name: 'dark',
+  properties: {
+    colorBg: '#222831', // dark gray
+    colorNavs: '#000000', // beige
+    colorPrimary: '#038cbd', // light blue
+    colorSecondary: '#c08146', // orange
+  },
+};
+
 export const themes: { [key in SupportedThemeName]: Theme } = {
   light: LightTheme,
+  dark: DarkTheme,
 };

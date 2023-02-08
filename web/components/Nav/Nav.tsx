@@ -2,21 +2,15 @@ import { Logo } from '@components/Logo';
 import { NavLinkSpaced } from '@components/Nav/NavLinkSpaced';
 import { ConnectWalletButton } from '@components/Wallet/ConnectWalletButton';
 import styled from 'styled-components';
-import { useThemeStore } from '@components/hooks';
-import { type Theme } from '@themes/themes';
 import { Spacer } from '@components/Spacer';
 import { spacing } from '@themes/spacing';
 
-interface NavContainerProps {
-  theme: Theme;
-}
-
-const NavContainer = styled.div<NavContainerProps>`
+const NavContainer = styled.div`
   display: block;
   position: relative;
   width: 100%;
   height: 82px;
-  background: ${(props: NavContainerProps) => props.theme.properties.colorNavs};
+  background: ${(props) => props.theme.properties.colorNavs};
   align-content: center;
 `;
 
@@ -28,9 +22,8 @@ const NavSubcontainer = styled.div`
 `;
 
 export function Nav(): JSX.Element {
-  const { theme } = useThemeStore();
   return (
-    <NavContainer theme={theme}>
+    <NavContainer>
       <Spacer size={spacing.spacing_xs} vertical />
       <NavSubcontainer float="left">
         <Spacer size={spacing.spacing_xs} vertical={false} />
