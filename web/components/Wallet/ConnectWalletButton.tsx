@@ -33,21 +33,17 @@ export function ConnectWalletButton(): JSX.Element {
   }, [address, wallet]);
 
   return connectedWallet === undefined ? (
-    <div>
-      <Button
-        onClick={() => {
-          console.log('here');
-          void (async () => {
-            await connect('nautilus'); // TODO take this from user input
-          })();
-        }}
-      >
-        Connect wallet
-      </Button>
-    </div>
+    <Button
+      onClick={() => {
+        console.log('here');
+        void (async () => {
+          await connect('nautilus'); // TODO take this from user input
+        })();
+      }}
+    >
+      Connect wallet
+    </Button>
   ) : (
-    <div>
-      <Button onClick={disconnect}>{displayAddress}</Button>
-    </div>
+    <Button onClick={disconnect}>{displayAddress}</Button>
   );
 }

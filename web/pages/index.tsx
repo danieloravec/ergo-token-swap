@@ -1,9 +1,9 @@
-import { ConnectWalletButton } from '@components/Wallet/ConnectWalletButton';
+import { Nav } from '@components/Nav/Nav';
 
 export default function Home(): JSX.Element {
   return (
     <div>
-      <ConnectWalletButton />
+      <Nav />
     </div>
   );
 }
