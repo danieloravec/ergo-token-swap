@@ -48,7 +48,6 @@ app.post('/session/enter', async (req, res) => {
         return;
     }
     const body: {secret: string, guestAddr: string} = req.body;
-    console.log(`BODY: ${JSON.stringify(body)}`);
     if(!ErgoAddress.validate(body!.guestAddr)) {
         res.status(400);
         res.send("Invalid guestAddr");
@@ -88,6 +87,36 @@ app.post('/session/enter', async (req, res) => {
     const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
     res.status(200);
     res.send({assets, nanoErg: String(nanoErg)});
+});
+
+app.get('/session/whoami', async (req, res) => {
+    if(req.query.secret === undefined || req.query.address === undefined) {
+        res.status(400);
+        res.send("Missing secret or address");
+        return;
+    }
+    const secret = req.query.secret as string;
+    const address = req.query.address as string;
+    if(!ErgoAddress.validate(address)) {
+        res.status(400);
+        res.send("Invalid address provided");
+        return;
+    }
+    const session = await Session.findOne({
+        where: {
+            secret
+        }
+    });
+    let whoami = "nobody";
+    if(session) {
+        if(session.creatorAddr === address) {
+            whoami = "creator";
+        } else if(session.guestAddr === address) {
+            whoami = "guest";
+        }
+    }
+    res.status(200);
+    res.send({whoami});
 });
 
 app.listen(config.backendPort, () => {
