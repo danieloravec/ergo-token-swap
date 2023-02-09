@@ -6,16 +6,18 @@ import * as utils from '@utils';
 import * as types from '@types';
 import {ErgoAddress} from '@fleet-sdk/core';
 import sequelizeConnection from "@db/config";
+import cors from 'cors';
 
 const app = express();
+
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send("Ergo token swap API /");
 });
 
 app.post('/session/create', async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     const bodyIsValid = await utils.validateObject(req.body, types.SessionCreateBodySchema);
     if(!bodyIsValid) {
         res.status(400);
@@ -42,7 +44,6 @@ app.post('/session/create', async (req, res) => {
 });
 
 app.post('/session/enter', async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     const bodyIsValid = await utils.validateObject(req.body, types.SessionEnterBodySchema);
     if(!bodyIsValid) {
         res.status(400);
@@ -92,7 +93,6 @@ app.post('/session/enter', async (req, res) => {
 });
 
 app.get('/session/whoami', async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     if(req.query.secret === undefined || req.query.address === undefined) {
         res.status(400);
         res.send("Missing secret or address");
@@ -110,7 +110,7 @@ app.get('/session/whoami', async (req, res) => {
             secret
         }
     });
-    let whoami = undefined;
+    let whoami;
     if(session) {
         if(session.creatorAddr === address) {
             whoami = "creator";

@@ -16,5 +16,14 @@ export const backendRequest = async (
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
-  return await response.json();
+  if (response.status !== 200) {
+    return {
+      status: response.status,
+      body: await response.text(),
+    };
+  }
+  return {
+    status: response.status,
+    body: await response.json(),
+  };
 };
