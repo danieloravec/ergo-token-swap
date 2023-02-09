@@ -1,7 +1,11 @@
 interface ConfigType {
-  blockchainApiUrl: string;
+  explorerApiUrl: string;
+  nodeApiUrl: string;
+  backendUrl: string;
 }
 
 export const config: ConfigType = {
-  blockchainApiUrl: process.env.NEXT_PUBLIC_BLOCKCHAIN_API_URL as string,
+  explorerApiUrl: process.env.NEXT_PUBLIC_BLOCKCHAIN_API_URL as string,
+  nodeApiUrl: process.env.NEXT_PUBLIC_NODE_API_URL as string,
+  backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL as string,
 };

@@ -18,7 +18,8 @@
       "@ergo/*": ["ergo/*"],
       "@components/*": ["components/*"],
       "@config": ["config.ts"],
-      "@themes/*": ["themes/*"]
+      "@themes/*": ["themes/*"],
+      "@utils/*": ["utils/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

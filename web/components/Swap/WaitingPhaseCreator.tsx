@@ -1,4 +1,4 @@
-import styled, { useTheme, ThemeProvider } from 'styled-components';
+import { useTheme, ThemeProvider } from 'styled-components';
 import {
   Heading1,
   Heading3,
@@ -10,16 +10,8 @@ import React from 'react';
 import {
   CenteredDivHorizontal,
   CenteredDivVertical,
+  MainSectionDiv,
 } from '@components/Common/Alignment';
-
-const WaitingPhaseCreatorContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  height: 80vh;
-  flex-direction: column;
-  align-content: center;
-  background: ${(props) => props.theme.properties.colorBg};
-`;
 
 export function WaitingPhaseCreator(props: {
   tradingSessionId: string;
@@ -27,7 +19,7 @@ export function WaitingPhaseCreator(props: {
   const theme = useTheme();
   return (
     <ThemeProvider theme={theme}>
-      <WaitingPhaseCreatorContainer>
+      <MainSectionDiv>
         <CenteredDivVertical>
           <CenteredDivHorizontal>
             <Heading1>Welcome to your trading room!</Heading1>
@@ -53,7 +45,7 @@ export function WaitingPhaseCreator(props: {
             />
           </CenteredDivHorizontal>
         </CenteredDivVertical>
-      </WaitingPhaseCreatorContainer>
+      </MainSectionDiv>
     </ThemeProvider>
   );
 }

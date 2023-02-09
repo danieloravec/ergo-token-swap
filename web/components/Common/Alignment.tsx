@@ -25,3 +25,12 @@ export const FlexDiv = styled.div`
   flex-wrap: wrap;
   flex-direction: row;
 `;
+
+export const MainSectionDiv = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  height: 80vh;
+  flex-direction: column;
+  align-content: center;
+  background: ${(props) => props.theme.properties.colorBg};
+`;
