@@ -23,3 +23,7 @@ export const TextSecondaryWrapper = styled.span`
 export const Paragraph = styled.p`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
+
+export const OrderedList = styled.ol`
+  color: ${(props) => props.theme.properties.colorBgText};
+`;

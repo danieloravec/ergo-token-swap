@@ -5,6 +5,7 @@ import React from 'react';
 import { Footer } from '@components/Footer/Footer';
 import { WaitingPhaseCreator } from '@components/Swap/WaitingPhaseCreator';
 import { useRouter } from 'next/router';
+// import {WaitingPhaseGuest} from "@components/Swap/WaitingPhaseGuest";
 
 export default function Home(): JSX.Element {
   const { theme } = useThemeStore();

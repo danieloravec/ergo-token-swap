@@ -19,3 +19,9 @@ export const CenteredDivVertical = styled.div`
   align-content: center;
   justify-content: center;
 `;
+
+export const FlexDiv = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+`;
