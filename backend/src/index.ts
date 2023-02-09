@@ -107,7 +107,7 @@ app.get('/session/whoami', async (req, res) => {
             secret
         }
     });
-    let whoami = "nobody";
+    let whoami = undefined;
     if(session) {
         if(session.creatorAddr === address) {
             whoami = "creator";
