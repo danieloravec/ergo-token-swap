@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/session/create', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const bodyIsValid = await utils.validateObject(req.body, types.SessionCreateBodySchema);
     if(!bodyIsValid) {
         res.status(400);
@@ -41,6 +42,7 @@ app.post('/session/create', async (req, res) => {
 });
 
 app.post('/session/enter', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const bodyIsValid = await utils.validateObject(req.body, types.SessionEnterBodySchema);
     if(!bodyIsValid) {
         res.status(400);
@@ -90,6 +92,7 @@ app.post('/session/enter', async (req, res) => {
 });
 
 app.get('/session/whoami', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if(req.query.secret === undefined || req.query.address === undefined) {
         res.status(400);
         res.send("Missing secret or address");
