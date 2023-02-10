@@ -7,6 +7,8 @@ export interface Theme {
     colorNavs: string;
     colorPrimary: string;
     colorSecondary: string;
+    colorBgText: string;
+    colorNavsText: string;
   };
 }
 
@@ -17,6 +19,8 @@ export const LightTheme: Theme = {
     colorNavs: '#222831', // dark gray
     colorPrimary: '#038cbd', // light blue
     colorSecondary: '#c08146', // orange
+    colorBgText: '#222831',
+    colorNavsText: '#e4dede',
   },
 };
 
@@ -27,6 +31,8 @@ export const DarkTheme: Theme = {
     colorNavs: '#000000', // beige
     colorPrimary: '#038cbd', // light blue
     colorSecondary: '#c08146', // orange
+    colorBgText: '#e4dede',
+    colorNavsText: '#222831',
   },
 };
 

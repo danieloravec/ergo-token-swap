@@ -8,7 +8,7 @@ import { type Wallet } from '@ergo/wallet';
 import { config } from '@config';
 
 export async function explorerRequest(endpoint: string): Promise<any> {
-  const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
+  const res = await fetch(`${config.explorerApiUrl}${endpoint}`);
   return await res.json();
 }
 

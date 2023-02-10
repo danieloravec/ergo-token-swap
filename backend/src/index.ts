@@ -6,9 +6,12 @@ import * as utils from '@utils';
 import * as types from '@types';
 import {ErgoAddress} from '@fleet-sdk/core';
 import sequelizeConnection from "@db/config";
+import cors from 'cors';
 
 const app = express();
+
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send("Ergo token swap API /");
@@ -107,7 +110,7 @@ app.get('/session/whoami', async (req, res) => {
             secret
         }
     });
-    let whoami = undefined;
+    let whoami;
     if(session) {
         if(session.creatorAddr === address) {
             whoami = "creator";
