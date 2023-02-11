@@ -9,7 +9,7 @@ import { useWalletStore } from '@components/Wallet/hooks';
 import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected';
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
-import NoSsr from '@components/NoSsr';
+import NoSsr from '@components/Common/NoSsr';
 
 export default function Swap(): JSX.Element {
   const creatorRepr = 'creator';

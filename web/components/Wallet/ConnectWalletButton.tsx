@@ -1,7 +1,7 @@
 import { useWalletConnect, useWalletStore } from '@components/Wallet/hooks';
 import { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
-import { Button } from '@components/Button';
+import { Button } from '@components/Common/Button';
 
 export function ConnectWalletButton(): JSX.Element {
   const [displayAddress, setDisplayAddress] = useState<string | undefined>(

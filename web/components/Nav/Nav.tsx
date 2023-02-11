@@ -1,8 +1,8 @@
-import { Logo } from '@components/Logo';
+import { Logo } from '@components/Common/Logo';
 import { NavLinkSpaced } from '@components/Nav/NavLinkSpaced';
 import { ConnectWalletButton } from '@components/Wallet/ConnectWalletButton';
 import styled from 'styled-components';
-import { Spacer } from '@components/Spacer';
+import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 
 const NavContainer = styled.div`

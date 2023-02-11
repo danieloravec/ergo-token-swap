@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Spacer } from '@components/Spacer';
+import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import React from 'react';
 
