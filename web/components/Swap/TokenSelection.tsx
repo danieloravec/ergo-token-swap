@@ -1,11 +1,14 @@
 import styled, { ThemeProvider, useTheme } from 'styled-components';
-import { ParagraphNavs } from '@components/Common/Text';
-import { type ReactNode } from 'react';
-import { CenteredDivHorizontal } from '@components/Common/Alignment';
+import { Paragraph, ParagraphNavs, Strong } from '@components/Common/Text';
+import { type ReactNode, useState } from 'react';
+import {
+  CenteredDiv,
+  CenteredDivHorizontal,
+  Div,
+} from '@components/Common/Alignment';
 import Image from 'next/image';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
-import { config } from '@config';
 
 export interface Nft {
   imageUrl: string;
@@ -35,22 +38,59 @@ const TokenSelectionHeading = styled(CenteredDivHorizontal)`
   display: flex;
 `;
 
-function NftDisplay(props: { nft: Nft }): JSX.Element {
+const ImageSelectedOverlay = styled(CenteredDiv)`
+  backdrop-filter: blur(4px) grayscale(100%) brightness(0.4);
+  //backdrop-filter: grayscale(100%);
+  width: 180px;
+  height: 184px;
+  margin-top: -184px;
+`;
+
+const StrongSecondary = styled(Strong)`
+  color: ${(props) => props.theme.properties.colorNavsText};
+`;
+
+function NftDisplay(props: {
+  nft: Nft;
+  isSelected: boolean;
+  onClick: (tokenId: string) => void;
+}): JSX.Element {
   const theme = useTheme();
+  const Img = (
+    <Image
+      src={props.nft.imageUrl}
+      alt={props.nft.name}
+      width={180}
+      height={180}
+      onClick={() => {
+        props.onClick(props.nft.tokenId);
+      }}
+    />
+  );
   return (
-    <a href={`${config.explorerFrontendUrl}/en/token/${props.nft.tokenId}`}>
+    <div>
       <ThemeProvider theme={theme}>
-        <Image
-          src={props.nft.imageUrl}
-          alt={props.nft.name}
-          width={180}
-          height={180}
-        />
+        {props.isSelected ? (
+          <Div>
+            {Img}
+            <ImageSelectedOverlay
+              onClick={() => {
+                props.onClick(props.nft.tokenId);
+              }}
+            >
+              <Paragraph>
+                <StrongSecondary>DESELECT</StrongSecondary>
+              </Paragraph>
+            </ImageSelectedOverlay>
+          </Div>
+        ) : (
+          <Div>{Img}</Div>
+        )}
         <ParagraphNavs style={{ marginBottom: spacing.spacing_xl }}>
           {props.nft.name}
         </ParagraphNavs>
       </ThemeProvider>
-    </a>
+    </div>
   );
 }
 
@@ -59,6 +99,14 @@ export function TokenSelection(props: {
   nfts: Nft[];
 }): JSX.Element {
   const theme = useTheme();
+  const [selectedNftIds, setSelectedNftIds] = useState<string[]>([]); // We probably don't need a Set here
+  const toggleNftSelected = (tokenId: string): void => {
+    if (selectedNftIds.includes(tokenId)) {
+      setSelectedNftIds(selectedNftIds.filter((id) => id !== tokenId));
+    } else {
+      setSelectedNftIds([...selectedNftIds, tokenId]);
+    }
+  };
   return (
     <ThemeProvider theme={theme}>
       <TokenSelectionHeading>
@@ -67,7 +115,12 @@ export function TokenSelection(props: {
       <Spacer size={spacing.spacing_xxxl} vertical={false} />
       <TokenSelectionBody>
         {props.nfts.map((nft) => (
-          <NftDisplay nft={nft} />
+          <NftDisplay
+            nft={nft}
+            key={nft.tokenId}
+            onClick={toggleNftSelected}
+            isSelected={selectedNftIds.includes(nft.tokenId)}
+          />
         ))}
       </TokenSelectionBody>
     </ThemeProvider>

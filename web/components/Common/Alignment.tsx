@@ -8,7 +8,6 @@ export const CenteredDivHorizontal = styled.div`
   width: 100%;
   align-items: center;
   align-content: center;
-  //justify-content: center;
 `;
 
 export const CenteredDivVertical = styled.div`
@@ -19,7 +18,10 @@ export const CenteredDivVertical = styled.div`
   height: 100%;
   align-items: center;
   align-content: center;
-  //justify-content: center;
+`;
+
+export const CenteredDiv = styled(CenteredDivHorizontal)`
+  justify-content: center;
 `;
 
 export const FlexDiv = styled.div`
@@ -36,3 +38,5 @@ export const MainSectionDiv = styled.div`
   align-content: center;
   background: ${(props) => props.theme.properties.colorBg};
 `;
+
+export const Div = styled.div``;

@@ -13,81 +13,70 @@ export default function Home(): JSX.Element {
   const { theme } = useThemeStore();
   const mockedNfts: Nft[] = [
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
         'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb404',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb405',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb406',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb407',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb408',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb409',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb410',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb411',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb412',
     },
     {
-      imageUrl:
-        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      imageUrl: 'https://www.ergnomes.io/assets/images/home/thornyhero.webP',
       name: 'Mocked NFT #0001',
       tokenId:
-        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb413',
     },
   ];
   return (

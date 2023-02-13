@@ -22,7 +22,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.pngtree.com', // TODO change
+        hostname: 'www.ergnomes.io', // TODO change
       },
     ],
   },

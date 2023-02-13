@@ -31,3 +31,5 @@ export const ParagraphNavs = styled.p`
 export const OrderedList = styled.ol`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
+
+export const Strong = styled.strong``;
