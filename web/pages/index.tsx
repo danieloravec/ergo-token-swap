@@ -11,6 +11,85 @@ import beastImage from '@public/token-swap-beast.png';
 
 export default function Home(): JSX.Element {
   const { theme } = useThemeStore();
+  const mockedNfts: Nft[] = [
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+    {
+      imageUrl:
+        'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg',
+      name: 'Mocked NFT #0001',
+      tokenId:
+        'b6bde800cf80f1201d22d938ded5a7c47ec389427f49b20e0099b75cfb5cb403',
+    },
+  ];
   return (
     <ThemeProvider theme={theme}>
       <Nav />

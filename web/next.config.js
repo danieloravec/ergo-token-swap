@@ -18,6 +18,14 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.pngtree.com', // TODO change
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

@@ -24,6 +24,10 @@ export const Paragraph = styled.p`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
 
+export const ParagraphNavs = styled.p`
+  color: ${(props) => props.theme.properties.colorNavsText};
+`;
+
 export const OrderedList = styled.ol`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
