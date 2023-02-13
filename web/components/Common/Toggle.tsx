@@ -1,21 +1,16 @@
 import { useState } from 'react';
 import { TextSecondaryWrapper } from '@components/Common/Text';
 import styled, { ThemeProvider, useTheme } from 'styled-components';
-import { CenteredDivHorizontal } from '@components/Common/Alignment';
+import { CenteredDiv, FlexDiv } from '@components/Common/Alignment';
 
-const ToggleHalf = styled(CenteredDivHorizontal)<{ side: string }>`
+const ToggleHalf = styled(CenteredDiv)<{ side: string }>`
   border-radius: ${(props) =>
     props.side === 'left' ? '30px 0 0 30px' : '0 30px 30px 0'};
   background: ${(props) => props.theme.properties.colorNavs};
-  display: flex;
   align-content: center;
   width: 80px;
   height: 30px;
   margin: 1px;
-`;
-
-const ToggleContainer = styled.div`
-  display: flex;
 `;
 
 export function Toggle(props: {
@@ -40,7 +35,7 @@ export function Toggle(props: {
   };
   return (
     <ThemeProvider theme={theme}>
-      <ToggleContainer>
+      <FlexDiv style={{ alignContent: 'center' }}>
         <ToggleHalf
           side="left"
           onClick={() => {
@@ -65,7 +60,7 @@ export function Toggle(props: {
             <TextSecondaryWrapper>{props.rightOption}</TextSecondaryWrapper>
           )}
         </ToggleHalf>
-      </ToggleContainer>
+      </FlexDiv>
     </ThemeProvider>
   );
 }

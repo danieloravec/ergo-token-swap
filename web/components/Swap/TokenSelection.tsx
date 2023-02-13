@@ -1,14 +1,16 @@
 import styled, { ThemeProvider, useTheme } from 'styled-components';
-import { Paragraph, ParagraphNavs, Strong } from '@components/Common/Text';
-import { type ReactNode, useState } from 'react';
 import {
-  CenteredDiv,
-  CenteredDivHorizontal,
-  Div,
-} from '@components/Common/Alignment';
+  Heading3,
+  Paragraph,
+  ParagraphNavs,
+  Strong,
+} from '@components/Common/Text';
+import { type ReactNode, useState } from 'react';
+import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import Image from 'next/image';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
+import { Toggle } from '@components/Common/Toggle';
 
 export interface Nft {
   imageUrl: string;
@@ -16,13 +18,13 @@ export interface Nft {
   tokenId: string;
 }
 
-const TokenSelectionBody = styled.div`
+const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
   background: ${(props) => props.theme.properties.colorNavs};
-  width: 420px;
+  width: ${(props) => `${props.width}px`};
   height: 600px;
   box-shadow: ${(props) => {
     return `0 3px 10px ${props.theme.properties.colorNavs}`;
@@ -31,11 +33,15 @@ const TokenSelectionBody = styled.div`
   padding: ${() => `${spacing.spacing_xs}px`};
 `;
 
-const TokenSelectionHeading = styled(CenteredDivHorizontal)`
+const TokenSelectionHeading = styled.div<{ width: number }>`
   height: 40px;
-  width: 420px;
+  width: ${(props) => `${props.width}px`};
   background: ${(props) => props.theme.properties.colorSecondary};
   display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  position: relative;
+  align-content: center;
 `;
 
 const ImageSelectedOverlay = styled(CenteredDiv)`
@@ -95,6 +101,8 @@ function NftDisplay(props: {
 }
 
 export function TokenSelection(props: {
+  width?: number;
+  description: string;
   heading: ReactNode;
   nfts: Nft[];
 }): JSX.Element {
@@ -107,13 +115,26 @@ export function TokenSelection(props: {
       setSelectedNftIds([...selectedNftIds, tokenId]);
     }
   };
+  const width = props.width ?? 420;
   return (
     <ThemeProvider theme={theme}>
-      <TokenSelectionHeading>
+      <FlexDiv style={{ width, justifyContent: 'space-between' }}>
+        <Heading3 style={{ width: Math.floor(width / 2) }}>
+          {props.description}
+        </Heading3>
+        <Toggle
+          leftOption="NFT"
+          rightOption="Fungible"
+          onToggle={(toggledToSide: string) => {
+            console.log(toggledToSide);
+          }}
+        />
+      </FlexDiv>
+      <TokenSelectionHeading width={width}>
         <ParagraphNavs>{props.heading}</ParagraphNavs>
       </TokenSelectionHeading>
       <Spacer size={spacing.spacing_xxxl} vertical={false} />
-      <TokenSelectionBody>
+      <TokenSelectionBody width={width}>
         {props.nfts.map((nft) => (
           <NftDisplay
             nft={nft}
