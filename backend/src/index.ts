@@ -31,16 +31,22 @@ app.post('/session/create', async (req, res) => {
         return;
     }
     const secret = randomBytes(16).toString('hex');
+    const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.creatorAddr);
     try {
-        await Session.create({secret, creatorAddr: body!.creatorAddr});
+        await Session.create({
+            secret,
+            creatorAddr: body!.creatorAddr,
+            creatorAssetsJson: assets,
+            creatorNanoErg: nanoErg,
+        });
     } catch (e) {
+        console.error(e.message);
         res.status(500);
         res.send("Error while creating session");
         return;
     }
-    const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.creatorAddr);
     res.status(200);
-    res.send({secret, assets, nanoErg: String(nanoErg)});
+    res.send({secret});
 });
 
 app.post('/session/enter', async (req, res) => {
@@ -56,6 +62,7 @@ app.post('/session/enter', async (req, res) => {
         res.send("Invalid guestAddr");
         return;
     }
+    const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
     const sessionNotFoundMsg = "Session not found";
     try {
         await sequelizeConnection.transaction(async (t) => {
@@ -71,7 +78,11 @@ app.post('/session/enter', async (req, res) => {
             if(session.submittedAt) {
                 throw new Error("Session already settled");
             }
-            await Session.update({ guestAddr: body.guestAddr }, {
+            await Session.update({
+                guestAddr: body.guestAddr,
+                guestAssetsJson: assets,
+                guestNanoErg: nanoErg
+            }, {
                 where: {
                     secret: body.secret
                 }
@@ -87,41 +98,35 @@ app.post('/session/enter', async (req, res) => {
         }
         return;
     }
-    const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
     res.status(200);
-    res.send({assets, nanoErg: String(nanoErg)});
+    res.send({});
 });
 
-app.get('/session/whoami', async (req, res) => {
-    if(req.query.secret === undefined || req.query.address === undefined) {
+app.get('/session/info', async (req, res) => {
+    if(req.query.secret === undefined) {
         res.status(400);
-        res.send("Missing secret or address");
+        res.send("Missing secret");
         return;
     }
     const secret = req.query.secret as string;
-    const address = req.query.address as string;
-    if(!ErgoAddress.validate(address)) {
-        res.status(400);
-        res.send("Invalid address provided");
-        return;
-    }
     const session = await Session.findOne({
         where: {
             secret
         }
     });
-    let whoami: "creator" | "guest";
-    if(session) {
-        if(session.creatorAddr === address) {
-            whoami = "creator";
-        } else if(session.guestAddr === address) {
-            whoami = "guest";
-        }
+    if(!session) {
+        res.status(400);
+        res.send("Unknown session");
+        return;
     }
     res.status(200);
     res.send({
-        whoami,
-        sessionIsReady: session.creatorAddr !== null && session.guestAddr !== null
+        creatorAddr: session.creatorAddr,
+        creatorAssets: session.creatorAssetsJson,
+        creatorNanoErg: session.creatorNanoErg,
+        guestAddr: session.guestAddr ?? undefined,
+        guestAssets: session.guestAssetsJson ?? undefined,
+        guestNanoErg: session.guestNanoErg ?? undefined,
     });
 });
 
