@@ -1,5 +1,5 @@
 import {config} from "@config";
-import {Asset, Schema} from "@types";
+import {Asset, Schema, Nft, FungibleToken} from "@types";
 
 export async function explorerRequest(endpoint: string): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
@@ -27,4 +27,31 @@ export const validateObject = async (obj: any, model: Schema) => {
         }
     }
     return true;
+}
+
+// TODO make differentiating between NFTs and fungible tokens according to standard
+export const splitAssets = (assets: Asset[] | undefined | null): {nfts: Nft[], fungibleTokens: FungibleToken[]} | undefined => {
+    if(!assets) {
+        return {
+            nfts: undefined,
+            fungibleTokens: undefined,
+        };
+    }
+    const rawNfts = assets.filter((asset: Asset) => {return asset.amount === 1;});
+    const rawFungibleTokens = assets.filter((asset: Asset) => {return asset.amount !==1;});
+    const nfts = rawNfts.map((asset: Asset) => {
+        return {
+            name: asset.name,
+            tokenId: asset.tokenId,
+        };
+    });
+    const fungibleTokens = rawFungibleTokens.map((asset: Asset) => {
+        return {
+            name: asset.name,
+            tokenId: asset.tokenId,
+            amount: asset.amount,
+            decimals: asset.decimals,
+        }
+    });
+    return { nfts, fungibleTokens };
 }
