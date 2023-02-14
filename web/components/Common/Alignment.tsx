@@ -24,10 +24,15 @@ export const CenteredDiv = styled(CenteredDivHorizontal)`
   justify-content: center;
 `;
 
-export const FlexDiv = styled.div`
+export const FlexDiv = styled.div<{ width?: string; flexDirection?: string }>`
   display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
+  width: ${(props) => {
+    return props.width ?? 'auto';
+  }};
+  flex-direction: ${(props) => {
+    return props.flexDirection ?? 'row';
+  }};
 `;
 
 export const MainSectionDiv = styled.div`

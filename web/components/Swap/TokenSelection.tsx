@@ -5,7 +5,7 @@ import {
   ParagraphNavs,
   Strong,
 } from '@components/Common/Text';
-import { type ReactNode, useState } from 'react';
+import React, { type ReactNode, useState } from 'react';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import Image from 'next/image';
 import { Spacer } from '@components/Common/Spacer';
@@ -18,11 +18,20 @@ export interface Nft {
   tokenId: string;
 }
 
+export interface FungibleToken {
+  imageUrl: string;
+  name: string;
+  tokenId: string;
+  availableAmount: number;
+  decimals: number;
+}
+
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-content: flex-start;
   background: ${(props) => props.theme.properties.colorNavs};
   width: ${(props) => `${props.width}px`};
   height: 600px;
@@ -100,14 +109,77 @@ function NftDisplay(props: {
   );
 }
 
+const FungibleImageAndNameContainer = styled.div`
+  width: 80px;
+`;
+
+function FungibleTokenDisplay(props: {
+  fungibleToken: FungibleToken;
+  initialValue: number;
+  onChange: (newAmount: number) => void;
+}): JSX.Element {
+  const theme = useTheme();
+  const [selectedAmt, setSelectedAmt] = useState(props.initialValue);
+  const handleChange = (event: React.FormEvent<HTMLInputElement>): void => {
+    const newValue = Number(event.currentTarget.value);
+    setSelectedAmt(newValue);
+    props.onChange(newValue);
+  };
+  return (
+    <ThemeProvider theme={theme}>
+      <FlexDiv style={{ alignItems: 'top' }}>
+        <FungibleImageAndNameContainer>
+          <Image
+            src={props.fungibleToken.imageUrl}
+            alt={props.fungibleToken.name}
+            width={80}
+            height={80}
+          />
+          <ParagraphNavs>{props.fungibleToken.name}</ParagraphNavs>
+        </FungibleImageAndNameContainer>
+        <Div>
+          <ParagraphNavs>
+            <FlexDiv>
+              <Strong>Available: </Strong>
+              <Spacer size={spacing.spacing_xxs} vertical={false} />
+              {props.fungibleToken.availableAmount.toLocaleString('en-US', {
+                maximumFractionDigits: props.fungibleToken.decimals,
+                minimumFractionDigits: props.fungibleToken.decimals,
+              })}
+            </FlexDiv>
+          </ParagraphNavs>
+          <ParagraphNavs>
+            <FlexDiv>
+              <Strong>Selected: </Strong>
+              <Spacer size={spacing.spacing_xxs} vertical={false} />
+              <input
+                style={{ width: '100px' }}
+                value={selectedAmt}
+                type="number"
+                onChange={handleChange}
+              />
+            </FlexDiv>
+          </ParagraphNavs>
+        </Div>
+      </FlexDiv>
+    </ThemeProvider>
+  );
+}
+
 export function TokenSelection(props: {
   width?: number;
   description: string;
-  heading: ReactNode;
+  headingNft: ReactNode;
+  headingFungible: ReactNode;
   nfts: Nft[];
+  fungibleTokens: FungibleToken[];
 }): JSX.Element {
   const theme = useTheme();
   const [selectedNftIds, setSelectedNftIds] = useState<string[]>([]); // We probably don't need a Set here
+  const [selectedFungibleAmounts, setSelectedFungibleAmounts] = useState<
+    Record<string, number>
+  >({});
+  const [showNftSelect, setShowNftSelect] = useState(true);
   const toggleNftSelected = (tokenId: string): void => {
     if (selectedNftIds.includes(tokenId)) {
       setSelectedNftIds(selectedNftIds.filter((id) => id !== tokenId));
@@ -115,34 +187,59 @@ export function TokenSelection(props: {
       setSelectedNftIds([...selectedNftIds, tokenId]);
     }
   };
+  const handleFungibleChange = (tokenId: string, newAmount: number): void => {
+    const updatedFungibleAmounts = {
+      ...selectedFungibleAmounts,
+      [tokenId]: newAmount,
+    };
+    setSelectedFungibleAmounts(updatedFungibleAmounts);
+  };
   const width = props.width ?? 420;
   return (
     <ThemeProvider theme={theme}>
-      <FlexDiv style={{ width, justifyContent: 'space-between' }}>
+      <FlexDiv>
         <Heading3 style={{ width: Math.floor(width / 2) }}>
           {props.description}
         </Heading3>
         <Toggle
           leftOption="NFT"
           rightOption="Fungible"
-          onToggle={(toggledToSide: string) => {
-            console.log(toggledToSide);
+          onToggle={(toggledToSide: 'left' | 'right') => {
+            if (toggledToSide === 'left') {
+              setShowNftSelect(true);
+            } else {
+              setShowNftSelect(false);
+            }
           }}
         />
       </FlexDiv>
       <TokenSelectionHeading width={width}>
-        <ParagraphNavs>{props.heading}</ParagraphNavs>
+        <ParagraphNavs>
+          {showNftSelect ? props.headingNft : props.headingFungible}
+        </ParagraphNavs>
       </TokenSelectionHeading>
-      <Spacer size={spacing.spacing_xxxl} vertical={false} />
       <TokenSelectionBody width={width}>
-        {props.nfts.map((nft) => (
-          <NftDisplay
-            nft={nft}
-            key={nft.tokenId}
-            onClick={toggleNftSelected}
-            isSelected={selectedNftIds.includes(nft.tokenId)}
-          />
-        ))}
+        {showNftSelect
+          ? props.nfts.map((nft) => (
+              <NftDisplay
+                nft={nft}
+                key={nft.tokenId}
+                onClick={toggleNftSelected}
+                isSelected={selectedNftIds.includes(nft.tokenId)}
+              />
+            ))
+          : props.fungibleTokens.map((fungibleToken: FungibleToken) => (
+              <FungibleTokenDisplay
+                fungibleToken={fungibleToken}
+                key={fungibleToken.tokenId}
+                initialValue={
+                  selectedFungibleAmounts[fungibleToken.tokenId] ?? 0
+                }
+                onChange={(newAmount: number) => {
+                  handleFungibleChange(fungibleToken.tokenId, newAmount);
+                }}
+              />
+            ))}
       </TokenSelectionBody>
     </ThemeProvider>
   );
