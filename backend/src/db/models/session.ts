@@ -1,15 +1,16 @@
 import {DataTypes, Model, Optional} from 'sequelize'
 import sequelizeConnection from '@db/config'
+import { Asset } from "@types";
 
 interface SessionAttributes {
     id: number;
     secret: string;
     createdAt: Date;
     creatorAddr: string;
-    creatorAssetsJson: object;
+    creatorAssetsJson: Asset[];
     creatorNanoErg: bigint;
     guestAddr?: string;
-    guestAssetsJson?: object;
+    guestAssetsJson?: Asset[];
     guestNanoErg?: bigint;
     txPartial?: string;
     txPartialAddedOn?: string;
@@ -26,10 +27,10 @@ export interface SessionOuput extends Required<SessionAttributes> {
 class Session extends Model<SessionAttributes, SessionInput> implements SessionAttributes {
     public id!: number
     creatorAddr!: string;
-    creatorAssetsJson!: object;
+    creatorAssetsJson!: Asset[];
     creatorNanoErg!: bigint;
     guestAddr: string;
-    guestAssetsJson: object;
+    guestAssetsJson: Asset[];
     guestNanoErg: bigint;
     secret!: string;
     submittedAt: Date;

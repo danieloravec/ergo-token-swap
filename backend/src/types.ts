@@ -23,3 +23,15 @@ export const SessionEnterBodySchema: Schema = {
         guestAddr: 'string',
     },
 };
+
+export interface Nft {
+    name: string;
+    tokenId: string;
+}
+
+export interface FungibleToken {
+    name: string;
+    tokenId: string;
+    amount: number;
+    decimals: number;
+}

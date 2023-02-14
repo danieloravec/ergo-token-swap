@@ -7,6 +7,7 @@ import * as types from '@types';
 import {ErgoAddress} from '@fleet-sdk/core';
 import sequelizeConnection from "@db/config";
 import cors from 'cors';
+import {FungibleToken, Nft} from "@types";
 
 const app = express();
 
@@ -103,31 +104,44 @@ app.post('/session/enter', async (req, res) => {
 });
 
 app.get('/session/info', async (req, res) => {
-    if(req.query.secret === undefined) {
-        res.status(400);
-        res.send("Missing secret");
-        return;
-    }
-    const secret = req.query.secret as string;
-    const session = await Session.findOne({
-        where: {
-            secret
+    try {
+        if (req.query.secret === undefined) {
+            res.status(400);
+            res.send("Missing secret");
+            return;
         }
-    });
-    if(!session) {
-        res.status(400);
-        res.send("Unknown session");
-        return;
+        const secret = req.query.secret as string;
+        const session = await Session.findOne({
+            where: {
+                secret
+            }
+        });
+        if (!session) {
+            res.status(400);
+            res.send("Unknown session");
+            return;
+        }
+        const {nfts: creatorNfts, fungibleTokens: creatorFungibleTokens} = utils.splitAssets(session.creatorAssetsJson);
+        const {nfts: guestNfts, fungibleTokens: guestFungibleTokens} = utils.splitAssets(session.guestAssetsJson);
+        res.status(200);
+        res.send({
+            creator: {
+                address: session.creatorAddr,
+                nfts: creatorNfts,
+                fungibleTokens: creatorFungibleTokens,
+                nanoErg: session.creatorNanoErg,
+            },
+            guest: session.guestAddr === null ? undefined : {
+                address: session.guestAddr,
+                nfts: guestNfts,
+                fungibleTokens: guestFungibleTokens,
+                nanoErg: session.guestNanoErg ?? undefined,
+            },
+        });
+    } catch (err) {
+        res.status(500);
+        res.send("Server-side error while getting info");
     }
-    res.status(200);
-    res.send({
-        creatorAddr: session.creatorAddr,
-        creatorAssets: session.creatorAssetsJson,
-        creatorNanoErg: session.creatorNanoErg,
-        guestAddr: session.guestAddr ?? undefined,
-        guestAssets: session.guestAssetsJson ?? undefined,
-        guestNanoErg: session.guestNanoErg ?? undefined,
-    });
 });
 
 app.listen(config.backendPort, () => {
