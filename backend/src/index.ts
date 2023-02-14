@@ -110,7 +110,7 @@ app.get('/session/whoami', async (req, res) => {
             secret
         }
     });
-    let whoami;
+    let whoami: "creator" | "guest";
     if(session) {
         if(session.creatorAddr === address) {
             whoami = "creator";
@@ -119,7 +119,10 @@ app.get('/session/whoami', async (req, res) => {
         }
     }
     res.status(200);
-    res.send({whoami});
+    res.send({
+        whoami,
+        sessionIsReady: session.creatorAddr !== null && session.guestAddr !== null
+    });
 });
 
 app.listen(config.backendPort, () => {
