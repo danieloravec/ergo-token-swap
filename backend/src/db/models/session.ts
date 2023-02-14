@@ -6,7 +6,11 @@ interface SessionAttributes {
     secret: string;
     createdAt: Date;
     creatorAddr: string;
+    creatorAssetsJson: object;
+    creatorNanoErg: bigint;
     guestAddr?: string;
+    guestAssetsJson?: object;
+    guestNanoErg?: bigint;
     txPartial?: string;
     txPartialAddedOn?: string;
     txId?: string;
@@ -22,7 +26,11 @@ export interface SessionOuput extends Required<SessionAttributes> {
 class Session extends Model<SessionAttributes, SessionInput> implements SessionAttributes {
     public id!: number
     creatorAddr!: string;
+    creatorAssetsJson!: object;
+    creatorNanoErg!: bigint;
     guestAddr: string;
+    guestAssetsJson: object;
+    guestNanoErg: bigint;
     secret!: string;
     submittedAt: Date;
     txId: string;
@@ -48,6 +56,14 @@ Session.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
+    creatorAssetsJson: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+    },
+    creatorNanoErg: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+    },
     txPartial: {
         type: DataTypes.TEXT,
     },
@@ -56,6 +72,12 @@ Session.init({
     },
     guestAddr: {
         type: DataTypes.STRING,
+    },
+    guestAssetsJson: {
+        type: DataTypes.JSONB,
+    },
+    guestNanoErg: {
+        type: DataTypes.BIGINT,
     },
     txId: {
         type: DataTypes.STRING,
