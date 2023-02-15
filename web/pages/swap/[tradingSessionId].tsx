@@ -10,28 +10,38 @@ import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected'
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
 import NoSsr from '@components/Common/NoSsr';
+import {
+  type ParticipantInfo,
+  SwappingPhaseCreator,
+} from '@components/Swap/SwappingPhaseCreator';
 
 export default function Swap(): JSX.Element {
-  const creatorRepr = 'creator';
-  const guestRepr = 'guest';
   const { theme } = useThemeStore();
   const { address } = useWalletStore();
   const router = useRouter();
   const { tradingSessionId } = router.query;
-  const [whoami, setWhoami] = useState<string | undefined>(undefined);
+  const [creatorInfo, setCreatorInfo] = useState<ParticipantInfo | undefined>();
+  const [guestInfo, setGuestInfo] = useState<ParticipantInfo | undefined>();
   useEffect(() => {
-    const fetchWhoamiMaybeEnter = async (): Promise<void> => {
+    const fetchInfoMaybeEnter = async (): Promise<void> => {
       if (tradingSessionId === undefined || address === undefined) {
         return;
       }
-      const whoamiResponse = await backendRequest(
-        `/session/whoami?secret=${tradingSessionId}&address=${address}`
+      const infoResponse = await backendRequest(
+        `/session/info?secret=${tradingSessionId}`
       );
-      if (whoamiResponse.status !== 200) {
-        setWhoami(undefined);
-      } else if (whoamiResponse.body?.whoami !== undefined) {
-        setWhoami(whoamiResponse.body.whoami);
-      } else {
+      if (infoResponse.status !== 200) {
+        console.error(infoResponse);
+        setCreatorInfo(undefined);
+        setGuestInfo(undefined);
+        return;
+      }
+      if (infoResponse.body?.creator !== undefined) {
+        setCreatorInfo(infoResponse.body.creator as ParticipantInfo);
+      }
+      if (infoResponse.body?.guest !== undefined) {
+        setGuestInfo(infoResponse.body.guest as ParticipantInfo);
+      } else if (infoResponse.body?.creator?.address !== address) {
         const sessionEnterBody = {
           secret: tradingSessionId,
           guestAddr: address,
@@ -44,10 +54,18 @@ export default function Swap(): JSX.Element {
         if (sessionEnterResponse.status !== 200) {
           throw new Error('Error entering session as a guest.');
         }
-        setWhoami(guestRepr);
+        const updatedInfoResponse = await backendRequest(
+          `/session/info?secret=${tradingSessionId}`
+        );
+        if (
+          updatedInfoResponse.status === 200 &&
+          updatedInfoResponse.body?.guest !== undefined
+        ) {
+          setGuestInfo(updatedInfoResponse.body.guest as ParticipantInfo);
+        }
       }
     };
-    fetchWhoamiMaybeEnter().catch(console.error);
+    fetchInfoMaybeEnter().catch(console.error);
   }, [address, tradingSessionId]);
 
   if (address === undefined) {
@@ -65,10 +83,32 @@ export default function Swap(): JSX.Element {
     ); // TODO use something more reasonable here
   }
 
-  if (whoami !== creatorRepr && whoami !== guestRepr) {
+  if (creatorInfo?.address !== address && guestInfo?.address !== address) {
     return (
       <NoSsr>
         <div>Loading...</div> // TODO make a loader page for this instead
+      </NoSsr>
+    );
+  }
+
+  if (
+    creatorInfo !== undefined &&
+    guestInfo !== undefined &&
+    creatorInfo?.address === address
+  ) {
+    console.log(`creatorInfo: ${JSON.stringify(creatorInfo)}`);
+    console.log(`guestInfo: ${JSON.stringify(guestInfo)}`);
+    console.log(`address: ${address}`);
+    return (
+      <NoSsr>
+        <ThemeProvider theme={theme}>
+          <Nav />
+          <SwappingPhaseCreator
+            creatorInfo={creatorInfo}
+            guestInfo={guestInfo}
+          />
+          <Footer />
+        </ThemeProvider>
       </NoSsr>
     );
   }
@@ -77,10 +117,10 @@ export default function Swap(): JSX.Element {
     <NoSsr>
       <ThemeProvider theme={theme}>
         <Nav />
-        {whoami === creatorRepr && (
+        {address === creatorInfo?.address && (
           <WaitingPhaseCreator tradingSessionId={tradingSessionId} />
         )}
-        {whoami === guestRepr && (
+        {address === guestInfo?.address && (
           <WaitingPhaseGuest tradingSessionId={tradingSessionId} />
         )}
         <Footer />

@@ -6,7 +6,11 @@ import {
   Strong,
 } from '@components/Common/Text';
 import React, { type ReactNode, useState } from 'react';
-import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
+import {
+  CenteredDiv,
+  Div,
+  FlexDiv,
+} from '@components/Common/Alignment';
 import Image from 'next/image';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
@@ -22,7 +26,7 @@ export interface FungibleToken {
   imageUrl: string;
   name: string;
   tokenId: string;
-  availableAmount: number;
+  amount: number;
   decimals: number;
 }
 
@@ -73,7 +77,11 @@ function NftDisplay(props: {
   const theme = useTheme();
   const Img = (
     <Image
-      src={props.nft.imageUrl}
+      src={
+        props.nft.imageUrl === 'unknown'
+          ? 'https://www.ergnomes.io/assets/images/home/thornyhero.webP'
+          : props.nft.imageUrl
+      }
       alt={props.nft.name}
       width={180}
       height={180}
@@ -101,9 +109,17 @@ function NftDisplay(props: {
         ) : (
           <Div>{Img}</Div>
         )}
-        <ParagraphNavs style={{ marginBottom: spacing.spacing_xl }}>
-          {props.nft.name}
-        </ParagraphNavs>
+        <CenteredDiv>
+          <ParagraphNavs
+            style={{
+              marginBottom: spacing.spacing_xl,
+              maxWidth: 80,
+              overflowWrap: 'break-word',
+            }}
+          >
+            {props.nft.name}
+          </ParagraphNavs>
+        </CenteredDiv>
       </ThemeProvider>
     </div>
   );
@@ -130,19 +146,25 @@ function FungibleTokenDisplay(props: {
       <FlexDiv style={{ alignItems: 'top' }}>
         <FungibleImageAndNameContainer>
           <Image
-            src={props.fungibleToken.imageUrl}
+            src={
+              props.fungibleToken.imageUrl === 'unknown'
+                ? 'https://www.ergnomes.io/assets/images/home/thornyhero.webP'
+                : props.fungibleToken.imageUrl
+            }
             alt={props.fungibleToken.name}
             width={80}
             height={80}
           />
-          <ParagraphNavs>{props.fungibleToken.name}</ParagraphNavs>
+          <ParagraphNavs style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
+            {props.fungibleToken.name}
+          </ParagraphNavs>
         </FungibleImageAndNameContainer>
         <Div>
           <ParagraphNavs>
             <FlexDiv>
               <Strong>Available: </Strong>
               <Spacer size={spacing.spacing_xxs} vertical={false} />
-              {props.fungibleToken.availableAmount.toLocaleString('en-US', {
+              {props.fungibleToken.amount.toLocaleString('en-US', {
                 maximumFractionDigits: props.fungibleToken.decimals,
                 minimumFractionDigits: props.fungibleToken.decimals,
               })}
@@ -197,50 +219,52 @@ export function TokenSelection(props: {
   const width = props.width ?? 420;
   return (
     <ThemeProvider theme={theme}>
-      <FlexDiv>
-        <Heading3 style={{ width: Math.floor(width / 2) }}>
-          {props.description}
-        </Heading3>
-        <Toggle
-          leftOption="NFT"
-          rightOption="Fungible"
-          onToggle={(toggledToSide: 'left' | 'right') => {
-            if (toggledToSide === 'left') {
-              setShowNftSelect(true);
-            } else {
-              setShowNftSelect(false);
-            }
-          }}
-        />
-      </FlexDiv>
-      <TokenSelectionHeading width={width}>
-        <ParagraphNavs>
-          {showNftSelect ? props.headingNft : props.headingFungible}
-        </ParagraphNavs>
-      </TokenSelectionHeading>
-      <TokenSelectionBody width={width}>
-        {showNftSelect
-          ? props.nfts.map((nft) => (
-              <NftDisplay
-                nft={nft}
-                key={nft.tokenId}
-                onClick={toggleNftSelected}
-                isSelected={selectedNftIds.includes(nft.tokenId)}
-              />
-            ))
-          : props.fungibleTokens.map((fungibleToken: FungibleToken) => (
-              <FungibleTokenDisplay
-                fungibleToken={fungibleToken}
-                key={fungibleToken.tokenId}
-                initialValue={
-                  selectedFungibleAmounts[fungibleToken.tokenId] ?? 0
-                }
-                onChange={(newAmount: number) => {
-                  handleFungibleChange(fungibleToken.tokenId, newAmount);
-                }}
-              />
-            ))}
-      </TokenSelectionBody>
+      <Div>
+        <FlexDiv style={{ justifyContent: 'space-between' }}>
+          <Heading3 style={{ width: Math.floor(width / 2) }}>
+            {props.description}
+          </Heading3>
+          <Toggle
+            leftOption="NFT"
+            rightOption="Fungible"
+            onToggle={(toggledToSide: 'left' | 'right') => {
+              if (toggledToSide === 'left') {
+                setShowNftSelect(true);
+              } else {
+                setShowNftSelect(false);
+              }
+            }}
+          />
+        </FlexDiv>
+        <TokenSelectionHeading width={width}>
+          <ParagraphNavs>
+            {showNftSelect ? props.headingNft : props.headingFungible}
+          </ParagraphNavs>
+        </TokenSelectionHeading>
+        <TokenSelectionBody width={width}>
+          {showNftSelect
+            ? props.nfts.map((nft) => (
+                <NftDisplay
+                  nft={nft}
+                  key={nft.tokenId}
+                  onClick={toggleNftSelected}
+                  isSelected={selectedNftIds.includes(nft.tokenId)}
+                />
+              ))
+            : props.fungibleTokens.map((fungibleToken: FungibleToken) => (
+                <FungibleTokenDisplay
+                  fungibleToken={fungibleToken}
+                  key={fungibleToken.tokenId}
+                  initialValue={
+                    selectedFungibleAmounts[fungibleToken.tokenId] ?? 0
+                  }
+                  onChange={(newAmount: number) => {
+                    handleFungibleChange(fungibleToken.tokenId, newAmount);
+                  }}
+                />
+              ))}
+        </TokenSelectionBody>
+      </Div>
     </ThemeProvider>
   );
 }
