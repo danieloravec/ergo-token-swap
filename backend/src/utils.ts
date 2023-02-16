@@ -1,5 +1,7 @@
 import {config} from "@config";
 import {Asset, Schema, Nft, FungibleToken} from "@types";
+import sequelizeConnection from "@db/config";
+import Session from "@db/models/session";
 
 export async function explorerRequest(endpoint: string): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
@@ -56,4 +58,45 @@ export const splitAssets = (assets: Asset[] | undefined | null): {nfts: Nft[], f
         }
     });
     return { nfts, fungibleTokens };
+}
+
+export const updateSession = async (secret: string, updatedData: object): Promise<{status: number, message: string}> => {
+    const sessionNotFoundMsg = "Session not found";
+    try {
+        await sequelizeConnection.transaction(async (t) => {
+            const session = await Session.findOne({
+                where: {
+                    secret
+                },
+                transaction: t,
+            });
+            if(!session) {
+                throw new Error(sessionNotFoundMsg);
+            }
+            if(session.submittedAt) {
+                throw new Error("Session already settled");
+            }
+            await Session.update(updatedData, {
+                where: {
+                    secret
+                }
+            });
+        });
+    } catch (e) {
+        if(e.message === sessionNotFoundMsg) {
+            return {
+                status: 404,
+                message: e.message,
+            }
+        } else {
+            return {
+                status: 500,
+                message: "Error while entering session",
+            }
+        }
+    }
+    return {
+        status: 200,
+        message: "OK",
+    }
 }

@@ -4,10 +4,9 @@ import {config} from '@config';
 import Session from '@db/models/session';
 import * as utils from '@utils';
 import * as types from '@types';
-import {ErgoAddress} from '@fleet-sdk/core';
-import sequelizeConnection from "@db/config";
 import cors from 'cors';
-import {FungibleToken, Nft} from "@types";
+import {ErgoAddress} from "@fleet-sdk/core";
+import {EIP12UnsignedTransaction, SignedInput} from "@fleet-sdk/common";
 
 const app = express();
 
@@ -64,39 +63,14 @@ app.post('/session/enter', async (req, res) => {
         return;
     }
     const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
-    const sessionNotFoundMsg = "Session not found";
-    try {
-        await sequelizeConnection.transaction(async (t) => {
-            const session = await Session.findOne({
-                where: {
-                    secret: body.secret
-                },
-                transaction: t,
-            });
-            if(!session) {
-                throw new Error(sessionNotFoundMsg);
-            }
-            if(session.submittedAt) {
-                throw new Error("Session already settled");
-            }
-            await Session.update({
-                guestAddr: body.guestAddr,
-                guestAssetsJson: assets,
-                guestNanoErg: nanoErg
-            }, {
-                where: {
-                    secret: body.secret
-                }
-            });
-        });
-    } catch (e) {
-        if(e.message === sessionNotFoundMsg) {
-            res.status(404);
-            res.send(e.message);
-        } else {
-            res.status(500);
-            res.send("Error while entering session");
-        }
+    const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
+        guestAddr: body.guestAddr,
+        guestAssetsJson: assets,
+        guestNanoErg: nanoErg
+    });
+    if(updateStatus !== 200) {
+        res.status(updateStatus);
+        res.send(updateMessage);
         return;
     }
     res.status(200);
@@ -141,6 +115,35 @@ app.get('/session/info', async (req, res) => {
     } catch (err) {
         res.status(500);
         res.send("Server-side error while getting info");
+    }
+});
+
+app.post('/tx/partial/register', async (req, res) => {
+    try {
+        const bodyIsValid = await utils.validateObject(req.body, types.TxPartialRegisterBodySchema);
+        if(!bodyIsValid) {
+            res.status(400);
+            res.send('Invalid body');
+            return;
+        }
+        const body: {secret: string, unsignedTx: EIP12UnsignedTransaction, signedInputsCreator: SignedInput[], inputIndicesCreator: number[], inputIndicesGuest: number[]} = req.body;
+        const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
+            unsignedTx: body.unsignedTx,
+            unsignedTxAddedOn: new Date(),
+            signedInputsCreator: body.signedInputsCreator,
+            txInputIndicesCreator: body.inputIndicesCreator,
+            txInputIndicesGuest: body.inputIndicesGuest,
+        });
+        if(updateStatus !== 200) {
+            res.status(updateStatus);
+            res.send(updateMessage);
+            return;
+        }
+        res.status(200);
+        res.send({});
+    } catch(err) {
+        res.status(500);
+        res.send("Server-side error while registering the transaction");
     }
 });
 

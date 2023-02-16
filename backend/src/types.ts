@@ -24,6 +24,16 @@ export const SessionEnterBodySchema: Schema = {
     },
 };
 
+export const TxPartialRegisterBodySchema: Schema = {
+    fields: {
+        secret: 'string',
+        unsignedTx: 'object',
+        signedInputsCreator: 'object',
+        inputIndicesCreator: 'object',
+        inputIndicesGuest: 'object',
+    }
+}
+
 export interface Nft {
     imageUrl: string;
     name: string;
