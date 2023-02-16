@@ -34,6 +34,13 @@ export const TxPartialRegisterBodySchema: Schema = {
     }
 }
 
+export const TxRegisterBodySchema: Schema = {
+    fields: {
+        secret: 'string',
+        txId: 'string',
+    }
+}
+
 export interface Nft {
     imageUrl: string;
     name: string;
