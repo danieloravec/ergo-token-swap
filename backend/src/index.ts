@@ -162,6 +162,26 @@ app.get('/tx/partial', async (req, res) => {
     }
 });
 
+// Checks if the transaction for a specific session was submitted to the network already
+app.get('/tx', async (req, res) => {
+    try {
+        const {status, result} = await utils.getSessionByQuery(req);
+        if(status !== 200) {
+            res.status(status);
+            res.send(result);
+        }
+        const session = result as Session;
+        res.status(200);
+        res.send({
+            submitted: (session.submittedAt !== null),
+            txId: session.txId ?? undefined,
+        });
+    } catch (err) {
+        res.status(500);
+        res.send("Server-side error while getting info about the partial transaction");
+    }
+});
+
 app.listen(config.backendPort, () => {
     console.log(`server running on port ${config.backendPort}`);
 });
