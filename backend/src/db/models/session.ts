@@ -1,6 +1,7 @@
 import {DataTypes, Model, Optional} from 'sequelize'
 import sequelizeConnection from '@db/config'
 import { Asset } from "@types";
+import { EIP12UnsignedTransaction, SignedInput } from "@fleet-sdk/common";
 
 interface SessionAttributes {
     id: number;
@@ -12,8 +13,11 @@ interface SessionAttributes {
     guestAddr?: string;
     guestAssetsJson?: Asset[];
     guestNanoErg?: bigint;
-    txPartial?: string;
-    txPartialAddedOn?: string;
+    unsignedTx?: EIP12UnsignedTransaction;
+    unsignedTxAddedOn?: string;
+    signedInputsCreator?: SignedInput[];
+    txInputIndicesCreator?: number[];
+    txInputIndicesGuest?: number[];
     txId?: string;
     submittedAt?: Date;
 }
@@ -34,10 +38,13 @@ class Session extends Model<SessionAttributes, SessionInput> implements SessionA
     guestNanoErg: bigint;
     secret!: string;
     submittedAt: Date;
-    txId: string;
-    txPartial: string;
+    txId?: string;
+    unsignedTx?: EIP12UnsignedTransaction;
+    unsignedTxAddedOn?: string;
+    signedInputsCreator?: SignedInput[];
+    txInputIndicesCreator?: number[];
+    txInputIndicesGuest?: number[];
     public readonly createdAt!: Date;
-    txPartialAddedOn: string;
 }
 
 Session.init({
@@ -65,11 +72,20 @@ Session.init({
         type: DataTypes.BIGINT,
         allowNull: false,
     },
-    txPartial: {
-        type: DataTypes.TEXT,
+    unsignedTx: {
+        type: DataTypes.JSONB,
     },
-    txPartialAddedOn: {
-        type: DataTypes.DATE,
+    unsignedTxAddedOn: {
+        type: DataTypes.DATE
+    },
+    signedInputsCreator: {
+        type: DataTypes.JSONB,
+    },
+    txInputIndicesCreator: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
+    },
+    txInputIndicesGuest: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
     guestAddr: {
         type: DataTypes.STRING,
