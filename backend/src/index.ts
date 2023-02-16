@@ -79,22 +79,12 @@ app.post('/session/enter', async (req, res) => {
 
 app.get('/session/info', async (req, res) => {
     try {
-        if (req.query.secret === undefined) {
-            res.status(400);
-            res.send("Missing secret");
-            return;
+        const {status, result} = await utils.getSessionByQuery(req);
+        if(status !== 200) {
+            res.status(status);
+            res.send(result);
         }
-        const secret = req.query.secret as string;
-        const session = await Session.findOne({
-            where: {
-                secret
-            }
-        });
-        if (!session) {
-            res.status(400);
-            res.send("Unknown session");
-            return;
-        }
+        const session = result as Session;
         const {nfts: creatorNfts, fungibleTokens: creatorFungibleTokens} = utils.splitAssets(session.creatorAssetsJson);
         const {nfts: guestNfts, fungibleTokens: guestFungibleTokens} = utils.splitAssets(session.guestAssetsJson);
         res.status(200);
@@ -144,6 +134,31 @@ app.post('/tx/partial/register', async (req, res) => {
     } catch(err) {
         res.status(500);
         res.send("Server-side error while registering the transaction");
+    }
+});
+
+// Returns the unsigned transaction and the input indices of the guest who needs to finalize the signing process
+// Returns empty body if the partial transaction is not registered yet
+app.get('/tx/partial', async (req, res) => {
+    try {
+        const {status, result} = await utils.getSessionByQuery(req);
+        if(status !== 200) {
+            res.status(status);
+            res.send(result);
+        }
+        const session = result as Session;
+        res.status(200);
+        if(session.unsignedTx === null) {
+            res.send({});
+            return;
+        }
+        res.send({
+            unsignedTx: session.unsignedTx,
+            inputIndicesGuest: session.txInputIndicesGuest,
+        })
+    } catch (err) {
+        res.status(500);
+        res.send("Server-side error while getting info about the partial transaction");
     }
 });
 
