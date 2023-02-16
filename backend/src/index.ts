@@ -182,6 +182,34 @@ app.get('/tx', async (req, res) => {
     }
 });
 
+app.post('/tx/register', async (req, res) => {
+    try {
+        const bodyIsValid = await utils.validateObject(req.body, types.TxRegisterBodySchema);
+        if(!bodyIsValid) {
+            res.status(400);
+            res.send('Invalid body');
+            return;
+        }
+        const body: {secret: string, txId: string} = req.body;
+        const {status, message} = await utils.updateSession(body.secret, {
+            submittedAt: new Date(),
+            txId: body.txId,
+        });
+        if(status !== 200) {
+            res.status(status);
+            res.send(message);
+            return;
+        }
+        res.status(200);
+        res.send({
+            message: "Transaction registered successfully",
+        });
+    } catch (err) {
+        res.status(500);
+        res.send("Server-side error while registering the transaction");
+    }
+});
+
 app.listen(config.backendPort, () => {
     console.log(`server running on port ${config.backendPort}`);
 });
