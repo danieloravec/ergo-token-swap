@@ -2,6 +2,7 @@ import {config} from "@config";
 import {Asset, Schema, Nft, FungibleToken} from "@types";
 import sequelizeConnection from "@db/config";
 import Session from "@db/models/session";
+import {Request} from "express";
 
 export async function explorerRequest(endpoint: string): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
@@ -98,5 +99,30 @@ export const updateSession = async (secret: string, updatedData: object): Promis
     return {
         status: 200,
         message: "OK",
+    }
+}
+
+export const getSessionByQuery = async (req: Request): Promise<{status: number, result: string | Session}> => {
+    if (req.query.secret === undefined) {
+        return {
+            status: 400,
+            result: "Missing secret",
+        };
+    }
+    const secret = req.query.secret as string;
+    const session = await Session.findOne({
+        where: {
+            secret
+        }
+    });
+    if (!session) {
+        return {
+            status: 400,
+            result: "Unknown session",
+        }
+    }
+    return {
+        status: 200,
+        result: session,
     }
 }
