@@ -24,6 +24,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.ergnomes.io', // TODO change
       },
+      {
+        protocol: 'https',
+        hostname: 'cryptologos.cc',
+      },
     ],
   },
 };

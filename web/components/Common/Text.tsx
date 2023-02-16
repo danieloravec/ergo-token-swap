@@ -20,11 +20,11 @@ export const TextSecondaryWrapper = styled.span`
   color: ${(props) => props.theme.properties.colorSecondary};
 `;
 
-export const Paragraph = styled.p`
+export const Text = styled.p`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
 
-export const ParagraphNavs = styled.p`
+export const TextNavs = styled.div`
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
 

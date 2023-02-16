@@ -16,12 +16,14 @@ import {
 } from '@components/Swap/SwappingPhaseCreator';
 
 export default function Swap(): JSX.Element {
-  const { theme } = useThemeStore();
   const { address } = useWalletStore();
   const router = useRouter();
   const { tradingSessionId } = router.query;
+  const { wallet } = useWalletStore();
+  const { theme } = useThemeStore();
   const [creatorInfo, setCreatorInfo] = useState<ParticipantInfo | undefined>();
   const [guestInfo, setGuestInfo] = useState<ParticipantInfo | undefined>();
+
   useEffect(() => {
     const fetchInfoMaybeEnter = async (): Promise<void> => {
       if (tradingSessionId === undefined || address === undefined) {
@@ -96,14 +98,16 @@ export default function Swap(): JSX.Element {
     guestInfo !== undefined &&
     creatorInfo?.address === address
   ) {
-    console.log(`creatorInfo: ${JSON.stringify(creatorInfo)}`);
-    console.log(`guestInfo: ${JSON.stringify(guestInfo)}`);
-    console.log(`address: ${address}`);
+    if (wallet === undefined) {
+      throw new Error('Wallet is undefined');
+    }
     return (
       <NoSsr>
         <ThemeProvider theme={theme}>
           <Nav />
           <SwappingPhaseCreator
+            wallet={wallet}
+            tradingSessionId={tradingSessionId}
             creatorInfo={creatorInfo}
             guestInfo={guestInfo}
           />

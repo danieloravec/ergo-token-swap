@@ -2,7 +2,7 @@ import { useTheme, ThemeProvider } from 'styled-components';
 import {
   Heading1,
   Heading3,
-  Paragraph,
+  Text,
   TextPrimaryWrapper,
 } from '@components/Common/Text';
 import { Hourglass } from '@components/Icons/Hourglass';
@@ -25,10 +25,10 @@ export function WaitingPhaseCreator(props: {
             <Heading1>Welcome to your trading room!</Heading1>
           </CenteredDivHorizontal>
           <CenteredDivHorizontal>
-            <Paragraph>
+            <Text>
               Please send this link to the other party and wait for them to
               join:
-            </Paragraph>
+            </Text>
           </CenteredDivHorizontal>
           <CenteredDivHorizontal>
             <Heading3>
