@@ -22,6 +22,7 @@ export const CenteredDivVertical = styled.div`
 
 export const CenteredDiv = styled(CenteredDivHorizontal)`
   justify-content: center;
+  align-content: center;
 `;
 
 export const FlexDiv = styled.div<{ width?: string; flexDirection?: string }>`

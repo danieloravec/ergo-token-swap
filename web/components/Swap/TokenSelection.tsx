@@ -6,20 +6,7 @@ import Image from 'next/image';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
-
-export interface Nft {
-  imageUrl: string;
-  name: string;
-  tokenId: string;
-}
-
-export interface FungibleToken {
-  imageUrl: string;
-  name: string;
-  tokenId: string;
-  amount: number;
-  decimals: number;
-}
+import { type FungibleToken, type Nft } from '@components/Swap/types';
 
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;

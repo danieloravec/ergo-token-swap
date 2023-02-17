@@ -1,7 +1,7 @@
 import { ThemeProvider } from 'styled-components';
 import {
   CenteredDivHorizontal,
-  CenteredDivVertical,
+  Div,
   MainSectionDiv,
 } from '@components/Common/Alignment';
 import { Heading3 } from '@components/Common/Text';
@@ -16,8 +16,8 @@ export function SwapWalletNotConnected(): JSX.Element {
   return (
     <ThemeProvider theme={theme}>
       <Nav />
-      <MainSectionDiv>
-        <CenteredDivVertical>
+      <MainSectionDiv style={{ justifyContent: 'center' }}>
+        <Div>
           <CenteredDivHorizontal>
             <Heading3>
               In order to access the trading session, please connect your
@@ -27,7 +27,7 @@ export function SwapWalletNotConnected(): JSX.Element {
           <CenteredDivHorizontal>
             <ConnectWalletButton />
           </CenteredDivHorizontal>
-        </CenteredDivVertical>
+        </Div>
       </MainSectionDiv>
       <Footer />
     </ThemeProvider>

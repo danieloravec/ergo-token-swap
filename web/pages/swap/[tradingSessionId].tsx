@@ -10,10 +10,8 @@ import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected'
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
 import NoSsr from '@components/Common/NoSsr';
-import {
-  type ParticipantInfo,
-  SwappingPhaseCreator,
-} from '@components/Swap/SwappingPhaseCreator';
+import { SwappingPhaseCreator } from '@components/Swap/SwappingPhaseCreator';
+import { type ParticipantInfo } from '@components/Swap/types';
 
 export default function Swap(): JSX.Element {
   const { address } = useWalletStore();
