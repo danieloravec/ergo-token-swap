@@ -91,14 +91,15 @@ export default function Swap(): JSX.Element {
     );
   }
 
+  if (wallet === undefined) {
+    throw new Error('Wallet is undefined');
+  }
+
   if (
     creatorInfo !== undefined &&
     guestInfo !== undefined &&
     creatorInfo?.address === address
   ) {
-    if (wallet === undefined) {
-      throw new Error('Wallet is undefined');
-    }
     return (
       <NoSsr>
         <ThemeProvider theme={theme}>
@@ -123,7 +124,10 @@ export default function Swap(): JSX.Element {
           <WaitingPhaseCreator tradingSessionId={tradingSessionId} />
         )}
         {address === guestInfo?.address && (
-          <WaitingPhaseGuest tradingSessionId={tradingSessionId} />
+          <WaitingPhaseGuest
+            wallet={wallet}
+            tradingSessionId={tradingSessionId}
+          />
         )}
         <Footer />
       </ThemeProvider>

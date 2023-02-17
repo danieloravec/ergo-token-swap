@@ -3,6 +3,7 @@ import {
   type UnsignedTransaction,
   type SignedTransaction,
 } from '@fleet-sdk/common/src/types';
+import { type SignedInput } from '@fleet-sdk/common';
 
 interface WalletAuthApi {
   connect: () => Promise<boolean>;
@@ -75,6 +76,19 @@ export class Wallet {
       throw new Error('Wallet API not available');
     }
     return await this._walletApi.sign_tx(unsignedTx);
+  }
+
+  async signTxInputs(
+    unsignedTx: UnsignedTransaction,
+    indices: number[]
+  ): Promise<SignedInput[]> {
+    await this.init();
+    if (this._walletApi === undefined) {
+      throw new Error('Wallet API not available');
+    }
+    // TODO delete next line and use the commented one below it when the wallet API is updated
+    return [];
+    // return await this._walletApi.sign_tx_inputs(unsignedTx, indices);
   }
 
   async submitTx(signedTx: SignedTransaction): Promise<string> {

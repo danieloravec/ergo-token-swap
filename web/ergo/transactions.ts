@@ -1,14 +1,9 @@
-import {
-  type Amount,
-  type Box,
-  OutputBuilder,
-  TransactionBuilder,
-} from '@fleet-sdk/core';
+import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
 import { type Wallet } from '@ergo/wallet';
 import { config } from '@config';
-import {
-  type EIP12UnsignedTransaction,
-} from '@fleet-sdk/common';
+import { type EIP12UnsignedTransaction } from '@fleet-sdk/common';
+import * as utils from '@ergo/utils';
+import { Loader } from '@ergo/loader';
 
 interface BuildMultisigSwapTxParams {
   wallet: Wallet;
@@ -19,47 +14,6 @@ interface BuildMultisigSwapTxParams {
   assetsToReceiveByB: Record<string, bigint>;
   nanoErgToReceiveByB: bigint;
 }
-export async function explorerRequest(endpoint: string): Promise<any> {
-  const res = await fetch(`${config.explorerApiUrl}${endpoint}`);
-  return await res.json();
-}
-
-const getInputs = async (address: string): Promise<Array<Box<Amount>>> => {
-  const inputsResponse = await explorerRequest(
-    `/boxes/unspent/byAddress/${address}`
-  );
-  return inputsResponse.items.map((input: Box<Amount>) => {
-    return {
-      ergoTree: input.ergoTree,
-      creationHeight: input.creationHeight,
-      value: String(input.value),
-      assets: input.assets,
-      additionalRegisters: input.additionalRegisters,
-      boxId: input.boxId,
-      transactionId: input.transactionId,
-      index: input.index,
-    };
-  });
-};
-
-const aggregateTokensInfo = (
-  inputs: Array<Box<Amount>>
-): Record<string, bigint> => {
-  const totalAssets: Record<string, bigint> = {};
-  for (const input of inputs) {
-    for (const asset of input.assets) {
-      if (totalAssets[asset.tokenId] === undefined) {
-        totalAssets[asset.tokenId] = BigInt(0);
-      }
-      totalAssets[asset.tokenId] += BigInt(asset.amount);
-    }
-  }
-  return totalAssets;
-};
-
-const aggregateInputsNanoErgValue = (inputs: Array<Box<Amount>>): bigint => {
-  return inputs.reduce((acc, input) => acc + BigInt(input.value), BigInt(0));
-};
 
 export async function buildUnsignedMultisigSwapTx({
   wallet,
@@ -75,23 +29,23 @@ export async function buildUnsignedMultisigSwapTx({
   inputIndicesB: number[];
 }> {
   const creationHeight = await wallet.getCurrentHeight();
-  const inputsA = await getInputs(addressA);
-  const inputsB = await getInputs(addressB);
+  const inputsA = await utils.getInputs(addressA);
+  const inputsB = await utils.getInputs(addressB);
 
   if (inputsA.length === 0 || inputsB.length === 0) {
     throw new Error('No inputs found for at least one of the participants');
   }
 
-  const changeToA = aggregateTokensInfo(inputsA); // We'll subtract appropriate value from this later
-  const changeToB = aggregateTokensInfo(inputsB);
+  const changeToA = utils.aggregateTokensInfo(inputsA); // We'll subtract appropriate value from this later
+  const changeToB = utils.aggregateTokensInfo(inputsB);
   for (const tokenId in assetsToReceiveByB) {
     changeToA[tokenId] -= assetsToReceiveByB[tokenId];
   }
   for (const tokenId in assetsToReceiveByA) {
     changeToB[tokenId] -= assetsToReceiveByA[tokenId];
   }
-  const nanoErgChangeToA = aggregateInputsNanoErgValue(inputsA);
-  const nanoErgChangeToB = aggregateInputsNanoErgValue(inputsB);
+  const nanoErgChangeToA = utils.aggregateInputsNanoErgValue(inputsA);
+  const nanoErgChangeToB = utils.aggregateInputsNanoErgValue(inputsB);
 
   const outputs = [
     new OutputBuilder(
@@ -133,8 +87,18 @@ export async function buildUnsignedMultisigSwapTx({
     }
   });
 
+  await Loader.load();
+  const txId = Loader.Ergo.UnsignedTransaction.from_json(
+    JSON.stringify(unsignedTx)
+  )
+    .id()
+    .to_str();
+
   return {
-    unsignedTx,
+    unsignedTx: {
+      ...unsignedTx,
+      id: txId,
+    },
     inputIndicesA,
     inputIndicesB,
   };
@@ -142,15 +106,16 @@ export async function buildUnsignedMultisigSwapTx({
 
 // export async function buildTxExample(wallet: Wallet): Promise<void> {
 //   const address = await wallet.getAddress();
+//   console.log(`address: ${address}`);
 //
 //   const creationHeight = await wallet.getCurrentHeight();
-//   const inputs = await getInputs(address);
+//   const inputs = await utils.getInputs(address);
 //
 //   const unsignedTransaction = new TransactionBuilder(creationHeight)
 //     .from(inputs)
 //     .to(
 //       new OutputBuilder(
-//         BigInt(100000000),
+//         BigInt(1000000000),
 //         '9ez4QZZnrhRnXcFa4xupxtSU1cnkq7FaGPbRx2ygxe6ZGg5wBLR'
 //       )
 //     )

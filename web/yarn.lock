@@ -1393,6 +1393,11 @@ env-paths@^2.2.0:
   resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.2.1.tgz#420399d416ce1fbe9bc0a07c62fa68d67fd0f8f2"
   integrity sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==
 
+ergo-lib-wasm-browser@^0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/ergo-lib-wasm-browser/-/ergo-lib-wasm-browser-0.23.0.tgz#e9252d0f4f4faefcff5bb552fb901cfb7e880cae"
+  integrity sha512-wtxob1TJo8ocODqdWrOASOIbD0Gtd8ge6S6snMuqOVsX4hTgHupfNozJK0TAdGbWl1uo6Oo4hKZxUDi8xQOuiA==
+
 err-code@^2.0.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/err-code/-/err-code-2.0.3.tgz#23c2f3b756ffdfc608d30e27c9a941024807e7f9"

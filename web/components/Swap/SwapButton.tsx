@@ -1,5 +1,4 @@
 import { buildUnsignedMultisigSwapTx } from '@ergo/transactions';
-import { type SignedInput } from '@fleet-sdk/common';
 import { backendRequest } from '@utils/utils';
 import { Button } from '@components/Common/Button';
 import { useState } from 'react';
@@ -45,16 +44,10 @@ export const SwapButton = (props: {
               },
               nanoErgToReceiveByB: props.selectedNanoErgA,
             });
-          // TODO sign unsignedInputsA here instead of just logging
-          console.log(`unsignedTx: ${JSON.stringify(unsignedTx)}`);
-          console.log(`inputIndicesA: ${JSON.stringify(inputIndicesA)}`);
-          console.log(`inputIndicesB: ${JSON.stringify(inputIndicesB)}`);
-          // TODO use the commented snipped instead of mocked empty array once sign_tx_inputs is implemented
-          const signedInputsA: SignedInput[] = [];
-          // const signedInputsA = await props.wallet.sign_tx_inputs(
-          //   unsignedTx,
-          //   inputIndicesA.map((idx) => unsignedTx.inputs[idx])
-          // );
+          const signedInputsA = await props.wallet.signTxInputs(
+            unsignedTx,
+            inputIndicesA
+          );
 
           // Register the partial tx
           const txPartialRegisterResponse = await backendRequest(
@@ -76,8 +69,7 @@ export const SwapButton = (props: {
           let foundTxId: string | undefined;
           while (foundTxId === undefined) {
             const txResponse = await backendRequest(
-              `/tx?secret=${props.tradingSessionId}`,
-              'GET'
+              `/tx?secret=${props.tradingSessionId}`
             );
             if (txResponse.status !== 200) {
               throw new Error('Failed to get tx');
