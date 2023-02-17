@@ -167,6 +167,7 @@ app.get('/tx/partial', async (req, res) => {
         res.send({
             unsignedTx: session.unsignedTx,
             inputIndicesGuest: session.txInputIndicesGuest,
+            inputIndicesCreator: session.txInputIndicesCreator,
             signedInputsCreator: session.signedInputsCreator,
         })
     } catch (err) {
