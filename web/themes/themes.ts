@@ -1,5 +1,7 @@
 export type SupportedThemeName = 'light' | 'dark';
 
+export type AlertType = 'info' | 'success' | 'warning' | 'error';
+
 export interface Theme {
   name: SupportedThemeName;
   properties: {
@@ -9,6 +11,12 @@ export interface Theme {
     colorSecondary: string;
     colorBgText: string;
     colorNavsText: string;
+    alertColors: {
+      info: string;
+      success: string;
+      warning: string;
+      error: string;
+    };
   };
 }
 
@@ -21,6 +29,12 @@ export const LightTheme: Theme = {
     colorSecondary: '#c08146', // orange
     colorBgText: '#222831',
     colorNavsText: '#e4dede',
+    alertColors: {
+      info: '#038cbd',
+      success: '#00b894',
+      warning: '#c08146',
+      error: '#e74c3c',
+    },
   },
 };
 
@@ -33,6 +47,12 @@ export const DarkTheme: Theme = {
     colorSecondary: '#c08146', // orange
     colorBgText: '#e4dede',
     colorNavsText: '#222831',
+    alertColors: {
+      info: '#038cbd',
+      success: '#00b894',
+      warning: '#c08146',
+      error: '#e74c3c',
+    },
   },
 };
 
