@@ -18,63 +18,73 @@ app.get('/', (req, res) => {
 });
 
 app.post('/session/create', async (req, res) => {
-    const bodyIsValid = await utils.validateObject(req.body, types.SessionCreateBodySchema);
-    if(!bodyIsValid) {
-        res.status(400);
-        res.send('Invalid body');
-        return;
-    }
-    const body: {creatorAddr: string} = req.body;
-    if (!ErgoAddress.validate(body!.creatorAddr)) {
-        res.status(400);
-        res.send("Invalid creatorAddress");
-        return;
-    }
-    const secret = randomBytes(16).toString('hex');
-    const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.creatorAddr);
     try {
-        await Session.create({
-            secret,
-            creatorAddr: body!.creatorAddr,
-            creatorAssetsJson: assets,
-            creatorNanoErg: nanoErg,
-        });
-    } catch (e) {
-        console.error(e.message);
+        const bodyIsValid = await utils.validateObject(req.body, types.SessionCreateBodySchema);
+        if (!bodyIsValid) {
+            res.status(400);
+            res.send('Invalid body');
+            return;
+        }
+        const body: { creatorAddr: string } = req.body;
+        if (!ErgoAddress.validate(body!.creatorAddr)) {
+            res.status(400);
+            res.send("Invalid creatorAddress");
+            return;
+        }
+        const secret = randomBytes(16).toString('hex');
+        const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(body!.creatorAddr);
+        try {
+            await Session.create({
+                secret,
+                creatorAddr: body!.creatorAddr,
+                creatorAssetsJson: assets,
+                creatorNanoErg: nanoErg,
+            });
+        } catch (e) {
+            console.error(e.message);
+            res.status(500);
+            res.send("Error while creating session");
+            return;
+        }
+        res.status(200);
+        res.send({secret});
+    } catch (err) {
         res.status(500);
-        res.send("Error while creating session");
-        return;
+        res.send("Server-side error while creating a trading session");
     }
-    res.status(200);
-    res.send({secret});
 });
 
 app.post('/session/enter', async (req, res) => {
-    const bodyIsValid = await utils.validateObject(req.body, types.SessionEnterBodySchema);
-    if(!bodyIsValid) {
-        res.status(400);
-        res.send('Invalid body');
-        return;
+    try {
+        const bodyIsValid = await utils.validateObject(req.body, types.SessionEnterBodySchema);
+        if (!bodyIsValid) {
+            res.status(400);
+            res.send('Invalid body');
+            return;
+        }
+        const body: { secret: string, guestAddr: string } = req.body;
+        if (!ErgoAddress.validate(body!.guestAddr)) {
+            res.status(400);
+            res.send("Invalid guestAddr");
+            return;
+        }
+        const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
+        const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
+            guestAddr: body.guestAddr,
+            guestAssetsJson: assets,
+            guestNanoErg: nanoErg
+        });
+        if (updateStatus !== 200) {
+            res.status(updateStatus);
+            res.send(updateMessage);
+            return;
+        }
+        res.status(200);
+        res.send({});
+    } catch (err) {
+        res.status(500);
+        res.send("Server-side error while entering a trading session");
     }
-    const body: {secret: string, guestAddr: string} = req.body;
-    if(!ErgoAddress.validate(body!.guestAddr)) {
-        res.status(400);
-        res.send("Invalid guestAddr");
-        return;
-    }
-    const { assets, nanoErg } = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
-    const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
-        guestAddr: body.guestAddr,
-        guestAssetsJson: assets,
-        guestNanoErg: nanoErg
-    });
-    if(updateStatus !== 200) {
-        res.status(updateStatus);
-        res.send(updateMessage);
-        return;
-    }
-    res.status(200);
-    res.send({});
 });
 
 app.get('/session/info', async (req, res) => {
