@@ -8,6 +8,7 @@ import { type Wallet } from '@ergo/wallet';
 import { type ParticipantInfo } from '@components/Swap/types';
 import { SwapButton } from '@components/Swap/SwapButton';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
+import { Alert } from '@components/Common/Alert';
 
 export function SwappingPhaseCreator(props: {
   wallet: Wallet;
@@ -22,14 +23,15 @@ export function SwappingPhaseCreator(props: {
   const [selectedFungibleTokensA, setSelectedFungibleTokensA] = useState<
     Record<string, bigint>
   >({});
-  const [selectedNanoErgA, setSelectedNanoErgA] = useState<bigint>(BigInt(0));
+  const [selectedNanoErgA, setSelectedNanoErgA] = useState(BigInt(0));
   const [selectedNftsB, setSelectedNftsB] = useState<Record<string, bigint>>(
     {}
   );
   const [selectedFungibleTokensB, setSelectedFungibleTokensB] = useState<
     Record<string, bigint>
   >({});
-  const [selectedNanoErgB, setSelectedNanoErgB] = useState<bigint>(BigInt(0));
+  const [selectedNanoErgB, setSelectedNanoErgB] = useState(BigInt(0));
+  const [awaitingGuestSignature, setAwaitingGuestSignature] = useState(false);
   const [txId, setTxId] = useState<string | undefined>(undefined);
 
   if (txId !== undefined) {
@@ -43,6 +45,12 @@ export function SwappingPhaseCreator(props: {
   return (
     <ThemeProvider theme={theme}>
       <MainSectionDiv>
+        {awaitingGuestSignature && (
+          <Alert type="success">
+            Please wait for the guest to validate and sign the transaction now.
+            Don't refresh the page.
+          </Alert>
+        )}
         <CenteredDiv>
           <TokenSelection
             description="YOUR WALLET"
@@ -83,6 +91,9 @@ export function SwappingPhaseCreator(props: {
                 selectedNftsB={selectedNftsB}
                 selectedFungibleTokensB={selectedFungibleTokensB}
                 selectedNanoErgB={selectedNanoErgB}
+                notifyAwaitingGuestSignature={() => {
+                  setAwaitingGuestSignature(true);
+                }}
                 setTxId={setTxId}
               />
             </CenteredDiv>

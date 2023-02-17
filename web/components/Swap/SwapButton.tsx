@@ -17,6 +17,7 @@ export const SwapButton = (props: {
   selectedNftsB: Record<string, bigint>;
   selectedFungibleTokensB: Record<string, bigint>;
   selectedNanoErgB: bigint;
+  notifyAwaitingGuestSignature: () => void;
   setTxId: (txId: string) => void;
 }): JSX.Element => {
   const [isWaitingForGuestSignature, setIsWaitingForGuestSignature] =
@@ -26,6 +27,7 @@ export const SwapButton = (props: {
       disabled={isWaitingForGuestSignature}
       onClick={() => {
         setIsWaitingForGuestSignature(true);
+        props.notifyAwaitingGuestSignature();
         (async () => {
           const { unsignedTx, inputIndicesA, inputIndicesB } =
             await buildUnsignedMultisigSwapTx({
