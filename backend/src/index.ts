@@ -93,6 +93,7 @@ app.get('/session/info', async (req, res) => {
         if(status !== 200) {
             res.status(status);
             res.send(result);
+            return;
         }
         const session = result as Session;
         const {nfts: creatorNfts, fungibleTokens: creatorFungibleTokens} = utils.splitAssets(session.creatorAssetsJson);
@@ -155,6 +156,7 @@ app.get('/tx/partial', async (req, res) => {
         if(status !== 200) {
             res.status(status);
             res.send(result);
+            return;
         }
         const session = result as Session;
         res.status(200);
@@ -165,6 +167,7 @@ app.get('/tx/partial', async (req, res) => {
         res.send({
             unsignedTx: session.unsignedTx,
             inputIndicesGuest: session.txInputIndicesGuest,
+            signedInputsCreator: session.signedInputsCreator,
         })
     } catch (err) {
         res.status(500);
@@ -179,6 +182,7 @@ app.get('/tx', async (req, res) => {
         if(status !== 200) {
             res.status(status);
             res.send(result);
+            return;
         }
         const session = result as Session;
         res.status(200);
