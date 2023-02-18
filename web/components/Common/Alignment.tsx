@@ -8,6 +8,7 @@ export const CenteredDivHorizontal = styled.div`
   width: 100%;
   align-items: center;
   align-content: center;
+  justify-content: center;
 `;
 
 export const CenteredDivVertical = styled.div`

@@ -1,13 +1,14 @@
 import { Heading1, OrderedList } from '@components/Common/Text';
 import styled from 'styled-components';
-import { Button } from '@components/Button';
+import { Button } from '@components/Common/Button';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
-import { Spacer } from '@components/Spacer';
+import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { type Wallet } from '@ergo/wallet';
 import { backendRequest } from '@utils/utils';
 import { useRouter } from 'next/router';
+import NoSsr from '@components/Common/NoSsr';
 
 const IntroductionContainer = styled.div`
   width: 550px;
@@ -43,23 +44,25 @@ export function Introduction(): JSX.Element {
           <li>Wait for the other party to validate and sign it too.</li>
         </OrderedList>
       </FlexDiv>
-      <CenteredDivHorizontal>
-        {wallet === undefined ? (
-          <Button disabled>Wallet not connected</Button>
-        ) : (
-          <Button
-            onClick={() => {
-              const startSession = async (): Promise<void> => {
-                const tradingSessionId = await startTradingSession(wallet);
-                await router.push(`/swap/${tradingSessionId}`);
-              };
-              startSession().catch(console.error);
-            }}
-          >
-            Start Trading Session
-          </Button>
-        )}
-      </CenteredDivHorizontal>
+      <NoSsr>
+        <CenteredDivHorizontal>
+          {wallet === undefined ? (
+            <Button disabled>Wallet not connected</Button>
+          ) : (
+            <Button
+              onClick={() => {
+                const startSession = async (): Promise<void> => {
+                  const tradingSessionId = await startTradingSession(wallet);
+                  await router.push(`/swap/${tradingSessionId}`);
+                };
+                startSession().catch(console.error);
+              }}
+            >
+              Start Trading Session
+            </Button>
+          )}
+        </CenteredDivHorizontal>
+      </NoSsr>
     </IntroductionContainer>
   );
 }

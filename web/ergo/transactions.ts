@@ -28,6 +28,7 @@ export async function buildUnsignedMultisigSwapTx({
   inputIndicesA: number[];
   inputIndicesB: number[];
 }> {
+  await Loader.load();
   const creationHeight = await wallet.getCurrentHeight();
   const inputsA = await utils.getInputs(addressA);
   const inputsB = await utils.getInputs(addressB);
@@ -85,6 +86,26 @@ export async function buildUnsignedMultisigSwapTx({
     .payMinFee()
     .build('EIP-12');
 
+  // Calculate txId from unsignedTx
+  const txId = Loader.Ergo.UnsignedTransaction.from_json(
+    JSON.stringify(unsignedTx)
+  )
+    .id()
+    .to_str();
+
+  // Calculate boxIds
+  unsignedTx.outputs.forEach((output, idx) => {
+    unsignedTx.outputs[idx].boxId = Loader.Ergo.ErgoBox.from_json(
+      JSON.stringify({
+        ...output,
+        index: idx,
+        transactionId: txId,
+      })
+    )
+      .box_id()
+      .to_str();
+  });
+
   const inputIndicesA: number[] = [];
   const inputIndicesB: number[] = [];
   unsignedTx.inputs.forEach((input, index) => {
@@ -96,13 +117,6 @@ export async function buildUnsignedMultisigSwapTx({
       throw new Error('Unexpected input');
     }
   });
-
-  await Loader.load();
-  const txId = Loader.Ergo.UnsignedTransaction.from_json(
-    JSON.stringify(unsignedTx)
-  )
-    .id()
-    .to_str();
 
   return {
     unsignedTx: {
