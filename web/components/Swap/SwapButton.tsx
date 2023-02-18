@@ -32,17 +32,17 @@ export const SwapButton = (props: {
             await buildUnsignedMultisigSwapTx({
               wallet: props.wallet,
               addressA: props.creatorInfo.address,
-              assetsToReceiveByA: {
+              assetsToReceiveByAFromB: {
                 ...props.selectedNftsB,
                 ...props.selectedFungibleTokensB,
               },
-              nanoErgToReceiveByA: props.selectedNanoErgB,
+              nanoErgToReceiveByAFromB: props.selectedNanoErgB,
               addressB: props.guestInfo.address,
-              assetsToReceiveByB: {
+              assetsToReceiveByBFromA: {
                 ...props.selectedNftsA,
                 ...props.selectedFungibleTokensA,
               },
-              nanoErgToReceiveByB: props.selectedNanoErgA,
+              nanoErgToReceiveByBFromA: props.selectedNanoErgA,
             });
           const signedInputsA = await props.wallet.signTxInputs(
             unsignedTx,

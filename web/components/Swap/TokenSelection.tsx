@@ -109,16 +109,20 @@ const FungibleImageAndNameContainer = styled.div`
 
 function FungibleTokenDisplay(props: {
   fungibleToken: FungibleToken;
-  initialValue: number;
+  initialValue: bigint;
   onChange: (newAmount: bigint) => void;
 }): JSX.Element {
   const theme = useTheme();
-  const [selectedAmt, setSelectedAmt] = useState(props.initialValue);
+  const [displayAmt, setDisplayAmt] = useState(
+    Number(props.initialValue) / Math.pow(10, props.fungibleToken.decimals)
+  );
   const handleChange = (event: React.FormEvent<HTMLInputElement>): void => {
-    const newValue = Number(event.currentTarget.value);
-    setSelectedAmt(newValue);
+    const newDisplayValue = Number(event.currentTarget.value);
+    setDisplayAmt(newDisplayValue);
     props.onChange(
-      BigInt(newValue * Math.pow(10, props.fungibleToken.decimals))
+      BigInt(
+        Math.floor(newDisplayValue * Math.pow(10, props.fungibleToken.decimals))
+      )
     );
   };
   return (
@@ -161,7 +165,7 @@ function FungibleTokenDisplay(props: {
               <Spacer size={spacing.spacing_xxs} vertical={false} />
               <input
                 style={{ width: '100px' }}
-                value={String(selectedAmt)}
+                value={String(displayAmt)}
                 type="number"
                 onChange={handleChange}
               />
@@ -223,6 +227,7 @@ export function TokenSelection(props: {
     }
   };
   const handleFungibleChange = (tokenId: string, newAmount: bigint): void => {
+    console.log(`Fungible changed to: ${newAmount}`);
     const updatedFungibleAmounts = {
       ...selectedFungibleAmounts,
       [tokenId]: newAmount,
@@ -236,6 +241,7 @@ export function TokenSelection(props: {
   };
   const handleNanoErgChange = (newAmount: bigint): void => {
     setSelectedNanoErg(newAmount);
+    console.log(`NanoErg changed to: ${newAmount}`);
     props.onChange(
       recordFromNftTokenIds(selectedNftIds),
       newAmount,
@@ -243,7 +249,6 @@ export function TokenSelection(props: {
     );
   };
   const width = props.width ?? 420;
-  const ergDecimals = 9;
   return (
     <ThemeProvider theme={theme}>
       <Div>
@@ -286,11 +291,9 @@ export function TokenSelection(props: {
                   name: 'Ergo',
                   tokenId: '',
                   amount: Number(props.nanoErg),
-                  decimals: ergDecimals,
+                  decimals: 9,
                 }}
-                initialValue={
-                  Number(selectedNanoErg) / Math.pow(10, ergDecimals) ?? 0
-                }
+                initialValue={selectedNanoErg ?? BigInt(0)}
                 onChange={handleNanoErgChange}
               />
               {props.fungibleTokens.map((fungibleToken: FungibleToken) => (
@@ -298,8 +301,7 @@ export function TokenSelection(props: {
                   fungibleToken={fungibleToken}
                   key={fungibleToken.tokenId}
                   initialValue={
-                    Number(selectedFungibleAmounts[fungibleToken.tokenId]) /
-                      Math.pow(10, fungibleToken.decimals) ?? 0
+                    selectedFungibleAmounts[fungibleToken.tokenId] ?? BigInt(0)
                   }
                   onChange={(newAmount: bigint) => {
                     handleFungibleChange(fungibleToken.tokenId, newAmount);

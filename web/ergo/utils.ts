@@ -39,7 +39,6 @@ export const getInputs = async (
     `/boxes/unspent/byAddress/${address}`
   );
   return inputsResponse.items.map((input: Box<Amount>) => {
-    console.log(`register: ${JSON.stringify(input)}`);
     return {
       ergoTree: input.ergoTree,
       creationHeight: input.creationHeight,
@@ -77,4 +76,32 @@ export const aggregateInputsNanoErgValue = (
   inputs: Array<Box<Amount>>
 ): bigint => {
   return inputs.reduce((acc, input) => acc + BigInt(input.value), BigInt(0));
+};
+
+export const subtractAssets = (
+  assets: Record<string, bigint>,
+  assetsToSubtract: Record<string, bigint>
+): Record<string, bigint> => {
+  const assetsCopy = { ...assets };
+  for (const tokenId in assetsToSubtract) {
+    if (assetsCopy[tokenId] === undefined) {
+      throw new Error('Token not available and can not be subtracted');
+    }
+    assetsCopy[tokenId] -= assetsToSubtract[tokenId];
+  }
+  return assetsCopy;
+};
+
+export const mergeAssets = (
+  assetsA: Record<string, bigint>,
+  assetsB: Record<string, bigint>
+): Record<string, bigint> => {
+  const result = { ...assetsA };
+  for (const tokenId in assetsB) {
+    if (result[tokenId] === undefined) {
+      result[tokenId] = BigInt(0);
+    }
+    result[tokenId] += assetsB[tokenId];
+  }
+  return result;
 };

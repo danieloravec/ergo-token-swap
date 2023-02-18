@@ -8,21 +8,21 @@ import { Loader } from '@ergo/loader';
 interface BuildMultisigSwapTxParams {
   wallet: Wallet;
   addressA: string;
-  assetsToReceiveByA: Record<string, bigint>;
-  nanoErgToReceiveByA: bigint;
+  assetsToReceiveByAFromB: Record<string, bigint>;
+  nanoErgToReceiveByAFromB: bigint;
   addressB: string;
-  assetsToReceiveByB: Record<string, bigint>;
-  nanoErgToReceiveByB: bigint;
+  assetsToReceiveByBFromA: Record<string, bigint>;
+  nanoErgToReceiveByBFromA: bigint;
 }
 
 export async function buildUnsignedMultisigSwapTx({
   wallet,
   addressA,
-  assetsToReceiveByA,
-  nanoErgToReceiveByA,
+  assetsToReceiveByAFromB,
+  nanoErgToReceiveByAFromB,
   addressB,
-  assetsToReceiveByB,
-  nanoErgToReceiveByB,
+  assetsToReceiveByBFromA,
+  nanoErgToReceiveByBFromA,
 }: BuildMultisigSwapTxParams): Promise<{
   unsignedTx: EIP12UnsignedTransaction;
   inputIndicesA: number[];
@@ -36,34 +36,44 @@ export async function buildUnsignedMultisigSwapTx({
     throw new Error('No inputs found for at least one of the participants');
   }
 
-  const changeToA = utils.aggregateTokensInfo(inputsA); // We'll subtract appropriate value from this later
-  const changeToB = utils.aggregateTokensInfo(inputsB);
-  for (const tokenId in assetsToReceiveByB) {
-    changeToA[tokenId] -= assetsToReceiveByB[tokenId];
-  }
-  for (const tokenId in assetsToReceiveByA) {
-    changeToB[tokenId] -= assetsToReceiveByA[tokenId];
-  }
-  const nanoErgChangeToA = utils.aggregateInputsNanoErgValue(inputsA);
-  const nanoErgChangeToB = utils.aggregateInputsNanoErgValue(inputsB);
+  const changeAssetsToA = utils.subtractAssets(
+    utils.aggregateTokensInfo(inputsA),
+    assetsToReceiveByBFromA
+  );
+  const changeAssetsToB = utils.subtractAssets(
+    utils.aggregateTokensInfo(inputsB),
+    assetsToReceiveByAFromB
+  );
+
+  const allNanoErgA = utils.aggregateInputsNanoErgValue(inputsA);
+  const allNanoErgB = utils.aggregateInputsNanoErgValue(inputsB);
+
+  const totalAssetsToReceiveByA = utils.mergeAssets(
+    assetsToReceiveByAFromB,
+    changeAssetsToA
+  );
+  const totalAssetsToReceiveByB = utils.mergeAssets(
+    assetsToReceiveByBFromA,
+    changeAssetsToB
+  );
 
   const outputs = [
     new OutputBuilder(
-      nanoErgChangeToA + nanoErgToReceiveByA - config.serviceFeeNanoErg,
+      allNanoErgA - nanoErgToReceiveByBFromA - config.serviceFeeNanoErg,
       addressA
     ).addTokens([
-      ...Object.keys(assetsToReceiveByA).map((tokenId) => ({
+      ...Object.keys(totalAssetsToReceiveByA).map((tokenId) => ({
         tokenId,
-        amount: assetsToReceiveByA[tokenId],
+        amount: totalAssetsToReceiveByA[tokenId],
       })),
     ]),
     new OutputBuilder(
-      nanoErgChangeToB + nanoErgToReceiveByB - config.serviceFeeNanoErg,
+      allNanoErgB - nanoErgToReceiveByAFromB - config.serviceFeeNanoErg,
       addressB
     ).addTokens([
-      ...Object.keys(assetsToReceiveByB).map((tokenId) => ({
+      ...Object.keys(totalAssetsToReceiveByB).map((tokenId) => ({
         tokenId,
-        amount: assetsToReceiveByB[tokenId],
+        amount: totalAssetsToReceiveByB[tokenId],
       })),
     ]),
   ];
