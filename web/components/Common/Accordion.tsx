@@ -59,6 +59,7 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
         {props.entries.map((entry, idx) => {
           return (
             <AccordionItemWrapper
+              key={idx}
               onClick={() => {
                 if (idx === openIndex) {
                   setOpenIndex(null);
