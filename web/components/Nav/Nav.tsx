@@ -30,8 +30,7 @@ export function Nav(): JSX.Element {
         <Logo />
       </NavSubcontainer>
       <NavSubcontainer float="right">
-        <NavLinkSpaced href="#">Home</NavLinkSpaced>
-        <NavLinkSpaced href="#">About</NavLinkSpaced>
+        <NavLinkSpaced href="/">Home</NavLinkSpaced>
         <ConnectWalletButton />
         <Spacer size={spacing.spacing_xs} vertical={false} />
       </NavSubcontainer>
