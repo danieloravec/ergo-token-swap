@@ -27,8 +27,14 @@ export const parseAdditionalRegisters = (
   return parsedRegisters;
 };
 
-export async function explorerRequest(endpoint: string): Promise<any> {
-  const res = await fetch(`${config.explorerApiUrl}${endpoint}`);
+export async function explorerRequest(
+  endpoint: string,
+  apiVersion: 0 | 1 = 1
+): Promise<any> {
+  if (!endpoint.startsWith('/')) {
+    endpoint = `/${endpoint}`;
+  }
+  const res = await fetch(`${config.explorerApiUrl}/v${apiVersion}${endpoint}`);
   return await res.json();
 }
 

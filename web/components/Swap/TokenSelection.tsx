@@ -1,12 +1,15 @@
 import styled, { ThemeProvider, useTheme } from 'styled-components';
 import { Heading3, Text, TextNavs, Strong } from '@components/Common/Text';
-import React, { type ReactNode, useState } from 'react';
+import React, { type ReactNode, useEffect, useState } from 'react';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import Image from 'next/image';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
+import { explorerRequest } from '@ergo/utils';
+
+const imgSize = 180;
 
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
@@ -37,10 +40,9 @@ const TokenSelectionHeading = styled.div<{ width: number }>`
 
 const ImageSelectedOverlay = styled(CenteredDiv)`
   backdrop-filter: blur(4px) grayscale(100%) brightness(0.4);
-  //backdrop-filter: grayscale(100%);
-  width: 180px;
-  height: 184px;
-  margin-top: -184px;
+  width: ${() => `${imgSize}px`};
+  height: ${() => `${imgSize + 8}px`};
+  margin-top: ${() => `${-imgSize - 8}px`};
 `;
 
 const StrongSecondary = styled(Strong)`
@@ -53,21 +55,60 @@ function NftDisplay(props: {
   onClick: (tokenId: string) => void;
 }): JSX.Element {
   const theme = useTheme();
-  const Img = (
-    <Image
-      src={
-        props.nft.imageUrl === 'unknown'
-          ? 'https://www.ergnomes.io/assets/images/home/thornyhero.webP'
-          : props.nft.imageUrl
-      }
-      alt={props.nft.name}
-      width={180}
-      height={180}
-      onClick={() => {
-        props.onClick(props.nft.tokenId);
-      }}
-    />
-  );
+  const [unknownAssetType, setUnknownAssetType] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (imageUrl === undefined) {
+      const loadImage = async (): Promise<void> => {
+        const issuingBoxResponse = await explorerRequest(
+          `/assets/${props.nft.tokenId}/issuingBox`,
+          0
+        );
+        if (issuingBoxResponse !== undefined && issuingBoxResponse.length > 0) {
+          const registers = issuingBoxResponse[0].additionalRegisters;
+          // Make sure it is an NFT picture artwork using R7 and get the image from R9
+          if (
+            registers.R7 !== undefined &&
+            registers.R7 === '0e020101' &&
+            registers.R9 !== undefined
+          ) {
+            let url = Buffer.from(registers.R9.substring(4), 'hex').toString(
+              'utf-8'
+            );
+            if (url.startsWith('ipfs://')) {
+              url = 'https://ipfs.io/ipfs/' + url.substring(7);
+            } else if (url.startsWith('http://')) {
+              url = 'https://' + url.substring(7);
+            }
+            setImageUrl(url);
+          } else {
+            setUnknownAssetType(true);
+          }
+        }
+      };
+      loadImage().catch(console.error);
+    }
+  });
+
+  const Img =
+    imageUrl === undefined ? (
+      <CenteredDiv style={{ width: `${imgSize}px`, height: `${imgSize}px` }}>
+        <TextNavs>
+          {unknownAssetType ? 'UNKNOWN ASSET TYPE' : 'IMAGE LOADING...'}
+        </TextNavs>
+      </CenteredDiv>
+    ) : (
+      <Image
+        src={imageUrl}
+        alt={props.nft.name}
+        width={imgSize}
+        height={imgSize}
+        onClick={() => {
+          props.onClick(props.nft.tokenId);
+        }}
+      />
+    );
   return (
     <div>
       <ThemeProvider theme={theme}>
@@ -91,7 +132,7 @@ function NftDisplay(props: {
           <TextNavs
             style={{
               marginBottom: spacing.spacing_xl,
-              maxWidth: 80,
+              maxWidth: imgSize,
               overflowWrap: 'break-word',
             }}
           >
@@ -130,11 +171,7 @@ function FungibleTokenDisplay(props: {
       <FlexDiv style={{ alignItems: 'top' }}>
         <FungibleImageAndNameContainer>
           <Image
-            src={
-              props.fungibleToken.imageUrl === 'unknown'
-                ? 'https://www.ergnomes.io/assets/images/home/thornyhero.webP'
-                : props.fungibleToken.imageUrl
-            }
+            src="https://www.ergnomes.io/assets/images/home/thornyhero.webP" // TODO replace with correct token image
             alt={props.fungibleToken.name}
             width={80}
             height={80}
@@ -287,7 +324,6 @@ export function TokenSelection(props: {
             <Div>
               <FungibleTokenDisplay
                 fungibleToken={{
-                  imageUrl: 'https://cryptologos.cc/logos/ergo-erg-logo.png',
                   name: 'Ergo',
                   tokenId: '',
                   amount: Number(props.nanoErg),
