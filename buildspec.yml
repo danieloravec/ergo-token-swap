@@ -1,8 +1,11 @@
 version: 0.2
 
 phases:
-  pre_build:
+  install:
+    runtime-versions:
+      nodejs: latest
     commands:
+      - npm install -g typescript
       - cd backend && npm install && cd ..
   build:
     commands:
@@ -12,5 +15,7 @@ phases:
       - mv ./backend/dist ./dist
 artifacts:
   files:
-    - '**/*'
-  base-directory: ./dist
+    - package.json
+    - package-lock.json
+    - 'dist/**/*'
+  base-directory: ./backend
