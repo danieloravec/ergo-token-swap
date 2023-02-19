@@ -12,9 +12,7 @@ phases:
       - cp -r ./backend/dist ./dist
       - ls
 artifacts:
-  secondary-artifacts:
-    backend:
-      files:
-        - '**/*'
-      name: backend
-      base-directory: ./dist
+  files:
+    - '**/*'
+  base-directory: ./dist
+  name: backend
