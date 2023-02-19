@@ -16,3 +16,5 @@ artifacts:
     backend:
       files:
         - '**/*'
+      name: backend
+      base-directory: ./dist
