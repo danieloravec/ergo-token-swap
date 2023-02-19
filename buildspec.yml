@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - cd backend && npm install && cd ..
+  build:
+    commands:
+      - cd backend && npm run build && cd ..
+  post_build:
+    commands:
+      - mv ./backend/dist ./dist
+artifacts:
+  secondary-artifacts:
+    web:
+      files:
+        - '**/*'
+      base-directory: web
+    backend:
+      files:
+        - '**/*'
+      base-directory: dist
