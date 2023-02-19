@@ -12,11 +12,10 @@ phases:
       - mv ./backend/dist ./dist
 artifacts:
   secondary-artifacts:
-    web:
-      files:
-        - '**/*'
-      base-directory: web
     backend:
       files:
         - '**/*'
       base-directory: dist
+  files:
+    - '**/*'
+  base-directory: dist
