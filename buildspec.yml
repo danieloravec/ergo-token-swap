@@ -11,8 +11,8 @@ phases:
     commands:
       - mv ./backend/dist ./dist
 artifacts:
-  files:
-    - '**/*'
-  base-directory: dist
-  name: backend
-  discard-paths: no
+  secondary-artifacts:
+    backend:
+      base-directory: dist
+      files:
+        - '**/*'
