@@ -4,7 +4,11 @@ import { useThemeStore } from '@components/hooks';
 import React from 'react';
 import { Footer } from '@components/Footer/Footer';
 import { Accordion } from '@components/Common/Accordion';
-import { FlexDiv, MainSectionDiv } from '@components/Common/Alignment';
+import {
+  CenteredDiv,
+  FlexDiv,
+  MainSectionDiv,
+} from '@components/Common/Alignment';
 import { Introduction } from '@components/Home/Introduction';
 import Image from 'next/image';
 import beastImage from '@public/token-swap-beast.png';
@@ -15,7 +19,7 @@ export default function Home(): JSX.Element {
     <ThemeProvider theme={theme}>
       <Nav />
       <MainSectionDiv style={{ justifyContent: 'space-evenly' }}>
-        <FlexDiv>
+        <CenteredDiv>
           <FlexDiv style={{ width: '50%' }}>
             <Introduction />
             <Accordion
@@ -55,7 +59,7 @@ export default function Home(): JSX.Element {
             />
           </FlexDiv>
           <div
-            style={{ position: 'relative', width: '50%', aspectRatio: '1 / 1' }}
+            style={{ position: 'relative', width: '600px', height: '600px' }}
           >
             <Image
               fill
@@ -65,7 +69,7 @@ export default function Home(): JSX.Element {
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
-        </FlexDiv>
+        </CenteredDiv>
       </MainSectionDiv>
       <Footer />
     </ThemeProvider>

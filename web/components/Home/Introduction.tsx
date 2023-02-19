@@ -30,13 +30,13 @@ export function Introduction(): JSX.Element {
   const router = useRouter();
   return (
     <IntroductionContainer>
-      <Heading1>Swap Ergo assets instantly </Heading1>
+      <Heading1>SWAP ERGO ASSETS INSTANTLY</Heading1>
       <FlexDiv>
         <Spacer size={spacing.spacing_xs} vertical />
         <OrderedList style={{ fontSize: '20px' }}>
           <li>Connect your wallet (button in the upper right corner).</li>
           <li>
-            Push <strong>Start trading session</strong> the button below.
+            Push <strong>Start Trading Session</strong> the button below.
           </li>
           <li>A private room for you and the other party will be created. </li>
           <li>Send them a generated link and wait for them to connect.</li>
