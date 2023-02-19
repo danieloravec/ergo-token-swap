@@ -14,7 +14,7 @@ interface ConfigType {
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
-    backendPort: process.env.BACKEND_PORT as string,
+    backendPort: process.env.PORT as string,
     dbPort: process.env.DB_PORT as string,
     dbName: process.env.DB_NAME as string,
     dbUser: process.env.DB_USER as string,
