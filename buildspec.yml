@@ -9,10 +9,10 @@ phases:
       - cd backend && npm run build && cd ..
   post_build:
     commands:
-      - mv ./backend/dist ./dist
+      - cp -r ./backend/dist ./dist
+      - ls
 artifacts:
   secondary-artifacts:
     backend:
-      base-directory: dist
       files:
         - '**/*'
