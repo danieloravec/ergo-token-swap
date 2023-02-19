@@ -21,10 +21,12 @@ export const TextSecondaryWrapper = styled.span`
 `;
 
 export const Text = styled.div`
+  display: flex;
   color: ${(props) => props.theme.properties.colorBgText};
 `;
 
 export const TextNavs = styled.div`
+  display: flex;
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
 

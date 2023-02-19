@@ -8,6 +8,7 @@ import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { explorerRequest } from '@ergo/utils';
+import { assetIconMap } from '@mappers/assetIconMap';
 
 const imgSize = 180;
 
@@ -168,14 +169,20 @@ function FungibleTokenDisplay(props: {
   };
   return (
     <ThemeProvider theme={theme}>
-      <FlexDiv style={{ alignItems: 'top' }}>
+      <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
         <FungibleImageAndNameContainer>
-          <Image
-            src="https://www.ergnomes.io/assets/images/home/thornyhero.webP" // TODO replace with correct token image
-            alt={props.fungibleToken.name}
-            width={80}
-            height={80}
-          />
+          <Div>
+            <Image
+              src={
+                assetIconMap[props.fungibleToken.tokenId] === undefined
+                  ? `/icons/generic-coin.svg`
+                  : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
+              }
+              alt={props.fungibleToken.name}
+              width={80}
+              height={80}
+            />
+          </Div>
           <TextNavs style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
             {props.fungibleToken.name}
           </TextNavs>
@@ -325,7 +332,8 @@ export function TokenSelection(props: {
               <FungibleTokenDisplay
                 fungibleToken={{
                   name: 'Ergo',
-                  tokenId: '',
+                  tokenId:
+                    '0000000000000000000000000000000000000000000000000000000000000000',
                   amount: Number(props.nanoErg),
                   decimals: 9,
                 }}
