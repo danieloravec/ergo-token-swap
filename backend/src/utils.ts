@@ -44,14 +44,12 @@ export const splitAssets = (assets: Asset[] | undefined | null): {nfts: Nft[], f
     const rawFungibleTokens = assets.filter((asset: Asset) => {return asset.amount !==1;});
     const nfts = rawNfts.map((asset: Asset) => {
         return {
-            imageUrl: "unknown",
             name: asset.name,
             tokenId: asset.tokenId,
         };
     });
     const fungibleTokens = rawFungibleTokens.map((asset: Asset) => {
         return {
-            imageUrl: "unknown",
             name: asset.name,
             tokenId: asset.tokenId,
             amount: asset.amount,
