@@ -7,7 +7,7 @@
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc && cp package.json dist/package.json",
     "prestart": "npm run build && ts-node -r tsconfig-paths/register src/db/init.ts",
-    "start": "npm install && npm run build ts-node -r tsconfig-paths/register ."
+    "start": "npm install && npm run build && node dist/index.js"
   },
   "author": "",
   "license": "ISC",
