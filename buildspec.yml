@@ -15,6 +15,7 @@ phases:
       - mv ./backend/dist ./dist
 artifacts:
   files:
+    - tsconfig.json
     - package.json
     - package-lock.json
     - 'dist/**/*'
