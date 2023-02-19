@@ -6,6 +6,7 @@ phases:
       nodejs: latest
     commands:
       - npm install -g typescript
+      - npm install -g ts-node
       - cd backend && npm install && cd ..
   build:
     commands:
