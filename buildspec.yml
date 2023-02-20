@@ -1,18 +1,20 @@
 version: 0.2
 
 phases:
-  pre_build:
+  install:
+    runtime-versions:
+      nodejs: latest
     commands:
+      - npm install -g typescript
+      - npm install -g ts-node
+      - npm install -g tsconfig-paths
       - cd backend && npm install && cd ..
   build:
     commands:
       - cd backend && npm run build && cd ..
-  post_build:
-    commands:
-      - cp -r ./backend/dist ./dist
-      - ls
 artifacts:
-  secondary-artifacts:
-    backend:
-      files:
-        - '**/*'
+  files:
+    - package.json
+    - package-lock.json
+    - 'dist/**/*'
+  base-directory: ./backend
