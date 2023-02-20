@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && tsc-alias",
-    "start": "npm run build && node ."
+    "build": "echo AAAA && tsc && echo BBB && tsc-alias && echo CCC",
+    "start": "echo DDD && npm run build && echo EEE && node ."
   },
   "author": "",
   "license": "ISC",
