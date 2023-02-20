@@ -3,6 +3,7 @@ import {Asset, Schema, Nft, FungibleToken} from "@types";
 import sequelizeConnection from "@db/config";
 import Session from "@db/models/session";
 import {Request} from "express";
+import fetch from "cross-fetch";
 
 export async function explorerRequest(endpoint: string): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
