@@ -4,7 +4,6 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",
     "prestart": "npm run build && ts-node -r tsconfig-paths/register src/db/init.ts",
     "start": "ts-node -r tsconfig-paths/register ."
