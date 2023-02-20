@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "echo AAAA && tsc && echo BBB && tsc-alias && echo CCC",
-    "start": "echo DDD && npm run build && echo EEE && node ."
+    "start": "node ."
   },
   "author": "",
   "license": "ISC",
