@@ -1,3 +1,5 @@
+import { type SupportedThemeName } from '@themes/themes';
+
 interface ConfigType {
   explorerApiUrl: string;
   nodeApiUrl: string;
@@ -5,6 +7,7 @@ interface ConfigType {
   explorerFrontendUrl: string;
   serviceFeeAddress: string;
   serviceFeeNanoErg: bigint;
+  defaultThemeName: SupportedThemeName;
 }
 
 export const config: ConfigType = {
@@ -16,4 +19,5 @@ export const config: ConfigType = {
   serviceFeeNanoErg: BigInt(
     process.env.NEXT_PUBLIC_SERVICE_FEE_NANO_ERG as string
   ),
+  defaultThemeName: 'dark' as SupportedThemeName,
 };

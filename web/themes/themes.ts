@@ -41,12 +41,12 @@ export const LightTheme: Theme = {
 export const DarkTheme: Theme = {
   name: 'dark',
   properties: {
-    colorBg: '#222831', // dark gray
-    colorNavs: '#000000', // beige
-    colorPrimary: '#038cbd', // light blue
-    colorSecondary: '#c08146', // orange
+    colorBg: '#222831',
+    colorNavs: '#323841',
+    colorPrimary: '#038cbd',
+    colorSecondary: '#c08146',
     colorBgText: '#e4dede',
-    colorNavsText: '#222831',
+    colorNavsText: '#e4dede',
     alertColors: {
       info: '#038cbd',
       success: '#00b894',

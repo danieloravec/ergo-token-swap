@@ -61,9 +61,7 @@ export function WaitingPhaseCreator(props: {
           </CenteredDivHorizontal>
           <CenteredDivHorizontal>
             <Heading3>
-              <TextPrimaryWrapper>
-                https://ergo-token-swap.io/{props.tradingSessionId}
-              </TextPrimaryWrapper>
+              <TextPrimaryWrapper>{window.location.href}</TextPrimaryWrapper>
             </Heading3>
           </CenteredDivHorizontal>
           <CenteredDivHorizontal>

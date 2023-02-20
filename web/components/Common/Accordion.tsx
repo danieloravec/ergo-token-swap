@@ -14,6 +14,7 @@ interface AccordionProps {
 
 const SvgMaybeRotated = styled.svg<{ rotated: boolean }>`
   transform: ${(props) => (props.rotated ? 'rotate(90deg)' : 'rotate(0deg)')};
+  fill: ${(props) => props.theme.properties.colorBgText};
 `;
 
 const Arrow = (props: { rotated: boolean }): JSX.Element => {
