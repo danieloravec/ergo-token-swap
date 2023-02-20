@@ -49,6 +49,7 @@ app.post('/session/create', async (req, res) => {
         res.status(200);
         res.send({secret});
     } catch (err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while creating a trading session");
     }
@@ -82,6 +83,7 @@ app.post('/session/enter', async (req, res) => {
         res.status(200);
         res.send({});
     } catch (err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while entering a trading session");
     }
@@ -114,6 +116,7 @@ app.get('/session/info', async (req, res) => {
             },
         });
     } catch (err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while getting info");
     }
@@ -143,6 +146,7 @@ app.post('/tx/partial/register', async (req, res) => {
         res.status(200);
         res.send({});
     } catch(err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while registering the transaction");
     }
@@ -171,6 +175,7 @@ app.get('/tx/partial', async (req, res) => {
             signedInputsCreator: session.signedInputsCreator,
         })
     } catch (err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while getting info about the partial transaction");
     }
@@ -192,6 +197,7 @@ app.get('/tx', async (req, res) => {
             txId: session.txId ?? undefined,
         });
     } catch (err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while getting info about the partial transaction");
     }
@@ -220,6 +226,7 @@ app.post('/tx/register', async (req, res) => {
             message: "Transaction registered successfully",
         });
     } catch (err) {
+        console.error(err.message);
         res.status(500);
         res.send("Server-side error while registering the transaction");
     }
