@@ -6,17 +6,21 @@ phases:
       nodejs: latest
     commands:
       - npm install -g typescript
+      - npm install -g tslint
+      - npm install -g ts-node
       - cd backend && npm install && cd ..
   build:
     commands:
       - cd backend && npm run build && cd ..
   post_build:
     commands:
-      - mv ./backend/dist ./dist
+      - cp ./backend/dist ./dist
+      - cp ./backend/src ./src
 artifacts:
   files:
     - tsconfig.json
     - package.json
     - package-lock.json
     - 'dist/**/*'
+    - 'src/**/*'
   base-directory: ./backend
