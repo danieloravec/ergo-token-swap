@@ -9,7 +9,7 @@ const LogoContainer = styled.div`
 export function Logo(): JSX.Element {
   return (
     <LogoContainer>
-      <Image src="/logo.png" alt="logo" width="50" height="50" />
+      <Image src="/logo.png" alt="logo" width="100" height="50" />
     </LogoContainer>
   );
 }
