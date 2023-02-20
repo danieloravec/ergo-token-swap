@@ -47,7 +47,8 @@ export default function Home(): JSX.Element {
                 {
                   question: 'Are there any fees?',
                   answer:
-                    "We are in a testing phase where we don't charge any fees. We will add a small fee in the future.",
+                    'We are in a testing phase and we charge a flat fee of 0.05 $ERG per swap paid by both parties. ' +
+                    'We will adjust the fee appropriately in the future.',
                 },
                 {
                   question: 'Can I see the source code?',
