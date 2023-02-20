@@ -8,19 +8,14 @@ phases:
       - npm install -g typescript
       - npm install -g tslint
       - npm install -g ts-node
+      - npm install -g tsconfig-paths
       - cd backend && npm install && cd ..
   build:
     commands:
       - cd backend && npm run build && cd ..
-  post_build:
-    commands:
-      - cp -r ./backend/dist ./dist
-      - cp -r ./backend/src ./src
 artifacts:
   files:
-    - tsconfig.json
     - package.json
     - package-lock.json
     - 'dist/**/*'
-    - 'src/**/*'
   base-directory: ./backend
