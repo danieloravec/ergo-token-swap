@@ -21,7 +21,7 @@ export const TradingSessionFinished = (props: {
           <TextCenterAlign>
             The{' '}
             <A
-              href={`${config.explorerFrontendUrl}/en/transactions/en/${props.txId}`}
+              href={`${config.explorerFrontendUrl}/en/transactions/${props.txId}`}
             >
               transaction
             </A>{' '}

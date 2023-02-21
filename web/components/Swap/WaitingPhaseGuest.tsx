@@ -107,6 +107,8 @@ export function WaitingPhaseGuest(props: {
         partialTxResponse?.body?.inputIndicesGuest !== undefined &&
         partialTxResponse?.body?.signedInputsCreator !== undefined
       ) {
+        console.log(`GONNA SET`);
+        console.log(partialTxResponse.body.unsignedTx);
         setUnsignedTx(partialTxResponse.body.unsignedTx);
         setInputIndicesCreator(partialTxResponse.body.inputIndicesCreator);
         setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
@@ -114,7 +116,13 @@ export function WaitingPhaseGuest(props: {
       }
     };
     fetchPartialTxInfo().catch(console.error);
-  }, [isLoaded]);
+    const interval = setInterval(() => {
+      fetchPartialTxInfo().catch(console.error);
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isLoaded, unsignedTx]);
 
   useEffect(() => {
     if (
@@ -173,7 +181,7 @@ export function WaitingPhaseGuest(props: {
       }
     };
     finalizeGuestSigningAndSubmit().catch(console.error);
-  }, [unsignedTx, signedInputsCreator, inputIndicesCreator, inputIndicesGuest]);
+  }, [unsignedTx]);
 
   return (
     <WaitingPhaseCreatorContainer>
