@@ -6,7 +6,7 @@ export interface Nft {
 export interface FungibleToken {
   name: string;
   tokenId: string;
-  amount: number;
+  amount: bigint;
   decimals: number;
 }
 

@@ -156,12 +156,17 @@ function FungibleTokenDisplay(props: {
   );
   const handleChange = (event: React.FormEvent<HTMLInputElement>): void => {
     const newDisplayValue = Number(event.currentTarget.value);
-    setDisplayAmt(newDisplayValue);
-    props.onChange(
-      BigInt(
-        Math.floor(newDisplayValue * Math.pow(10, props.fungibleToken.decimals))
-      )
+    const newValueScaled = BigInt(
+      Math.floor(newDisplayValue * Math.pow(10, props.fungibleToken.decimals))
     );
+    if (
+      newDisplayValue < BigInt(0) ||
+      newValueScaled > props.fungibleToken.amount
+    ) {
+      return;
+    }
+    setDisplayAmt(newDisplayValue);
+    props.onChange(newValueScaled);
   };
   return (
     <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
@@ -190,7 +195,7 @@ function FungibleTokenDisplay(props: {
             </TextNavs>
             <Spacer size={spacing.spacing_xxs} vertical={false} />
             {Number(
-              props.fungibleToken.amount /
+              Number(props.fungibleToken.amount) /
                 Math.pow(10, props.fungibleToken.decimals)
             ).toLocaleString('en-US', {
               maximumFractionDigits: props.fungibleToken.decimals,
@@ -326,7 +331,7 @@ export function TokenSelection(props: {
                 name: 'Ergo',
                 tokenId:
                   '0000000000000000000000000000000000000000000000000000000000000000',
-                amount: Number(props.nanoErg),
+                amount: props.nanoErg,
                 decimals: 9,
               }}
               initialValue={selectedNanoErg ?? BigInt(0)}
