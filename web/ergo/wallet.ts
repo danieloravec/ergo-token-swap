@@ -65,7 +65,11 @@ export class Wallet {
     }
     const addressess = await this._walletApi.get_used_addresses();
     if (addressess.length === 0) {
-      throw new Error('No used address available');
+      const unusedAddressess = await this._walletApi.get_unused_addresses();
+      if (unusedAddressess.length === 0) {
+        throw new Error('No address available');
+      }
+      return unusedAddressess[0];
     }
     return addressess[0];
   }
