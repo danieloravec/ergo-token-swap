@@ -11,4 +11,5 @@ export const Button = styled.button`
   height: 50px;
   border-radius: 10px;
   background: ${(props) => props.theme.properties.colorPrimary};
+  color: ${(props) => props.theme.properties.colorNavsText};
 `;

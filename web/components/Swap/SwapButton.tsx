@@ -21,6 +21,8 @@ export const SwapButton = (props: {
 }): JSX.Element => {
   const [isWaitingForGuestSignature, setIsWaitingForGuestSignature] =
     useState(false);
+  const [isWaitingForCreatorSignature, setIsWaitingForCreatorSignature] =
+    useState(false);
   const [pollForSubmittedrTxId, setPollForSubmittedTxId] = useState(false);
 
   useEffect(() => {
@@ -75,9 +77,10 @@ export const SwapButton = (props: {
 
   return (
     <Button
-      disabled={isWaitingForGuestSignature}
+      disabled={isWaitingForGuestSignature || isWaitingForCreatorSignature}
       onClick={() => {
         (async () => {
+          setIsWaitingForCreatorSignature(true);
           const { unsignedTx, inputIndicesA, inputIndicesB } =
             await buildUnsignedMultisigSwapTx({
               wallet: props.wallet,
@@ -115,7 +118,7 @@ export const SwapButton = (props: {
             throw new Error('Failed to register partial tx');
           }
 
-          // Poll for /tx/{secret} and wait until the tx is submitted (save the txId to show explorer link)
+          setIsWaitingForCreatorSignature(false);
           setPollForSubmittedTxId(true);
         })()
           .then(() => {
@@ -124,12 +127,17 @@ export const SwapButton = (props: {
           })
           .catch((err) => {
             console.error(err);
+            setIsWaitingForCreatorSignature(false);
             setIsWaitingForGuestSignature(false);
             props.notifyAwaitingGuestSignature(false);
           });
       }}
     >
-      {isWaitingForGuestSignature ? <span>Waiting...</span> : <span>Swap</span>}
+      {isWaitingForGuestSignature || isWaitingForCreatorSignature ? (
+        <span>Waiting...</span>
+      ) : (
+        <span>Swap</span>
+      )}
     </Button>
   );
 };

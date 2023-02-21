@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { TextSecondaryWrapper } from '@components/Common/Text';
-import styled, { ThemeProvider, useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { CenteredDiv, FlexDiv } from '@components/Common/Alignment';
-import NoSsr from '@components/Common/NoSsr';
 
 const ToggleHalf = styled(CenteredDiv)<{ side: string }>`
   border-radius: ${(props) =>
     props.side === 'left' ? '30px 0 0 30px' : '0 30px 30px 0'};
-  background: ${(props) => props.theme.properties.colorNavs};
+  background: ${(props) => props.theme.properties.colorExtras};
+  color: ${(props) => props.theme.properties.colorNavsText};
   align-content: center;
   width: 80px;
   height: 30px;
@@ -23,7 +23,6 @@ export function Toggle(props: {
   const [leftOptionSelected, setLeftOptionSelected] = useState(
     props.selected === undefined || props.selected === 'left'
   );
-  const theme = useTheme();
   const handleClick = (clickedSide: 'left' | 'right'): void => {
     if (clickedSide === 'left') {
       if (!leftOptionSelected) {
@@ -38,35 +37,31 @@ export function Toggle(props: {
     }
   };
   return (
-    <NoSsr>
-      <ThemeProvider theme={theme}>
-        <FlexDiv style={{ alignContent: 'center' }}>
-          <ToggleHalf
-            side="left"
-            onClick={() => {
-              handleClick('left');
-            }}
-          >
-            {leftOptionSelected ? (
-              <TextSecondaryWrapper>{props.leftOption}</TextSecondaryWrapper>
-            ) : (
-              props.leftOption
-            )}
-          </ToggleHalf>
-          <ToggleHalf
-            side="right"
-            onClick={() => {
-              handleClick('right');
-            }}
-          >
-            {leftOptionSelected ? (
-              props.rightOption
-            ) : (
-              <TextSecondaryWrapper>{props.rightOption}</TextSecondaryWrapper>
-            )}
-          </ToggleHalf>
-        </FlexDiv>
-      </ThemeProvider>
-    </NoSsr>
+    <FlexDiv style={{ alignContent: 'center' }}>
+      <ToggleHalf
+        side="left"
+        onClick={() => {
+          handleClick('left');
+        }}
+      >
+        {leftOptionSelected ? (
+          <TextSecondaryWrapper>{props.leftOption}</TextSecondaryWrapper>
+        ) : (
+          props.leftOption
+        )}
+      </ToggleHalf>
+      <ToggleHalf
+        side="right"
+        onClick={() => {
+          handleClick('right');
+        }}
+      >
+        {leftOptionSelected ? (
+          props.rightOption
+        ) : (
+          <TextSecondaryWrapper>{props.rightOption}</TextSecondaryWrapper>
+        )}
+      </ToggleHalf>
+    </FlexDiv>
   );
 }

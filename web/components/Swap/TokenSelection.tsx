@@ -1,4 +1,4 @@
-import styled, { ThemeProvider, useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { Heading3, Text, TextNavs, Strong } from '@components/Common/Text';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
@@ -55,7 +55,6 @@ function NftDisplay(props: {
   isSelected: boolean;
   onClick: (tokenId: string) => void;
 }): JSX.Element {
-  const theme = useTheme();
   const [unknownAssetType, setUnknownAssetType] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
 
@@ -102,7 +101,7 @@ function NftDisplay(props: {
     ) : (
       <Image
         src={imageUrl}
-        alt={props.nft.name}
+        alt={props.nft.name ?? 'nft-image'}
         width={imgSize}
         height={imgSize}
         onClick={() => {
@@ -112,35 +111,33 @@ function NftDisplay(props: {
     );
   return (
     <div>
-      <ThemeProvider theme={theme}>
-        {props.isSelected ? (
-          <Div>
-            {Img}
-            <ImageSelectedOverlay
-              onClick={() => {
-                props.onClick(props.nft.tokenId);
-              }}
-            >
-              <Text>
-                <StrongSecondary>DESELECT</StrongSecondary>
-              </Text>
-            </ImageSelectedOverlay>
-          </Div>
-        ) : (
-          <Div>{Img}</Div>
-        )}
-        <CenteredDiv>
-          <TextNavs
-            style={{
-              marginBottom: spacing.spacing_xl,
-              maxWidth: imgSize,
-              overflowWrap: 'break-word',
+      {props.isSelected ? (
+        <Div>
+          {Img}
+          <ImageSelectedOverlay
+            onClick={() => {
+              props.onClick(props.nft.tokenId);
             }}
           >
-            {props.nft.name}
-          </TextNavs>
-        </CenteredDiv>
-      </ThemeProvider>
+            <Text>
+              <StrongSecondary>DESELECT</StrongSecondary>
+            </Text>
+          </ImageSelectedOverlay>
+        </Div>
+      ) : (
+        <Div>{Img}</Div>
+      )}
+      <CenteredDiv>
+        <TextNavs
+          style={{
+            marginBottom: spacing.spacing_xl,
+            maxWidth: imgSize,
+            overflowWrap: 'break-word',
+          }}
+        >
+          {props.nft.name ?? '???'}
+        </TextNavs>
+      </CenteredDiv>
     </div>
   );
 }
@@ -154,7 +151,6 @@ function FungibleTokenDisplay(props: {
   initialValue: bigint;
   onChange: (newAmount: bigint) => void;
 }): JSX.Element {
-  const theme = useTheme();
   const [displayAmt, setDisplayAmt] = useState(
     Number(props.initialValue) / Math.pow(10, props.fungibleToken.decimals)
   );
@@ -168,56 +164,54 @@ function FungibleTokenDisplay(props: {
     );
   };
   return (
-    <ThemeProvider theme={theme}>
-      <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
-        <FungibleImageAndNameContainer>
-          <Div>
-            <Image
-              src={
-                assetIconMap[props.fungibleToken.tokenId] === undefined
-                  ? `/icons/generic-coin.svg`
-                  : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
-              }
-              alt={props.fungibleToken.name}
-              width={80}
-              height={80}
-            />
-          </Div>
-          <TextNavs style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
-            {props.fungibleToken.name}
-          </TextNavs>
-        </FungibleImageAndNameContainer>
+    <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
+      <FungibleImageAndNameContainer>
         <Div>
-          <TextNavs>
-            <FlexDiv>
-              <TextNavs>
-                <Strong>Available: </Strong>
-              </TextNavs>
-              <Spacer size={spacing.spacing_xxs} vertical={false} />
-              {Number(
-                props.fungibleToken.amount /
-                  Math.pow(10, props.fungibleToken.decimals)
-              ).toLocaleString('en-US', {
-                maximumFractionDigits: props.fungibleToken.decimals,
-                minimumFractionDigits: props.fungibleToken.decimals,
-              })}
-            </FlexDiv>
-          </TextNavs>
-          <TextNavs>
-            <FlexDiv>
-              <Strong>Selected: </Strong>
-              <Spacer size={spacing.spacing_xxs} vertical={false} />
-              <input
-                style={{ width: '100px' }}
-                value={String(displayAmt)}
-                type="number"
-                onChange={handleChange}
-              />
-            </FlexDiv>
-          </TextNavs>
+          <Image
+            src={
+              assetIconMap[props.fungibleToken.tokenId] === undefined
+                ? `/icons/generic-coin.svg`
+                : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
+            }
+            alt={props.fungibleToken.name ?? 'token-image'}
+            width={80}
+            height={80}
+          />
         </Div>
-      </FlexDiv>
-    </ThemeProvider>
+        <TextNavs style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
+          {props.fungibleToken.name ?? '???'}
+        </TextNavs>
+      </FungibleImageAndNameContainer>
+      <Div>
+        <TextNavs>
+          <FlexDiv>
+            <TextNavs>
+              <Strong>Available: </Strong>
+            </TextNavs>
+            <Spacer size={spacing.spacing_xxs} vertical={false} />
+            {Number(
+              props.fungibleToken.amount /
+                Math.pow(10, props.fungibleToken.decimals)
+            ).toLocaleString('en-US', {
+              maximumFractionDigits: props.fungibleToken.decimals,
+              minimumFractionDigits: props.fungibleToken.decimals,
+            })}
+          </FlexDiv>
+        </TextNavs>
+        <TextNavs>
+          <FlexDiv>
+            <Strong>Selected: </Strong>
+            <Spacer size={spacing.spacing_xxs} vertical={false} />
+            <input
+              style={{ width: '100px' }}
+              value={String(displayAmt)}
+              type="number"
+              onChange={handleChange}
+            />
+          </FlexDiv>
+        </TextNavs>
+      </Div>
+    </FlexDiv>
   );
 }
 
@@ -245,7 +239,6 @@ export function TokenSelection(props: {
     newSelectedFungibleTokens: Record<string, bigint>
   ) => void;
 }): JSX.Element {
-  const theme = useTheme();
   const [selectedNftIds, setSelectedNftIds] = useState<string[]>([]); // We probably don't need a Set here
   const [selectedNanoErg, setSelectedNanoErg] = useState<bigint>(BigInt(0));
   const [selectedFungibleAmounts, setSelectedFungibleAmounts] = useState<
@@ -294,68 +287,66 @@ export function TokenSelection(props: {
   };
   const width = props.width ?? 420;
   return (
-    <ThemeProvider theme={theme}>
-      <Div>
-        <FlexDiv style={{ justifyContent: 'space-between' }}>
-          <Heading3 style={{ width: Math.floor(width / 2) }}>
-            {props.description}
-          </Heading3>
-          <Toggle
-            leftOption="NFT"
-            rightOption="Fungible"
-            onToggle={(toggledToSide: 'left' | 'right') => {
-              if (toggledToSide === 'left') {
-                setShowNftSelect(true);
-              } else {
-                setShowNftSelect(false);
-              }
-            }}
-          />
-        </FlexDiv>
-        <TokenSelectionHeading width={width}>
-          <TextNavs>
-            {showNftSelect ? props.headingNft : props.headingFungible}
-          </TextNavs>
-        </TokenSelectionHeading>
-        <TokenSelectionBody width={width}>
-          {showNftSelect ? (
-            props.nfts.map((nft) => (
-              <NftDisplay
-                nft={nft}
-                key={nft.tokenId}
-                onClick={toggleNftSelected}
-                isSelected={selectedNftIds.includes(nft.tokenId)}
-              />
-            ))
-          ) : (
-            <Div>
+    <Div>
+      <FlexDiv style={{ justifyContent: 'space-between' }}>
+        <Heading3 style={{ width: Math.floor(width / 2) }}>
+          {props.description}
+        </Heading3>
+        <Toggle
+          leftOption="NFT"
+          rightOption="Fungible"
+          onToggle={(toggledToSide: 'left' | 'right') => {
+            if (toggledToSide === 'left') {
+              setShowNftSelect(true);
+            } else {
+              setShowNftSelect(false);
+            }
+          }}
+        />
+      </FlexDiv>
+      <TokenSelectionHeading width={width}>
+        <TextNavs>
+          {showNftSelect ? props.headingNft : props.headingFungible}
+        </TextNavs>
+      </TokenSelectionHeading>
+      <TokenSelectionBody width={width}>
+        {showNftSelect ? (
+          props.nfts.map((nft) => (
+            <NftDisplay
+              nft={nft}
+              key={nft.tokenId}
+              onClick={toggleNftSelected}
+              isSelected={selectedNftIds.includes(nft.tokenId)}
+            />
+          ))
+        ) : (
+          <Div>
+            <FungibleTokenDisplay
+              fungibleToken={{
+                name: 'Ergo',
+                tokenId:
+                  '0000000000000000000000000000000000000000000000000000000000000000',
+                amount: Number(props.nanoErg),
+                decimals: 9,
+              }}
+              initialValue={selectedNanoErg ?? BigInt(0)}
+              onChange={handleNanoErgChange}
+            />
+            {props.fungibleTokens.map((fungibleToken: FungibleToken) => (
               <FungibleTokenDisplay
-                fungibleToken={{
-                  name: 'Ergo',
-                  tokenId:
-                    '0000000000000000000000000000000000000000000000000000000000000000',
-                  amount: Number(props.nanoErg),
-                  decimals: 9,
+                fungibleToken={fungibleToken}
+                key={fungibleToken.tokenId}
+                initialValue={
+                  selectedFungibleAmounts[fungibleToken.tokenId] ?? BigInt(0)
+                }
+                onChange={(newAmount: bigint) => {
+                  handleFungibleChange(fungibleToken.tokenId, newAmount);
                 }}
-                initialValue={selectedNanoErg ?? BigInt(0)}
-                onChange={handleNanoErgChange}
               />
-              {props.fungibleTokens.map((fungibleToken: FungibleToken) => (
-                <FungibleTokenDisplay
-                  fungibleToken={fungibleToken}
-                  key={fungibleToken.tokenId}
-                  initialValue={
-                    selectedFungibleAmounts[fungibleToken.tokenId] ?? BigInt(0)
-                  }
-                  onChange={(newAmount: bigint) => {
-                    handleFungibleChange(fungibleToken.tokenId, newAmount);
-                  }}
-                />
-              ))}
-            </Div>
-          )}
-        </TokenSelectionBody>
-      </Div>
-    </ThemeProvider>
+            ))}
+          </Div>
+        )}
+      </TokenSelectionBody>
+    </Div>
   );
 }

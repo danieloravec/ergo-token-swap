@@ -17,6 +17,7 @@ const StyledNavLink = styled.a`
   width: auto;
   max-width: 100px;
   height: 21px;
+  color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
 const LinkAndSpacerContainer = styled.div`

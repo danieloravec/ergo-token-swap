@@ -8,7 +8,7 @@ import { useWalletStore } from '@components/Wallet/hooks';
 import { type Wallet } from '@ergo/wallet';
 import { backendRequest } from '@utils/utils';
 import { useRouter } from 'next/router';
-import NoSsr from '@components/Common/NoSsr';
+import { useEffect, useState } from 'react';
 
 const IntroductionContainer = styled.div`
   width: 550px;
@@ -25,9 +25,19 @@ const startTradingSession = async (wallet: Wallet): Promise<string> => {
   return sessionResponse.body.secret;
 };
 
+const DisabledButton = styled(Button)`
+  background-color: ${(props) => props.theme.properties.colorNavs};
+`;
+
 export function Introduction(): JSX.Element {
   const { wallet } = useWalletStore();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  });
+
   return (
     <IntroductionContainer>
       <Heading1>SWAP ERGO ASSETS INSTANTLY</Heading1>
@@ -44,25 +54,23 @@ export function Introduction(): JSX.Element {
           <li>Wait for the other party to validate and sign it too.</li>
         </OrderedList>
       </FlexDiv>
-      <NoSsr>
-        <CenteredDivHorizontal>
-          {wallet === undefined ? (
-            <Button disabled>Wallet not connected</Button>
-          ) : (
-            <Button
-              onClick={() => {
-                const startSession = async (): Promise<void> => {
-                  const tradingSessionId = await startTradingSession(wallet);
-                  await router.push(`/swap/${tradingSessionId}`);
-                };
-                startSession().catch(console.error);
-              }}
-            >
-              Start Trading Session
-            </Button>
-          )}
-        </CenteredDivHorizontal>
-      </NoSsr>
+      <CenteredDivHorizontal>
+        {!isMounted || wallet === undefined ? (
+          <DisabledButton disabled>Wallet not connected</DisabledButton>
+        ) : (
+          <Button
+            onClick={() => {
+              const startSession = async (): Promise<void> => {
+                const tradingSessionId = await startTradingSession(wallet);
+                await router.push(`/swap/${tradingSessionId}`);
+              };
+              startSession().catch(console.error);
+            }}
+          >
+            Start Trading Session
+          </Button>
+        )}
+      </CenteredDivHorizontal>
     </IntroductionContainer>
   );
 }

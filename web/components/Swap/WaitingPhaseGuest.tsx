@@ -1,4 +1,4 @@
-import styled, { useTheme, ThemeProvider } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import {
   Heading1,
   Heading3,
@@ -194,44 +194,42 @@ export function WaitingPhaseGuest(props: {
   }, [unsignedTx, signedInputsCreator, inputIndicesCreator, inputIndicesGuest]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <WaitingPhaseCreatorContainer>
-        <CenteredDivVertical>
+    <WaitingPhaseCreatorContainer>
+      <CenteredDivVertical>
+        <CenteredDivHorizontal>
+          <Heading1>
+            Welcome to trading room #
+            <TextPrimaryWrapper>{props.tradingSessionId}</TextPrimaryWrapper>!
+          </Heading1>
+        </CenteredDivHorizontal>
+        {submittedTxId !== undefined ? (
           <CenteredDivHorizontal>
-            <Heading1>
-              Welcome to trading room #
-              <TextPrimaryWrapper>{props.tradingSessionId}</TextPrimaryWrapper>!
-            </Heading1>
+            <Heading3>
+              The session transaction was{' '}
+              <A
+                target="_blank"
+                href={`${config.explorerFrontendUrl}/en/transactions/${submittedTxId}`}
+              >
+                submitted
+              </A>
+              .
+            </Heading3>
           </CenteredDivHorizontal>
-          {submittedTxId !== undefined ? (
+        ) : (
+          <Div>
             <CenteredDivHorizontal>
-              <Heading3>
-                The session transaction was{' '}
-                <A
-                  target="_blank"
-                  href={`${config.explorerFrontendUrl}/en/transactions/${submittedTxId}`}
-                >
-                  submitted
-                </A>
-                .
-              </Heading3>
+              <WaitingPhaseGuestGuide />
             </CenteredDivHorizontal>
-          ) : (
-            <Div>
-              <CenteredDivHorizontal>
-                <WaitingPhaseGuestGuide />
-              </CenteredDivHorizontal>
-              <CenteredDivHorizontal>
-                <Hourglass
-                  width={128}
-                  height={128}
-                  fill={theme.properties.colorBg}
-                />
-              </CenteredDivHorizontal>
-            </Div>
-          )}
-        </CenteredDivVertical>
-      </WaitingPhaseCreatorContainer>
-    </ThemeProvider>
+            <CenteredDivHorizontal>
+              <Hourglass
+                width={128}
+                height={128}
+                fill={theme.properties.colorBg}
+              />
+            </CenteredDivHorizontal>
+          </Div>
+        )}
+      </CenteredDivVertical>
+    </WaitingPhaseCreatorContainer>
   );
 }

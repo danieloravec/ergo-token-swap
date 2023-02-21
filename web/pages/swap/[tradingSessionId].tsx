@@ -1,6 +1,4 @@
 import { Nav } from '@components/Nav/Nav';
-import { ThemeProvider } from 'styled-components';
-import { useThemeStore } from '@components/hooks';
 import React, { useEffect, useState } from 'react';
 import { Footer } from '@components/Footer/Footer';
 import { WaitingPhaseCreator } from '@components/Swap/WaitingPhaseCreator';
@@ -9,18 +7,23 @@ import { useWalletStore } from '@components/Wallet/hooks';
 import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected';
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
-import NoSsr from '@components/Common/NoSsr';
 import { SwappingPhaseCreator } from '@components/Swap/SwappingPhaseCreator';
 import { type ParticipantInfo } from '@components/Swap/types';
+import { Div } from '@components/Common/Alignment';
+import { LoadingPage } from '@components/Common/LoadingPage';
 
 export default function Swap(): JSX.Element {
   const { address } = useWalletStore();
   const router = useRouter();
   const { tradingSessionId } = router.query;
   const { wallet } = useWalletStore();
-  const { theme } = useThemeStore();
   const [creatorInfo, setCreatorInfo] = useState<ParticipantInfo | undefined>();
   const [guestInfo, setGuestInfo] = useState<ParticipantInfo | undefined>();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  });
 
   useEffect(() => {
     const fetchInfoMaybeEnter = async (): Promise<void> => {
@@ -78,27 +81,19 @@ export default function Swap(): JSX.Element {
     };
   }, [tradingSessionId, address, creatorInfo]);
 
+  if (!isMounted) {
+    return <LoadingPage />;
+  }
+
   if (address === undefined) {
-    return (
-      <NoSsr>
-        <SwapWalletNotConnected />
-      </NoSsr>
-    );
+    return <SwapWalletNotConnected />;
   }
   if (typeof tradingSessionId !== 'string') {
-    return (
-      <NoSsr>
-        <div>Invalid trading session id</div>
-      </NoSsr>
-    ); // TODO use something more reasonable here
+    return <div>Invalid trading session id</div>; // TODO use something more reasonable here
   }
 
   if (creatorInfo?.address !== address && guestInfo?.address !== address) {
-    return (
-      <NoSsr>
-        <div>Loading...</div>
-      </NoSsr>
-    );
+    return <LoadingPage />;
   }
 
   if (wallet === undefined) {
@@ -111,36 +106,32 @@ export default function Swap(): JSX.Element {
     creatorInfo?.address === address
   ) {
     return (
-      <NoSsr>
-        <ThemeProvider theme={theme}>
-          <Nav />
-          <SwappingPhaseCreator
-            wallet={wallet}
-            tradingSessionId={tradingSessionId}
-            creatorInfo={creatorInfo}
-            guestInfo={guestInfo}
-          />
-          <Footer />
-        </ThemeProvider>
-      </NoSsr>
+      <Div>
+        <Nav />
+        <SwappingPhaseCreator
+          wallet={wallet}
+          tradingSessionId={tradingSessionId}
+          creatorInfo={creatorInfo}
+          guestInfo={guestInfo}
+        />
+        <Footer />
+      </Div>
     );
   }
 
   return (
-    <NoSsr>
-      <ThemeProvider theme={theme}>
-        <Nav />
-        {address === creatorInfo?.address && (
-          <WaitingPhaseCreator guestIsReady={guestInfo !== undefined} />
-        )}
-        {address === guestInfo?.address && (
-          <WaitingPhaseGuest
-            wallet={wallet}
-            tradingSessionId={tradingSessionId}
-          />
-        )}
-        <Footer />
-      </ThemeProvider>
-    </NoSsr>
+    <Div>
+      <Nav />
+      {address === creatorInfo?.address && (
+        <WaitingPhaseCreator guestIsReady={guestInfo !== undefined} />
+      )}
+      {address === guestInfo?.address && (
+        <WaitingPhaseGuest
+          wallet={wallet}
+          tradingSessionId={tradingSessionId}
+        />
+      )}
+      <Footer />
+    </Div>
   );
 }

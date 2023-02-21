@@ -11,6 +11,7 @@ export interface Theme {
     colorSecondary: string;
     colorBgText: string;
     colorNavsText: string;
+    colorExtras: string;
     alertColors: {
       info: string;
       success: string;
@@ -29,11 +30,12 @@ export const LightTheme: Theme = {
     colorSecondary: '#c08146', // orange
     colorBgText: '#222831',
     colorNavsText: '#e4dede',
+    colorExtras: '#323841',
     alertColors: {
       info: '#038cbd',
-      success: '#00b894',
-      warning: '#c08146',
-      error: '#e74c3c',
+      success: '#124d1f',
+      warning: '#694602',
+      error: '#570211',
     },
   },
 };
@@ -47,11 +49,12 @@ export const DarkTheme: Theme = {
     colorSecondary: '#c08146',
     colorBgText: '#e4dede',
     colorNavsText: '#e4dede',
+    colorExtras: '#121821',
     alertColors: {
       info: '#038cbd',
-      success: '#00b894',
-      warning: '#c08146',
-      error: '#e74c3c',
+      success: '#124d1f',
+      warning: '#694602',
+      error: '#570211',
     },
   },
 };
