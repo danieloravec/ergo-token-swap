@@ -44,7 +44,7 @@ export const useWalletConnect = () => {
       setWallet(newWallet);
       setAddress(address);
     } catch (err) {
-      console.log('User denied wallet connection');
+      console.log(err);
       disconnect();
     }
   };

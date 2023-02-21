@@ -1,14 +1,17 @@
 import styled, { useTheme, ThemeProvider } from 'styled-components';
 import {
   Heading1,
+  Heading3,
   OrderedList,
   TextPrimaryWrapper,
+  A,
 } from '@components/Common/Text';
 import { Hourglass } from '@components/Icons/Hourglass';
 import React, { useEffect, useState } from 'react';
 import {
   CenteredDivHorizontal,
   CenteredDivVertical,
+  Div,
   FlexDiv,
 } from '@components/Common/Alignment';
 import { backendRequest } from '@utils/utils';
@@ -20,6 +23,7 @@ import {
 import { type Wallet } from '@ergo/wallet';
 import { type Amount, type Box } from '@fleet-sdk/core';
 import { combineSignedInputs } from '@components/Swap/utils';
+import { config } from '@config';
 
 const WaitingPhaseCreatorContainer = styled.div`
   display: flex;
@@ -60,6 +64,31 @@ export function WaitingPhaseGuest(props: {
   const [signedInputsCreator, setSignedInputsCreator] = useState<
     SignedInput[] | undefined
   >(undefined);
+  const [submittedTxId, setSubmittedTxId] = useState<string | undefined>(
+    undefined
+  );
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const fetchIsFinished = async (): Promise<void> => {
+      const isFinishedResponse = await backendRequest(
+        `/tx?secret=${props.tradingSessionId}`
+      );
+      if (
+        isFinishedResponse.status !== 200 ||
+        isFinishedResponse?.body?.submitted === undefined
+      ) {
+        console.error('Failed to get isFinished');
+        setSubmittedTxId(undefined);
+      } else if (isFinishedResponse.body.submitted === true) {
+        setSubmittedTxId(isFinishedResponse.body.txId);
+      } else {
+        setSubmittedTxId(undefined);
+      }
+      setIsLoaded(true);
+    };
+    fetchIsFinished().catch(console.error);
+  });
 
   useEffect(() => {
     if (
@@ -68,45 +97,41 @@ export function WaitingPhaseGuest(props: {
       inputIndicesGuest === undefined ||
       signedInputsCreator === undefined
     ) {
-      const interval = setInterval(() => {
-        const fetchPartialTxInfo = async (): Promise<void> => {
-          let unsignedTxReady = false;
-          while (!unsignedTxReady) {
-            try {
-              const partialTxResponse = await backendRequest(
-                `/tx/partial?secret=${props.tradingSessionId}`
-              );
-              if (partialTxResponse.status !== 200) {
-                console.error('Failed to get partial tx info');
-              }
-              if (
-                partialTxResponse?.body?.unsignedTx !== undefined &&
-                partialTxResponse?.body?.inputIndicesCreator !== undefined &&
-                partialTxResponse?.body?.inputIndicesGuest !== undefined &&
-                partialTxResponse?.body?.signedInputsCreator !== undefined
-              ) {
-                unsignedTxReady = true;
-                setUnsignedTx(partialTxResponse.body.unsignedTx);
-                setInputIndicesCreator(
-                  partialTxResponse.body.inputIndicesCreator
-                );
-                setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
-                setSignedInputsCreator(
-                  partialTxResponse.body.signedInputsCreator
-                );
-              }
-            } catch (err) {
-              console.error(err);
+      const fetchPartialTxInfo = async (): Promise<void> => {
+        let unsignedTxReady = false;
+        while (!unsignedTxReady) {
+          try {
+            const partialTxResponse = await backendRequest(
+              `/tx/partial?secret=${props.tradingSessionId}`
+            );
+            if (partialTxResponse.status !== 200) {
+              console.error('Failed to get partial tx info');
             }
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            if (
+              partialTxResponse?.body?.unsignedTx !== undefined &&
+              partialTxResponse?.body?.inputIndicesCreator !== undefined &&
+              partialTxResponse?.body?.inputIndicesGuest !== undefined &&
+              partialTxResponse?.body?.signedInputsCreator !== undefined
+            ) {
+              unsignedTxReady = true;
+              setUnsignedTx(partialTxResponse.body.unsignedTx);
+              setInputIndicesCreator(
+                partialTxResponse.body.inputIndicesCreator
+              );
+              setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
+              setSignedInputsCreator(
+                partialTxResponse.body.signedInputsCreator
+              );
+            }
+          } catch (err) {
+            console.error(err);
           }
-        };
-        fetchPartialTxInfo().catch(console.error);
-      }, 1000);
-
-      return () => {
-        clearInterval(interval);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+        }
       };
+      if (isLoaded && submittedTxId === undefined) {
+        fetchPartialTxInfo().catch(console.error);
+      }
     }
   }, [unsignedTx, inputIndicesCreator, inputIndicesGuest, signedInputsCreator]);
 
@@ -120,8 +145,7 @@ export function WaitingPhaseGuest(props: {
       return;
     }
     const finalizeGuestSigningAndSubmit = async (): Promise<void> => {
-      const txId = unsignedTx.id;
-      if (txId === undefined) {
+      if (unsignedTx.id === undefined) {
         throw new Error('txId is undefined');
       }
       const signedGuestInputs = await props.wallet.signTxInputs(
@@ -134,6 +158,7 @@ export function WaitingPhaseGuest(props: {
         inputIndicesCreator,
         inputIndicesGuest
       );
+      const txId = unsignedTx.id;
       const signedTx: SignedTransaction = {
         id: txId,
         inputs: signedInputs,
@@ -152,8 +177,20 @@ export function WaitingPhaseGuest(props: {
         }),
       };
       await props.wallet.submitTx(signedTx);
+      console.log(`submitted txId: ${signedTx.id}`);
+      try {
+        await backendRequest(`/tx/register`, 'POST', {
+          secret: props.tradingSessionId,
+          txId: signedTx.id,
+        });
+        setSubmittedTxId(signedTx.id);
+      } catch (err) {
+        console.error(err);
+      }
     };
-    finalizeGuestSigningAndSubmit().catch(console.error);
+    if (!isLoaded || submittedTxId !== undefined) {
+      finalizeGuestSigningAndSubmit().catch(console.error);
+    }
   }, [unsignedTx, signedInputsCreator, inputIndicesCreator, inputIndicesGuest]);
 
   return (
@@ -166,16 +203,33 @@ export function WaitingPhaseGuest(props: {
               <TextPrimaryWrapper>{props.tradingSessionId}</TextPrimaryWrapper>!
             </Heading1>
           </CenteredDivHorizontal>
-          <CenteredDivHorizontal>
-            <WaitingPhaseGuestGuide />
-          </CenteredDivHorizontal>
-          <CenteredDivHorizontal>
-            <Hourglass
-              width={128}
-              height={128}
-              fill={theme.properties.colorBg}
-            />
-          </CenteredDivHorizontal>
+          {submittedTxId !== undefined ? (
+            <CenteredDivHorizontal>
+              <Heading3>
+                The session transaction was{' '}
+                <A
+                  target="_blank"
+                  href={`${config.explorerFrontendUrl}/en/transactions/${submittedTxId}`}
+                >
+                  submitted
+                </A>
+                .
+              </Heading3>
+            </CenteredDivHorizontal>
+          ) : (
+            <Div>
+              <CenteredDivHorizontal>
+                <WaitingPhaseGuestGuide />
+              </CenteredDivHorizontal>
+              <CenteredDivHorizontal>
+                <Hourglass
+                  width={128}
+                  height={128}
+                  fill={theme.properties.colorBg}
+                />
+              </CenteredDivHorizontal>
+            </Div>
+          )}
         </CenteredDivVertical>
       </WaitingPhaseCreatorContainer>
     </ThemeProvider>

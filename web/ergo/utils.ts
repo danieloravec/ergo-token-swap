@@ -95,6 +95,12 @@ export const subtractAssets = (
     }
     assetsCopy[tokenId] -= assetsToSubtract[tokenId];
   }
+  for (const tokenId in assetsCopy) {
+    if (assetsCopy[tokenId] <= BigInt(0)) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete assetsCopy[tokenId];
+    }
+  }
   return assetsCopy;
 };
 
@@ -104,7 +110,7 @@ export const mergeAssets = (
 ): Record<string, bigint> => {
   const result = { ...assetsA };
   for (const tokenId in assetsB) {
-    if (result[tokenId] === undefined) {
+    if (result[tokenId] === undefined && assetsB[tokenId] > BigInt(0)) {
       result[tokenId] = BigInt(0);
     }
     result[tokenId] += assetsB[tokenId];

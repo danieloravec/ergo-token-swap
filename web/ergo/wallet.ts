@@ -86,9 +86,7 @@ export class Wallet {
     if (this._walletApi === undefined) {
       throw new Error('Wallet API not available');
     }
-    // TODO delete next line and use the commented one below it when the wallet API is updated
-    return [];
-    // return await this._walletApi.sign_tx_inputs(unsignedTx, indices);
+    return await this._walletApi.sign_tx_inputs(unsignedTx, indices);
   }
 
   async submitTx(signedTx: SignedTransaction): Promise<string> {

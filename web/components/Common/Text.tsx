@@ -46,4 +46,5 @@ export const Strong = styled.strong``;
 
 export const A = styled.a`
   color: ${(props) => props.theme.properties.colorPrimary};
+  cursor: pointer;
 `;

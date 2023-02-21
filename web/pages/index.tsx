@@ -16,6 +16,7 @@ import NoSsr from '@components/Common/NoSsr';
 
 export default function Home(): JSX.Element {
   const { theme } = useThemeStore();
+
   return (
     <NoSsr>
       <ThemeProvider theme={theme}>

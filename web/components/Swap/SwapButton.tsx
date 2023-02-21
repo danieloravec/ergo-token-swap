@@ -77,7 +77,7 @@ export const SwapButton = (props: {
             if (txResponse.body.submitted as boolean) {
               foundTxId = txResponse.body.txId;
             }
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 3000));
           }
           props.setTxId(foundTxId);
         })().catch(console.error);
