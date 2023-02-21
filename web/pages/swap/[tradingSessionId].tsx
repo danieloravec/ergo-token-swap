@@ -24,7 +24,11 @@ export default function Swap(): JSX.Element {
 
   useEffect(() => {
     const fetchInfoMaybeEnter = async (): Promise<void> => {
-      if (tradingSessionId === undefined || address === undefined) {
+      if (
+        tradingSessionId === undefined ||
+        address === undefined ||
+        guestInfo !== undefined
+      ) {
         return;
       }
       const infoResponse = await backendRequest(
@@ -66,7 +70,13 @@ export default function Swap(): JSX.Element {
       }
     };
     fetchInfoMaybeEnter().catch(console.error);
-  }, [address, tradingSessionId]);
+    const interval = setInterval(() => {
+      fetchInfoMaybeEnter().catch(console.error);
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [tradingSessionId, address, creatorInfo]);
 
   if (address === undefined) {
     return (
@@ -86,7 +96,7 @@ export default function Swap(): JSX.Element {
   if (creatorInfo?.address !== address && guestInfo?.address !== address) {
     return (
       <NoSsr>
-        <div>Loading...</div> // TODO make a loader page for this instead
+        <div>Loading...</div>
       </NoSsr>
     );
   }
@@ -121,7 +131,7 @@ export default function Swap(): JSX.Element {
       <ThemeProvider theme={theme}>
         <Nav />
         {address === creatorInfo?.address && (
-          <WaitingPhaseCreator tradingSessionId={tradingSessionId} />
+          <WaitingPhaseCreator guestIsReady={guestInfo !== undefined} />
         )}
         {address === guestInfo?.address && (
           <WaitingPhaseGuest

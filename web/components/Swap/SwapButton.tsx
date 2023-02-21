@@ -1,7 +1,7 @@
 import { buildUnsignedMultisigSwapTx } from '@ergo/transactions';
 import { backendRequest } from '@utils/utils';
 import { Button } from '@components/Common/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type ParticipantInfo } from '@components/Swap/types';
 import { type Wallet } from '@ergo/wallet';
 
@@ -16,17 +16,67 @@ export const SwapButton = (props: {
   selectedNftsB: Record<string, bigint>;
   selectedFungibleTokensB: Record<string, bigint>;
   selectedNanoErgB: bigint;
-  notifyAwaitingGuestSignature: () => void;
+  notifyAwaitingGuestSignature: (isAwaiting: boolean) => void;
   setTxId: (txId: string) => void;
 }): JSX.Element => {
   const [isWaitingForGuestSignature, setIsWaitingForGuestSignature] =
     useState(false);
+  const [pollForSubmittedrTxId, setPollForSubmittedTxId] = useState(false);
+
+  useEffect(() => {
+    const fetchPartialTxInfo = async (): Promise<void> => {
+      if (isWaitingForGuestSignature) {
+        props.notifyAwaitingGuestSignature(true);
+        return;
+      }
+      const txPartialInfoResponse = await backendRequest(
+        `/tx/partial?secret=${props.tradingSessionId}`
+      );
+      if (
+        txPartialInfoResponse.status === 200 &&
+        txPartialInfoResponse?.body?.unsignedTx !== undefined
+      ) {
+        setIsWaitingForGuestSignature(true);
+      }
+    };
+    fetchPartialTxInfo().catch(console.error);
+    const interval = setInterval(() => {
+      fetchPartialTxInfo().catch(console.error);
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
+  useEffect(() => {
+    const fetchSubmittedTxId = async (): Promise<void> => {
+      if (!pollForSubmittedrTxId) {
+        return;
+      }
+      const txResponse = await backendRequest(
+        `/tx?secret=${props.tradingSessionId}`
+      );
+      if (txResponse.status !== 200) {
+        throw new Error('Failed to get tx');
+      }
+      if (txResponse.body.submitted === true) {
+        setPollForSubmittedTxId(false);
+        props.setTxId(txResponse.body.txId);
+      }
+    };
+    fetchSubmittedTxId().catch(console.error);
+    const interval = setInterval(() => {
+      fetchSubmittedTxId().catch(console.error);
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
   return (
     <Button
       disabled={isWaitingForGuestSignature}
       onClick={() => {
-        setIsWaitingForGuestSignature(true);
-        props.notifyAwaitingGuestSignature();
         (async () => {
           const { unsignedTx, inputIndicesA, inputIndicesB } =
             await buildUnsignedMultisigSwapTx({
@@ -66,21 +116,17 @@ export const SwapButton = (props: {
           }
 
           // Poll for /tx/{secret} and wait until the tx is submitted (save the txId to show explorer link)
-          let foundTxId: string | undefined;
-          while (foundTxId === undefined) {
-            const txResponse = await backendRequest(
-              `/tx?secret=${props.tradingSessionId}`
-            );
-            if (txResponse.status !== 200) {
-              throw new Error('Failed to get tx');
-            }
-            if (txResponse.body.submitted as boolean) {
-              foundTxId = txResponse.body.txId;
-            }
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-          }
-          props.setTxId(foundTxId);
-        })().catch(console.error);
+          setPollForSubmittedTxId(true);
+        })()
+          .then(() => {
+            setIsWaitingForGuestSignature(true);
+            props.notifyAwaitingGuestSignature(true);
+          })
+          .catch((err) => {
+            console.error(err);
+            setIsWaitingForGuestSignature(false);
+            props.notifyAwaitingGuestSignature(false);
+          });
       }}
     >
       {isWaitingForGuestSignature ? <span>Waiting...</span> : <span>Swap</span>}

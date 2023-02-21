@@ -34,6 +34,8 @@ export function SwappingPhaseCreator(props: {
   const [awaitingGuestSignature, setAwaitingGuestSignature] = useState(false);
   const [txId, setTxId] = useState<string | undefined>(undefined);
 
+  // TODO implement a hook to check if tx was submitted and use it to render success text
+
   if (txId !== undefined) {
     return (
       <ThemeProvider theme={theme}>
@@ -91,8 +93,8 @@ export function SwappingPhaseCreator(props: {
                 selectedNftsB={selectedNftsB}
                 selectedFungibleTokensB={selectedFungibleTokensB}
                 selectedNanoErgB={selectedNanoErgB}
-                notifyAwaitingGuestSignature={() => {
-                  setAwaitingGuestSignature(true);
+                notifyAwaitingGuestSignature={(isAwaiting: boolean) => {
+                  setAwaitingGuestSignature(isAwaiting);
                 }}
                 setTxId={setTxId}
               />
