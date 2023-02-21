@@ -11,6 +11,7 @@ import {
 import { Introduction } from '@components/Home/Introduction';
 import Image from 'next/image';
 import beastImage from '@public/token-swap-beast.png';
+import { Alert } from '@components/Common/Alert';
 
 export default function Home(): JSX.Element {
   return (
@@ -18,6 +19,10 @@ export default function Home(): JSX.Element {
       <Nav />
       <MainSectionDiv style={{ justifyContent: 'space-evenly' }}>
         <CenteredDiv>
+          <Alert type="error">
+            This is a beta version of single-tx-swap. Please only use tokens
+            that don't have value for testing.
+          </Alert>
           <FlexDiv style={{ width: '50%' }}>
             <Introduction />
             <Accordion
@@ -41,6 +46,13 @@ export default function Home(): JSX.Element {
                   answer:
                     'Yes! There are basically no risks if you carefully check the transaction before signing it. ' +
                     'Once the transaction is submitted, the swap happens as a whole or does not happen at all if it fails.',
+                },
+                {
+                  question: 'Which wallets are supported?',
+                  answer:
+                    'Features we need are currently only implemented in a beta release of Nautilus wallet. ' +
+                    'If you would like to test this application, you have to install a beta release that can be found ' +
+                    'here: https://github.com/capt-nemo429/nautilus-wallet/releases/tag/v0.8.0-alpha.0',
                 },
                 {
                   question: 'Are there any fees?',
