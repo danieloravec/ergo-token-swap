@@ -1,8 +1,8 @@
-import { Logo } from '@components/Logo';
+import { Logo } from '@components/Common/Logo';
 import { NavLinkSpaced } from '@components/Nav/NavLinkSpaced';
 import { ConnectWalletButton } from '@components/Wallet/ConnectWalletButton';
 import styled from 'styled-components';
-import { Spacer } from '@components/Spacer';
+import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 
 const NavContainer = styled.div`
@@ -30,8 +30,7 @@ export function Nav(): JSX.Element {
         <Logo />
       </NavSubcontainer>
       <NavSubcontainer float="right">
-        <NavLinkSpaced href="#">Home</NavLinkSpaced>
-        <NavLinkSpaced href="#">About</NavLinkSpaced>
+        <NavLinkSpaced href="/">Home</NavLinkSpaced>
         <ConnectWalletButton />
         <Spacer size={spacing.spacing_xs} vertical={false} />
       </NavSubcontainer>

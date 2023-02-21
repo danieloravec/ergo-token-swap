@@ -1,6 +1,4 @@
 import { Nav } from '@components/Nav/Nav';
-import { ThemeProvider } from 'styled-components';
-import { useThemeStore } from '@components/hooks';
 import React, { useEffect, useState } from 'react';
 import { Footer } from '@components/Footer/Footer';
 import { WaitingPhaseCreator } from '@components/Swap/WaitingPhaseCreator';
@@ -9,29 +7,48 @@ import { useWalletStore } from '@components/Wallet/hooks';
 import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected';
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
-import NoSsr from '@components/NoSsr';
+import { SwappingPhaseCreator } from '@components/Swap/SwappingPhaseCreator';
+import { type ParticipantInfo } from '@components/Swap/types';
+import { Div } from '@components/Common/Alignment';
+import { LoadingPage } from '@components/Common/LoadingPage';
 
 export default function Swap(): JSX.Element {
-  const creatorRepr = 'creator';
-  const guestRepr = 'guest';
-  const { theme } = useThemeStore();
   const { address } = useWalletStore();
   const router = useRouter();
   const { tradingSessionId } = router.query;
-  const [whoami, setWhoami] = useState<string | undefined>(undefined);
+  const { wallet } = useWalletStore();
+  const [creatorInfo, setCreatorInfo] = useState<ParticipantInfo | undefined>();
+  const [guestInfo, setGuestInfo] = useState<ParticipantInfo | undefined>();
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
-    const fetchWhoamiMaybeEnter = async (): Promise<void> => {
-      if (tradingSessionId === undefined || address === undefined) {
+    setIsMounted(true);
+  });
+
+  useEffect(() => {
+    const fetchInfoMaybeEnter = async (): Promise<void> => {
+      if (
+        tradingSessionId === undefined ||
+        address === undefined ||
+        guestInfo !== undefined
+      ) {
         return;
       }
-      const whoamiResponse = await backendRequest(
-        `/session/whoami?secret=${tradingSessionId}&address=${address}`
+      const infoResponse = await backendRequest(
+        `/session/info?secret=${tradingSessionId}`
       );
-      if (whoamiResponse.status !== 200) {
-        setWhoami(undefined);
-      } else if (whoamiResponse.body?.whoami !== undefined) {
-        setWhoami(whoamiResponse.body.whoami);
-      } else {
+      if (infoResponse.status !== 200) {
+        console.error(infoResponse);
+        setCreatorInfo(undefined);
+        setGuestInfo(undefined);
+        return;
+      }
+      if (infoResponse.body?.creator !== undefined) {
+        setCreatorInfo(infoResponse.body.creator as ParticipantInfo);
+      }
+      if (infoResponse.body?.guest !== undefined) {
+        setGuestInfo(infoResponse.body.guest as ParticipantInfo);
+      } else if (infoResponse.body?.creator?.address !== address) {
         const sessionEnterBody = {
           secret: tradingSessionId,
           guestAddr: address,
@@ -44,47 +61,77 @@ export default function Swap(): JSX.Element {
         if (sessionEnterResponse.status !== 200) {
           throw new Error('Error entering session as a guest.');
         }
-        setWhoami(guestRepr);
+        const updatedInfoResponse = await backendRequest(
+          `/session/info?secret=${tradingSessionId}`
+        );
+        if (
+          updatedInfoResponse.status === 200 &&
+          updatedInfoResponse.body?.guest !== undefined
+        ) {
+          setGuestInfo(updatedInfoResponse.body.guest as ParticipantInfo);
+        }
       }
     };
-    fetchWhoamiMaybeEnter().catch(console.error);
-  }, [address, tradingSessionId]);
+    fetchInfoMaybeEnter().catch(console.error);
+    const interval = setInterval(() => {
+      fetchInfoMaybeEnter().catch(console.error);
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [tradingSessionId, address, creatorInfo]);
+
+  if (!isMounted) {
+    return <LoadingPage />;
+  }
 
   if (address === undefined) {
-    return (
-      <NoSsr>
-        <SwapWalletNotConnected />
-      </NoSsr>
-    );
+    return <SwapWalletNotConnected />;
   }
   if (typeof tradingSessionId !== 'string') {
-    return (
-      <NoSsr>
-        <div>Invalid trading session id</div>
-      </NoSsr>
-    ); // TODO use something more reasonable here
+    return <div>Invalid trading session id</div>; // TODO use something more reasonable here
   }
 
-  if (whoami !== creatorRepr && whoami !== guestRepr) {
+  if (creatorInfo?.address !== address && guestInfo?.address !== address) {
+    return <LoadingPage />;
+  }
+
+  if (wallet === undefined) {
+    throw new Error('Wallet is undefined');
+  }
+
+  if (
+    creatorInfo !== undefined &&
+    guestInfo !== undefined &&
+    creatorInfo?.address === address
+  ) {
     return (
-      <NoSsr>
-        <div>Loading...</div> // TODO make a loader page for this instead
-      </NoSsr>
+      <Div>
+        <Nav />
+        <SwappingPhaseCreator
+          wallet={wallet}
+          tradingSessionId={tradingSessionId}
+          creatorInfo={creatorInfo}
+          guestInfo={guestInfo}
+        />
+        <Footer />
+      </Div>
     );
   }
 
   return (
-    <NoSsr>
-      <ThemeProvider theme={theme}>
-        <Nav />
-        {whoami === creatorRepr && (
-          <WaitingPhaseCreator tradingSessionId={tradingSessionId} />
-        )}
-        {whoami === guestRepr && (
-          <WaitingPhaseGuest tradingSessionId={tradingSessionId} />
-        )}
-        <Footer />
-      </ThemeProvider>
-    </NoSsr>
+    <Div>
+      <Nav />
+      {address === creatorInfo?.address && (
+        <WaitingPhaseCreator guestIsReady={guestInfo !== undefined} />
+      )}
+      {address === guestInfo?.address && (
+        <WaitingPhaseGuest
+          wallet={wallet}
+          tradingSessionId={tradingSessionId}
+        />
+      )}
+      <Footer />
+    </Div>
   );
 }

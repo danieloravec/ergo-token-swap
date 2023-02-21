@@ -3,6 +3,7 @@ import {
   type SignedTransaction,
   type UnsignedTransaction,
   type TransactionId,
+  type SignedInput,
 } from '@fleet-sdk/common/src/types';
 
 interface Paginate {
@@ -30,6 +31,11 @@ export declare interface WalletApi {
     tx: UnsignedTransaction,
     index: number
   ) => Promise<SignedInput>;
+  // Not a part of EIP-0012 yet, might not be available in all wallets
+  sign_tx_inputs: (
+    tx: UnsignedTransaction,
+    indices: number[]
+  ) => Promise<SignedInput[]>;
   sign_data: (addr: Address, message: string) => Promise<string>;
   submit_tx: (tx: SignedTransaction) => Promise<TransactionId>;
 }

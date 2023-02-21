@@ -19,13 +19,22 @@ export const CenteredDivVertical = styled.div`
   height: 100%;
   align-items: center;
   align-content: center;
-  justify-content: center;
 `;
 
-export const FlexDiv = styled.div`
+export const CenteredDiv = styled(CenteredDivHorizontal)`
+  justify-content: center;
+  align-content: center;
+`;
+
+export const FlexDiv = styled.div<{ width?: string; flexDirection?: string }>`
   display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
+  width: ${(props) => {
+    return props.width ?? 'auto';
+  }};
+  flex-direction: ${(props) => {
+    return props.flexDirection ?? 'row';
+  }};
 `;
 
 export const MainSectionDiv = styled.div`
@@ -36,3 +45,5 @@ export const MainSectionDiv = styled.div`
   align-content: center;
   background: ${(props) => props.theme.properties.colorBg};
 `;
+
+export const Div = styled.div``;

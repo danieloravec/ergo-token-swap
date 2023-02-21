@@ -1,7 +1,7 @@
 import { CenteredDivVertical, FlexDiv } from '@components/Common/Alignment';
 import { Heading1, Heading3 } from '@components/Common/Text';
 import { useState } from 'react';
-import styled, { ThemeProvider, useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 interface AccordionProps {
   width?: string;
@@ -14,6 +14,7 @@ interface AccordionProps {
 
 const SvgMaybeRotated = styled.svg<{ rotated: boolean }>`
   transform: ${(props) => (props.rotated ? 'rotate(90deg)' : 'rotate(0deg)')};
+  fill: ${(props) => props.theme.properties.colorBgText};
 `;
 
 const Arrow = (props: { rotated: boolean }): JSX.Element => {
@@ -49,36 +50,33 @@ const HeadingArrowWrapper = styled(CenteredDivVertical)`
 `;
 
 export const Accordion = (props: AccordionProps): JSX.Element => {
-  const theme = useTheme();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <ThemeProvider theme={theme}>
-      <AccordionContainer width={props.width}>
-        <Heading1>{props.title}</Heading1>
-        {props.entries.map((entry, idx) => {
-          return (
-            <AccordionItemWrapper
-              key={idx}
-              onClick={() => {
-                if (idx === openIndex) {
-                  setOpenIndex(null);
-                } else {
-                  setOpenIndex(idx);
-                }
-              }}
-            >
-              <HeadingArrowWrapper>
-                <Heading3>{entry.question}</Heading3>
-                <Arrow rotated={idx === openIndex} />
-              </HeadingArrowWrapper>
-              {idx === openIndex && (
-                <p style={{ width: '100%' }}>{entry.answer}</p>
-              )}
-            </AccordionItemWrapper>
-          );
-        })}
-      </AccordionContainer>
-    </ThemeProvider>
+    <AccordionContainer width={props.width}>
+      <Heading1>{props.title}</Heading1>
+      {props.entries.map((entry, idx) => {
+        return (
+          <AccordionItemWrapper
+            key={idx}
+            onClick={() => {
+              if (idx === openIndex) {
+                setOpenIndex(null);
+              } else {
+                setOpenIndex(idx);
+              }
+            }}
+          >
+            <HeadingArrowWrapper>
+              <Heading3>{entry.question}</Heading3>
+              <Arrow rotated={idx === openIndex} />
+            </HeadingArrowWrapper>
+            {idx === openIndex && (
+              <p style={{ width: '100%' }}>{entry.answer}</p>
+            )}
+          </AccordionItemWrapper>
+        );
+      })}
+    </AccordionContainer>
   );
 };

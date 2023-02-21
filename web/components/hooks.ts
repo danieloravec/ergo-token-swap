@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { themes, type SupportedThemeName, type Theme } from '@themes/themes';
-
-const defaultThemeName: SupportedThemeName = 'light'; // TODO move to config
+import { config } from '@config';
 
 export const useThemeStore = create<{
   themeName: SupportedThemeName;
@@ -12,8 +11,8 @@ export const useThemeStore = create<{
 }>()(
   persist(
     (set, get) => ({
-      themeName: defaultThemeName,
-      theme: themes[defaultThemeName as SupportedThemeName],
+      themeName: config.defaultThemeName,
+      theme: themes[config.defaultThemeName],
       setThemeName: (tn: SupportedThemeName) => {
         set({ themeName: tn });
       },

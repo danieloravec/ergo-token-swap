@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@fleet-sdk/core": "^0.1.0-alpha.19",
+    "@next/font": "^13.1.6",
     "@types/styled-components": "^5.1.26",
+    "ergo-lib-wasm-browser": "^0.23.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "fs": "^0.0.1-security",
     "install": "^0.13.0",

@@ -1,7 +1,8 @@
 import styled from 'styled-components';
-import { Spacer } from '@components/Spacer';
+import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import React from 'react';
+import { useRouter } from 'next/router';
 
 interface NavLinkProps {
   href?: string;
@@ -16,6 +17,7 @@ const StyledNavLink = styled.a`
   width: auto;
   max-width: 100px;
   height: 21px;
+  color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
 const LinkAndSpacerContainer = styled.div`
@@ -24,9 +26,20 @@ const LinkAndSpacerContainer = styled.div`
 `;
 
 export function NavLinkSpaced(props: NavLinkProps): JSX.Element {
+  const router = useRouter();
   return (
     <LinkAndSpacerContainer>
-      <StyledNavLink href={props.href === undefined ? '#' : props.href}>
+      <StyledNavLink
+        style={{ cursor: 'pointer' }}
+        onClick={() => {
+          const redirect = async (): Promise<void> => {
+            if (props.href !== undefined) {
+              await router.push(props.href);
+            }
+          };
+          redirect().catch(console.error);
+        }}
+      >
         {props.children === undefined ? null : props.children}
       </StyledNavLink>
       <Spacer vertical={false} size={spacing.spacing_xl} />
