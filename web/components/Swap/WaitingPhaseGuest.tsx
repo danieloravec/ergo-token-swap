@@ -91,49 +91,30 @@ export function WaitingPhaseGuest(props: {
   });
 
   useEffect(() => {
-    if (
-      unsignedTx === undefined ||
-      inputIndicesCreator === undefined ||
-      inputIndicesGuest === undefined ||
-      signedInputsCreator === undefined
-    ) {
-      const fetchPartialTxInfo = async (): Promise<void> => {
-        let unsignedTxReady = false;
-        while (!unsignedTxReady) {
-          try {
-            const partialTxResponse = await backendRequest(
-              `/tx/partial?secret=${props.tradingSessionId}`
-            );
-            if (partialTxResponse.status !== 200) {
-              console.error('Failed to get partial tx info');
-            }
-            if (
-              partialTxResponse?.body?.unsignedTx !== undefined &&
-              partialTxResponse?.body?.inputIndicesCreator !== undefined &&
-              partialTxResponse?.body?.inputIndicesGuest !== undefined &&
-              partialTxResponse?.body?.signedInputsCreator !== undefined
-            ) {
-              unsignedTxReady = true;
-              setUnsignedTx(partialTxResponse.body.unsignedTx);
-              setInputIndicesCreator(
-                partialTxResponse.body.inputIndicesCreator
-              );
-              setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
-              setSignedInputsCreator(
-                partialTxResponse.body.signedInputsCreator
-              );
-            }
-          } catch (err) {
-            console.error(err);
-          }
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-        }
-      };
-      if (isLoaded && submittedTxId === undefined) {
-        fetchPartialTxInfo().catch(console.error);
+    const fetchPartialTxInfo = async (): Promise<void> => {
+      if (!isLoaded || unsignedTx !== undefined) {
+        return;
       }
-    }
-  }, [unsignedTx, inputIndicesCreator, inputIndicesGuest, signedInputsCreator]);
+      const partialTxResponse = await backendRequest(
+        `/tx/partial?secret=${props.tradingSessionId}`
+      );
+      if (partialTxResponse.status !== 200) {
+        console.error('Failed to get partial tx info');
+      }
+      if (
+        partialTxResponse?.body?.unsignedTx !== undefined &&
+        partialTxResponse?.body?.inputIndicesCreator !== undefined &&
+        partialTxResponse?.body?.inputIndicesGuest !== undefined &&
+        partialTxResponse?.body?.signedInputsCreator !== undefined
+      ) {
+        setUnsignedTx(partialTxResponse.body.unsignedTx);
+        setInputIndicesCreator(partialTxResponse.body.inputIndicesCreator);
+        setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
+        setSignedInputsCreator(partialTxResponse.body.signedInputsCreator);
+      }
+    };
+    fetchPartialTxInfo().catch(console.error);
+  }, [isLoaded]);
 
   useEffect(() => {
     if (
@@ -145,6 +126,9 @@ export function WaitingPhaseGuest(props: {
       return;
     }
     const finalizeGuestSigningAndSubmit = async (): Promise<void> => {
+      if (submittedTxId !== undefined) {
+        return;
+      }
       if (unsignedTx.id === undefined) {
         throw new Error('txId is undefined');
       }
@@ -188,9 +172,7 @@ export function WaitingPhaseGuest(props: {
         console.error(err);
       }
     };
-    if (!isLoaded || submittedTxId !== undefined) {
-      finalizeGuestSigningAndSubmit().catch(console.error);
-    }
+    finalizeGuestSigningAndSubmit().catch(console.error);
   }, [unsignedTx, signedInputsCreator, inputIndicesCreator, inputIndicesGuest]);
 
   return (
