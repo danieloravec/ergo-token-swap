@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { useWalletConnect } from '@components/Wallet/hooks';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Chakra_Petch } from '@next/font/google';
 import { ThemeProvider } from 'styled-components';
 import { useThemeStore } from '@components/hooks';
@@ -15,8 +15,10 @@ const chakraPetch = Chakra_Petch({
 
 export default function App({ Component, pageProps }: AppProps): JSX.Element {
   const { reconnect } = useWalletConnect();
-  const { theme, setThemeName, setTheme } = useThemeStore();
-  const defaultTheme = themes[config.defaultThemeName];
+  const [selectedThemeName, setSelectedThemeName] = useState<'light' | 'dark'>(
+    config.defaultThemeName
+  );
+  const { themeName } = useThemeStore();
 
   useEffect(() => {
     const load = async (): Promise<void> => {
@@ -26,15 +28,12 @@ export default function App({ Component, pageProps }: AppProps): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (theme === undefined) {
-      setThemeName(config.defaultThemeName);
-      setTheme(defaultTheme);
-    }
+    setSelectedThemeName(themeName);
   });
 
   return (
     <main className={chakraPetch.className}>
-      <ThemeProvider theme={theme === undefined ? defaultTheme : theme}>
+      <ThemeProvider theme={themes[selectedThemeName]}>
         <Component {...pageProps} />
       </ThemeProvider>
     </main>
