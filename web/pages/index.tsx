@@ -4,14 +4,34 @@ import { Footer } from '@components/Footer/Footer';
 import { Accordion } from '@components/Common/Accordion';
 import {
   CenteredDiv,
+  CenteredDivHorizontal,
   Div,
-  FlexDiv,
   MainSectionDiv,
 } from '@components/Common/Alignment';
 import { Introduction } from '@components/Home/Introduction';
 import Image from 'next/image';
 import beastImage from '@public/token-swap-beast.png';
 import { Alert } from '@components/Common/Alert';
+import styled from 'styled-components';
+
+const ColumnContainer = styled(CenteredDivHorizontal)`
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 50%;
+  }
+`;
+
+const ImageColumnContainer = styled.div`
+  position: relative;
+  width: 300px;
+  height: 300px;
+
+  @media (min-width: 768px) {
+    width: 600px;
+    height: 600px;
+  }
+`;
 
 export default function Home(): JSX.Element {
   return (
@@ -23,10 +43,10 @@ export default function Home(): JSX.Element {
             This is a beta version of single-tx-swap. Please only use tokens
             that don't have value for testing.
           </Alert>
-          <FlexDiv style={{ width: '50%' }}>
+          <ColumnContainer>
             <Introduction />
             <Accordion
-              width="600px"
+              width="80%"
               title="FAQ"
               entries={[
                 {
@@ -68,10 +88,8 @@ export default function Home(): JSX.Element {
                 },
               ]}
             />
-          </FlexDiv>
-          <div
-            style={{ position: 'relative', width: '600px', height: '600px' }}
-          >
+          </ColumnContainer>
+          <ImageColumnContainer>
             <Image
               fill
               src={beastImage}
@@ -79,7 +97,7 @@ export default function Home(): JSX.Element {
               alt="Token swapping transaction"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-          </div>
+          </ImageColumnContainer>
         </CenteredDiv>
       </MainSectionDiv>
       <Footer />
