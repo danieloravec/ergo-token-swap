@@ -21,6 +21,13 @@ const NavSubcontainer = styled.div`
   align-items: center;
 `;
 
+const ConnectWalletButtonContainer = styled.div`
+  display: none;
+  @media (min-width: 600px) {
+    display: flex;
+  }
+`;
+
 export function Nav(): JSX.Element {
   return (
     <NavContainer>
@@ -31,7 +38,9 @@ export function Nav(): JSX.Element {
       </NavSubcontainer>
       <NavSubcontainer float="right">
         <NavLinkSpaced href="/">Home</NavLinkSpaced>
-        <ConnectWalletButton />
+        <ConnectWalletButtonContainer>
+          <ConnectWalletButton />
+        </ConnectWalletButtonContainer>
         <Spacer size={spacing.spacing_xs} vertical={false} />
       </NavSubcontainer>
     </NavContainer>
