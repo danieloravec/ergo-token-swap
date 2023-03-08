@@ -79,7 +79,7 @@ export default function Swap(): JSX.Element {
     return () => {
       clearInterval(interval);
     };
-  }, [tradingSessionId, address, creatorInfo]);
+  }, []);
 
   if (!isMounted) {
     return <LoadingPage />;
