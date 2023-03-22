@@ -25,7 +25,7 @@ import { type Amount, type Box } from '@fleet-sdk/core';
 import { combineSignedInputs } from '@components/Swap/utils';
 import { config } from '@config';
 
-const WaitingPhaseCreatorContainer = styled.div`
+const WaitingPhaseHostContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   height: 80vh;
@@ -55,13 +55,13 @@ export function WaitingPhaseGuest(props: {
   const [unsignedTx, setUnsignedTx] = useState<
     EIP12UnsignedTransaction | undefined
   >(undefined);
-  const [inputIndicesCreator, setInputIndicesCreator] = useState<
+  const [inputIndicesHost, setInputIndicesHost] = useState<
     number[] | undefined
   >(undefined);
   const [inputIndicesGuest, setInputIndicesGuest] = useState<
     number[] | undefined
   >(undefined);
-  const [signedInputsCreator, setSignedInputsCreator] = useState<
+  const [signedInputsHost, setSignedInputsHost] = useState<
     SignedInput[] | undefined
   >(undefined);
   const [submittedTxId, setSubmittedTxId] = useState<string | undefined>(
@@ -103,16 +103,16 @@ export function WaitingPhaseGuest(props: {
       }
       if (
         partialTxResponse?.body?.unsignedTx !== undefined &&
-        partialTxResponse?.body?.inputIndicesCreator !== undefined &&
+        partialTxResponse?.body?.inputIndicesHost !== undefined &&
         partialTxResponse?.body?.inputIndicesGuest !== undefined &&
-        partialTxResponse?.body?.signedInputsCreator !== undefined
+        partialTxResponse?.body?.signedInputsHost !== undefined
       ) {
         console.log(`GONNA SET`);
         console.log(partialTxResponse.body.unsignedTx);
         setUnsignedTx(partialTxResponse.body.unsignedTx);
-        setInputIndicesCreator(partialTxResponse.body.inputIndicesCreator);
+        setInputIndicesHost(partialTxResponse.body.inputIndicesHost);
         setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
-        setSignedInputsCreator(partialTxResponse.body.signedInputsCreator);
+        setSignedInputsHost(partialTxResponse.body.signedInputsHost);
       }
     };
     fetchPartialTxInfo().catch(console.error);
@@ -127,8 +127,8 @@ export function WaitingPhaseGuest(props: {
   useEffect(() => {
     if (
       unsignedTx === undefined ||
-      signedInputsCreator === undefined ||
-      inputIndicesCreator === undefined ||
+      signedInputsHost === undefined ||
+      inputIndicesHost === undefined ||
       inputIndicesGuest === undefined
     ) {
       return;
@@ -145,9 +145,9 @@ export function WaitingPhaseGuest(props: {
         inputIndicesGuest
       );
       const signedInputs = combineSignedInputs(
-        signedInputsCreator,
+        signedInputsHost,
         signedGuestInputs,
-        inputIndicesCreator,
+        inputIndicesHost,
         inputIndicesGuest
       );
       const txId = unsignedTx.id;
@@ -184,7 +184,7 @@ export function WaitingPhaseGuest(props: {
   }, [unsignedTx]);
 
   return (
-    <WaitingPhaseCreatorContainer>
+    <WaitingPhaseHostContainer>
       <CenteredDivVertical>
         <CenteredDivHorizontal>
           <Heading1>
@@ -220,6 +220,6 @@ export function WaitingPhaseGuest(props: {
           </Div>
         )}
       </CenteredDivVertical>
-    </WaitingPhaseCreatorContainer>
+    </WaitingPhaseHostContainer>
   );
 }

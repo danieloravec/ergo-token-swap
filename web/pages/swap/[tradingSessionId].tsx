@@ -1,13 +1,13 @@
 import { Nav } from '@components/Nav/Nav';
 import React, { useEffect, useState } from 'react';
 import { Footer } from '@components/Footer/Footer';
-import { WaitingPhaseCreator } from '@components/Swap/WaitingPhaseCreator';
+import { WaitingPhaseHost } from '@components/Swap/WaitingPhaseHost';
 import { useRouter } from 'next/router';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected';
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
-import { SwappingPhaseCreator } from '@components/Swap/SwappingPhaseCreator';
+import { SwappingPhaseHost } from '@components/Swap/SwappingPhaseHost';
 import { type ParticipantInfo } from '@components/Swap/types';
 import { Div } from '@components/Common/Alignment';
 import { LoadingPage } from '@components/Common/LoadingPage';
@@ -17,7 +17,7 @@ export default function Swap(): JSX.Element {
   const router = useRouter();
   const { tradingSessionId } = router.query;
   const { wallet } = useWalletStore();
-  const [creatorInfo, setCreatorInfo] = useState<ParticipantInfo | undefined>();
+  const [hostInfo, setHostInfo] = useState<ParticipantInfo | undefined>();
   const [guestInfo, setGuestInfo] = useState<ParticipantInfo | undefined>();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -39,16 +39,16 @@ export default function Swap(): JSX.Element {
       );
       if (infoResponse.status !== 200) {
         console.error(infoResponse);
-        setCreatorInfo(undefined);
+        setHostInfo(undefined);
         setGuestInfo(undefined);
         return;
       }
-      if (infoResponse.body?.creator !== undefined) {
-        setCreatorInfo(infoResponse.body.creator as ParticipantInfo);
+      if (infoResponse.body?.host !== undefined) {
+        setHostInfo(infoResponse.body.host as ParticipantInfo);
       }
       if (infoResponse.body?.guest !== undefined) {
         setGuestInfo(infoResponse.body.guest as ParticipantInfo);
-      } else if (infoResponse.body?.creator?.address !== address) {
+      } else if (infoResponse.body?.host?.address !== address) {
         const sessionEnterBody = {
           secret: tradingSessionId,
           guestAddr: address,
@@ -92,7 +92,7 @@ export default function Swap(): JSX.Element {
     return <div>Invalid trading session id</div>; // TODO use something more reasonable here
   }
 
-  if (creatorInfo?.address !== address && guestInfo?.address !== address) {
+  if (hostInfo?.address !== address && guestInfo?.address !== address) {
     return <LoadingPage />;
   }
 
@@ -101,17 +101,17 @@ export default function Swap(): JSX.Element {
   }
 
   if (
-    creatorInfo !== undefined &&
+    hostInfo !== undefined &&
     guestInfo !== undefined &&
-    creatorInfo?.address === address
+    hostInfo?.address === address
   ) {
     return (
       <Div>
         <Nav />
-        <SwappingPhaseCreator
+        <SwappingPhaseHost
           wallet={wallet}
           tradingSessionId={tradingSessionId}
-          creatorInfo={creatorInfo}
+          hostInfo={hostInfo}
           guestInfo={guestInfo}
         />
         <Footer />
@@ -122,8 +122,8 @@ export default function Swap(): JSX.Element {
   return (
     <Div>
       <Nav />
-      {address === creatorInfo?.address && (
-        <WaitingPhaseCreator guestIsReady={guestInfo !== undefined} />
+      {address === hostInfo?.address && (
+        <WaitingPhaseHost guestIsReady={guestInfo !== undefined} />
       )}
       {address === guestInfo?.address && (
         <WaitingPhaseGuest

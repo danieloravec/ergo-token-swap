@@ -13,7 +13,7 @@ export type Schema = {
 
 export const SessionCreateBodySchema: Schema = {
     fields: {
-        creatorAddr: 'string',
+        hostAddr: 'string',
     },
 };
 
@@ -28,8 +28,8 @@ export const TxPartialRegisterBodySchema: Schema = {
     fields: {
         secret: 'string',
         unsignedTx: 'object',
-        signedInputsCreator: 'object',
-        inputIndicesCreator: 'object',
+        signedInputsHost: 'object',
+        inputIndicesHost: 'object',
         inputIndicesGuest: 'object',
     }
 }
@@ -51,4 +51,16 @@ export interface FungibleToken {
     tokenId: string;
     amount: number;
     decimals: number;
+}
+
+export const UserCreateBodySchema: Schema = {
+    fields: {
+        address: 'string',
+        username: 'string',
+        email: 'string',
+        discord: 'string',
+        twitter: 'string',
+        allowMessages: 'boolean',
+        signature: 'string',
+    }
 }

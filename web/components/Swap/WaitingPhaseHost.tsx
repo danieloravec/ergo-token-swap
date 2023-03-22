@@ -13,7 +13,7 @@ import {
   MainSectionDiv,
 } from '@components/Common/Alignment';
 
-export function WaitingPhaseCreator(props: {
+export function WaitingPhaseHost(props: {
   guestIsReady: boolean; // Do not remove guestInfo prop, it is for automatic reload
 }): JSX.Element {
   const theme = useTheme();

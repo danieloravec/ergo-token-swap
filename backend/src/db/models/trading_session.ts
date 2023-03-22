@@ -3,36 +3,36 @@ import sequelizeConnection from '@db/config'
 import { Asset } from "@types";
 import { EIP12UnsignedTransaction, SignedInput } from "@fleet-sdk/common";
 
-interface SessionAttributes {
+interface TradingSessionAttributes {
     id: number;
     secret: string;
     createdAt: Date;
-    creatorAddr: string;
-    creatorAssetsJson: Asset[];
-    creatorNanoErg: bigint;
+    hostAddr: string;
+    hostAssetsJson: Asset[];
+    hostNanoErg: bigint;
     guestAddr?: string;
     guestAssetsJson?: Asset[];
     guestNanoErg?: bigint;
     unsignedTx?: EIP12UnsignedTransaction;
     unsignedTxAddedOn?: string;
-    signedInputsCreator?: SignedInput[];
-    txInputIndicesCreator?: number[];
+    signedInputsHost?: SignedInput[];
+    txInputIndicesHost?: number[];
     txInputIndicesGuest?: number[];
     txId?: string;
     submittedAt?: Date;
 }
 
-export interface SessionInput extends Optional<SessionAttributes, 'id'> {
+export interface TradingSessionInput extends Optional<TradingSessionAttributes, 'id'> {
 }
 
-export interface SessionOuput extends Required<SessionAttributes> {
+export interface TradingSessionOuput extends Required<TradingSessionAttributes> {
 }
 
-class Session extends Model<SessionAttributes, SessionInput> implements SessionAttributes {
+class TradingSession extends Model<TradingSessionAttributes, TradingSessionInput> implements TradingSessionAttributes {
     public id!: number
-    creatorAddr!: string;
-    creatorAssetsJson!: Asset[];
-    creatorNanoErg!: bigint;
+    hostAddr!: string;
+    hostAssetsJson!: Asset[];
+    hostNanoErg!: bigint;
     guestAddr: string;
     guestAssetsJson: Asset[];
     guestNanoErg: bigint;
@@ -41,13 +41,13 @@ class Session extends Model<SessionAttributes, SessionInput> implements SessionA
     txId?: string;
     unsignedTx?: EIP12UnsignedTransaction;
     unsignedTxAddedOn?: string;
-    signedInputsCreator?: SignedInput[];
-    txInputIndicesCreator?: number[];
+    signedInputsHost?: SignedInput[];
+    txInputIndicesHost?: number[];
     txInputIndicesGuest?: number[];
     public readonly createdAt!: Date;
 }
 
-Session.init({
+TradingSession.init({
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -60,15 +60,15 @@ Session.init({
         type: DataTypes.STRING,
         allowNull: false
     },
-    creatorAddr: {
+    hostAddr: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    creatorAssetsJson: {
+    hostAssetsJson: {
         type: DataTypes.JSONB,
         allowNull: false,
     },
-    creatorNanoErg: {
+    hostNanoErg: {
         type: DataTypes.BIGINT,
         allowNull: false,
     },
@@ -78,10 +78,10 @@ Session.init({
     unsignedTxAddedOn: {
         type: DataTypes.DATE
     },
-    signedInputsCreator: {
+    signedInputsHost: {
         type: DataTypes.JSONB,
     },
-    txInputIndicesCreator: {
+    txInputIndicesHost: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
     txInputIndicesGuest: {
@@ -114,4 +114,4 @@ Session.init({
     ],
 })
 
-export default Session;
+export default TradingSession;
