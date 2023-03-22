@@ -1,6 +1,11 @@
 import TradingSession from '@db/models/trading_session';
+import User from '@db/models/user';
 import {config} from '@config';
 
 TradingSession.sync({force: config.debug, logging: console.log}).then(() => {
-  console.log("Database synced");
+  console.log("TradingSessions synced");
+});
+
+User.sync({force: config.debug, logging: console.log}).then(() => {
+  console.log("Users synced");
 });
