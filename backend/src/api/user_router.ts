@@ -6,6 +6,28 @@ import {ErgoAddress} from "@fleet-sdk/core";
 
 const userRouter = Router();
 
+userRouter.get('/', async (req, res) => {
+    try {
+      if(req.query?.address === undefined || typeof req.query?.address !== "string") {
+        res.status(400);
+        res.send("Invalid body");
+        return;
+      }
+      const user = await User.findOne({where: {address: req.query!.address}});
+      if(!user) {
+        res.status(400);
+        res.send("User not found");
+        return;
+      }
+      res.status(200);
+      res.send(user);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500);
+      res.send("Server-side error while getting the user");
+    }
+});
+
 // For creating and updating users
 userRouter.post('/', async (req, res) => {
   try {
