@@ -1,10 +1,10 @@
-import * as express from "express";
+import Router from 'express';
 import * as utils from "@utils";
 import * as types from "@types";
 import {EIP12UnsignedTransaction, SignedInput} from "@fleet-sdk/common";
 import TradingSession from "@db/models/trading_session";
 
-const txRouter = express.Router();
+const txRouter = Router();
 
 
 txRouter.post('/partial/register', async (req, res) => {

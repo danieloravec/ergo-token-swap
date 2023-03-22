@@ -52,3 +52,15 @@ export interface FungibleToken {
     amount: number;
     decimals: number;
 }
+
+export const UserCreateBodySchema: Schema = {
+    fields: {
+        address: 'string',
+        username: 'string',
+        email: 'string',
+        discord: 'string',
+        twitter: 'string',
+        allowMessages: 'boolean',
+        signature: 'string',
+    }
+}

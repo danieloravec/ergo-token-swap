@@ -1,11 +1,11 @@
-import * as express from 'express';
+import Router from 'express';
 import * as utils from "@utils";
 import * as types from "@types";
 import {ErgoAddress} from "@fleet-sdk/core";
 import {randomBytes} from "crypto";
 import TradingSession from "@db/models/trading_session";
 
-const tradingSessionRouter = express.Router();
+const tradingSessionRouter = Router();
 
 tradingSessionRouter.post('/create', async (req, res) => {
   try {

@@ -125,3 +125,12 @@ export const getSessionByQuery = async (req: Request): Promise<{status: number, 
         result: session,
     }
 }
+
+export const toHex = (str: string): string => {
+    return Buffer.from(str).toString('hex');
+}
+
+export const verifySignature = (data: object, signature: string): boolean => {
+    const serializedData = toHex(JSON.stringify(data));
+    return true; // TODO implement signature verification once dApp connector's sign_data is available
+}
