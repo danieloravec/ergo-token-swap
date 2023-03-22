@@ -23,6 +23,7 @@
       "@utils/*": ["utils/*"],
       "@public/*": ["public/*"],
       "@mappers/*": ["mappers/*"],
+      "@data-types/*": ["types/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

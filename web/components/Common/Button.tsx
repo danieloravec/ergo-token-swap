@@ -13,3 +13,15 @@ export const Button = styled.button`
   background: ${(props) => props.theme.properties.colorPrimary};
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
+
+export const ButtonSecondary = styled(Button)`
+  background: ${(props) => props.theme.properties.colorSecondary};
+`;
+
+export const ButtonTertiary = styled(Button)`
+  background: none;
+  color: ${(props) => props.theme.properties.colorBgText};
+  border-radius: 50px;
+  width: 100px;
+  height: 25px;
+`;
