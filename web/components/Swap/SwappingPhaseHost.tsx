@@ -9,10 +9,10 @@ import { SwapButton } from '@components/Swap/SwapButton';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { Alert } from '@components/Common/Alert';
 
-export function SwappingPhaseCreator(props: {
+export function SwappingPhaseHost(props: {
   wallet: Wallet;
   tradingSessionId: string;
-  creatorInfo: ParticipantInfo;
+  hostInfo: ParticipantInfo;
   guestInfo: ParticipantInfo;
 }): JSX.Element {
   const [selectedNftsA, setSelectedNftsA] = useState<Record<string, bigint>>(
@@ -57,9 +57,9 @@ export function SwappingPhaseCreator(props: {
               Specify amounts of tokens to <strong>send</strong>.
             </span>
           }
-          nfts={props.creatorInfo.nfts}
-          fungibleTokens={props.creatorInfo.fungibleTokens}
-          nanoErg={props.creatorInfo.nanoErg}
+          nfts={props.hostInfo.nfts}
+          fungibleTokens={props.hostInfo.fungibleTokens}
+          nanoErg={props.hostInfo.nanoErg}
           onChange={(
             newSelectedNfts: Record<string, bigint>,
             newSelectedNanoErg: bigint,
@@ -76,7 +76,7 @@ export function SwappingPhaseCreator(props: {
             <SwapButton
               tradingSessionId={props.tradingSessionId}
               wallet={props.wallet}
-              creatorInfo={props.creatorInfo}
+              hostInfo={props.hostInfo}
               guestInfo={props.guestInfo}
               selectedNftsA={selectedNftsA}
               selectedFungibleTokensA={selectedFungibleTokensA}

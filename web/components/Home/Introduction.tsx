@@ -17,7 +17,7 @@ const IntroductionContainer = styled.div`
 const startTradingSession = async (wallet: Wallet): Promise<string> => {
   const address = await wallet.getAddress();
   const sessionResponse = await backendRequest('/session/create', 'POST', {
-    creatorAddr: address,
+    hostAddr: address,
   });
   if (sessionResponse?.body?.secret === undefined) {
     throw new Error('Could not create trading session');

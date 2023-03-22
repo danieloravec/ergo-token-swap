@@ -8,7 +8,7 @@ import { type Wallet } from '@ergo/wallet';
 export const SwapButton = (props: {
   tradingSessionId: string;
   wallet: Wallet;
-  creatorInfo: ParticipantInfo;
+  hostInfo: ParticipantInfo;
   guestInfo: ParticipantInfo;
   selectedNftsA: Record<string, bigint>;
   selectedFungibleTokensA: Record<string, bigint>;
@@ -21,7 +21,7 @@ export const SwapButton = (props: {
 }): JSX.Element => {
   const [isWaitingForGuestSignature, setIsWaitingForGuestSignature] =
     useState(false);
-  const [isWaitingForCreatorSignature, setIsWaitingForCreatorSignature] =
+  const [isWaitingForHostSignature, setIsWaitingForHostSignature] =
     useState(false);
   const [pollForSubmittedrTxId, setPollForSubmittedTxId] = useState(false);
 
@@ -77,14 +77,14 @@ export const SwapButton = (props: {
 
   return (
     <Button
-      disabled={isWaitingForGuestSignature || isWaitingForCreatorSignature}
+      disabled={isWaitingForGuestSignature || isWaitingForHostSignature}
       onClick={() => {
         (async () => {
-          setIsWaitingForCreatorSignature(true);
+          setIsWaitingForHostSignature(true);
           const { unsignedTx, inputIndicesA, inputIndicesB } =
             await buildUnsignedMultisigSwapTx({
               wallet: props.wallet,
-              addressA: props.creatorInfo.address,
+              addressA: props.hostInfo.address,
               assetsToReceiveByAFromB: {
                 ...props.selectedNftsB,
                 ...props.selectedFungibleTokensB,
@@ -109,8 +109,8 @@ export const SwapButton = (props: {
             {
               secret: props.tradingSessionId,
               unsignedTx,
-              signedInputsCreator: signedInputsA,
-              inputIndicesCreator: inputIndicesA,
+              signedInputsHost: signedInputsA,
+              inputIndicesHost: inputIndicesA,
               inputIndicesGuest: inputIndicesB,
             }
           );
@@ -118,7 +118,7 @@ export const SwapButton = (props: {
             throw new Error('Failed to register partial tx');
           }
 
-          setIsWaitingForCreatorSignature(false);
+          setIsWaitingForHostSignature(false);
           setPollForSubmittedTxId(true);
         })()
           .then(() => {
@@ -127,13 +127,13 @@ export const SwapButton = (props: {
           })
           .catch((err) => {
             console.error(err);
-            setIsWaitingForCreatorSignature(false);
+            setIsWaitingForHostSignature(false);
             setIsWaitingForGuestSignature(false);
             props.notifyAwaitingGuestSignature(false);
           });
       }}
     >
-      {isWaitingForGuestSignature || isWaitingForCreatorSignature ? (
+      {isWaitingForGuestSignature || isWaitingForHostSignature ? (
         <span>Waiting...</span>
       ) : (
         <span>Swap</span>

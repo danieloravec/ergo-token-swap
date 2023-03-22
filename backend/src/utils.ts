@@ -1,7 +1,7 @@
 import {config} from "@config";
 import {Asset, Schema, Nft, FungibleToken} from "@types";
 import sequelizeConnection from "@db/config";
-import Session from "@db/models/session";
+import TradingSession from "@db/models/trading_session";
 import {Request} from "express";
 import fetch from "cross-fetch";
 
@@ -64,7 +64,7 @@ export const updateSession = async (secret: string, updatedData: object): Promis
     const sessionNotFoundMsg = "Session not found";
     try {
         await sequelizeConnection.transaction(async (t) => {
-            const session = await Session.findOne({
+            const session = await TradingSession.findOne({
                 where: {
                     secret
                 },
@@ -76,7 +76,7 @@ export const updateSession = async (secret: string, updatedData: object): Promis
             if(session.submittedAt) {
                 throw new Error("Session already settled");
             }
-            await Session.update(updatedData, {
+            await TradingSession.update(updatedData, {
                 where: {
                     secret
                 }
@@ -101,7 +101,7 @@ export const updateSession = async (secret: string, updatedData: object): Promis
     }
 }
 
-export const getSessionByQuery = async (req: Request): Promise<{status: number, result: string | Session}> => {
+export const getSessionByQuery = async (req: Request): Promise<{status: number, result: string | TradingSession}> => {
     if (req.query.secret === undefined) {
         return {
             status: 400,
@@ -109,7 +109,7 @@ export const getSessionByQuery = async (req: Request): Promise<{status: number, 
         };
     }
     const secret = req.query.secret as string;
-    const session = await Session.findOne({
+    const session = await TradingSession.findOne({
         where: {
             secret
         }

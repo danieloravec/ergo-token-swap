@@ -1,7 +1,7 @@
 import express from 'express';
 import {randomBytes} from 'crypto';
 import {config} from '@config';
-import Session from '@db/models/session';
+import TradingSession from '@db/models/trading_session';
 import * as utils from '@utils';
 import * as types from '@types';
 import cors from 'cors';
@@ -25,20 +25,20 @@ app.post('/session/create', async (req, res) => {
             res.send('Invalid body');
             return;
         }
-        const body: { creatorAddr: string } = req.body;
-        if (!ErgoAddress.validate(body!.creatorAddr)) {
+        const body: { hostAddr: string } = req.body;
+        if (!ErgoAddress.validate(body!.hostAddr)) {
             res.status(400);
-            res.send("Invalid creatorAddress");
+            res.send("Invalid hostAddress");
             return;
         }
         const secret = randomBytes(16).toString('hex');
-        const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(body!.creatorAddr);
+        const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(body!.hostAddr);
         try {
-            await Session.create({
+            await TradingSession.create({
                 secret,
-                creatorAddr: body!.creatorAddr,
-                creatorAssetsJson: assets,
-                creatorNanoErg: nanoErg,
+                hostAddr: body!.hostAddr,
+                hostAssetsJson: assets,
+                hostNanoErg: nanoErg,
             });
         } catch (e) {
             console.error(e.message);
@@ -97,16 +97,16 @@ app.get('/session/info', async (req, res) => {
             res.send(result);
             return;
         }
-        const session = result as Session;
-        const {nfts: creatorNfts, fungibleTokens: creatorFungibleTokens} = utils.splitAssets(session.creatorAssetsJson);
+        const session = result as TradingSession;
+        const {nfts: hostNfts, fungibleTokens: hostFungibleTokens} = utils.splitAssets(session.hostAssetsJson);
         const {nfts: guestNfts, fungibleTokens: guestFungibleTokens} = utils.splitAssets(session.guestAssetsJson);
         res.status(200);
         res.send({
-            creator: {
-                address: session.creatorAddr,
-                nfts: creatorNfts,
-                fungibleTokens: creatorFungibleTokens,
-                nanoErg: session.creatorNanoErg,
+            host: {
+                address: session.hostAddr,
+                nfts: hostNfts,
+                fungibleTokens: hostFungibleTokens,
+                nanoErg: session.hostNanoErg,
             },
             guest: session.guestAddr === null ? undefined : {
                 address: session.guestAddr,
@@ -130,12 +130,12 @@ app.post('/tx/partial/register', async (req, res) => {
             res.send('Invalid body');
             return;
         }
-        const body: {secret: string, unsignedTx: EIP12UnsignedTransaction, signedInputsCreator: SignedInput[], inputIndicesCreator: number[], inputIndicesGuest: number[]} = req.body;
+        const body: {secret: string, unsignedTx: EIP12UnsignedTransaction, signedInputsHost: SignedInput[], inputIndicesHost: number[], inputIndicesGuest: number[]} = req.body;
         const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
             unsignedTx: body.unsignedTx,
             unsignedTxAddedOn: new Date(),
-            signedInputsCreator: body.signedInputsCreator,
-            txInputIndicesCreator: body.inputIndicesCreator,
+            signedInputsHost: body.signedInputsHost,
+            txInputIndicesHost: body.inputIndicesHost,
             txInputIndicesGuest: body.inputIndicesGuest,
         });
         if(updateStatus !== 200) {
@@ -162,7 +162,7 @@ app.get('/tx/partial', async (req, res) => {
             res.send(result);
             return;
         }
-        const session = result as Session;
+        const session = result as TradingSession;
         res.status(200);
         if(session.unsignedTx === null) {
             res.send({});
@@ -171,8 +171,8 @@ app.get('/tx/partial', async (req, res) => {
         res.send({
             unsignedTx: session.unsignedTx,
             inputIndicesGuest: session.txInputIndicesGuest,
-            inputIndicesCreator: session.txInputIndicesCreator,
-            signedInputsCreator: session.signedInputsCreator,
+            inputIndicesHost: session.txInputIndicesHost,
+            signedInputsHost: session.signedInputsHost,
         })
     } catch (err) {
         console.error(err.message);
@@ -190,7 +190,7 @@ app.get('/tx', async (req, res) => {
             res.send(result);
             return;
         }
-        const session = result as Session;
+        const session = result as TradingSession;
         res.status(200);
         res.send({
             submitted: (session.submittedAt !== null),

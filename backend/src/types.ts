@@ -13,7 +13,7 @@ export type Schema = {
 
 export const SessionCreateBodySchema: Schema = {
     fields: {
-        creatorAddr: 'string',
+        hostAddr: 'string',
     },
 };
 
@@ -28,8 +28,8 @@ export const TxPartialRegisterBodySchema: Schema = {
     fields: {
         secret: 'string',
         unsignedTx: 'object',
-        signedInputsCreator: 'object',
-        inputIndicesCreator: 'object',
+        signedInputsHost: 'object',
+        inputIndicesHost: 'object',
         inputIndicesGuest: 'object',
     }
 }
