@@ -5,6 +5,9 @@ import { backendRequest } from '@utils/utils';
 import { ProfileHeader } from '@components/Profile/ProfileHeader';
 import { type ProfileInfo } from '@data-types//profile';
 import { NotFoundPage } from '@components/Common/NotFoundPage';
+import { ProfileTabs } from '@components/Profile/ProfileTabs';
+import { Spacer } from '@components/Common/Spacer';
+import { spacing } from '@themes/spacing';
 
 export default function Profile(): JSX.Element {
   const router = useRouter();
@@ -69,6 +72,8 @@ export default function Profile(): JSX.Element {
   return (
     <Div>
       <ProfileHeader data={profileInfo} />
+      <Spacer size={spacing.spacing_m} vertical />
+      <ProfileTabs profileAddress={profileAddress} />
     </Div>
   );
 }
