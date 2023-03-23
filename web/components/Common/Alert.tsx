@@ -11,7 +11,7 @@ const AlertBody = styled.div<{ type: string }>`
   align-items: center;
   justify-content: space-between;
   width: calc(100% - 10px);
-  height: 50px;
+  min-height: 50px;
   margin: 10px;
   padding: 10px;
   border-radius: 5px;
