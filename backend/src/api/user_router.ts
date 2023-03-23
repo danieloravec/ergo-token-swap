@@ -108,4 +108,27 @@ userRouter.post('/', async (req, res) => {
   }
 });
 
+userRouter.get('/assets', async (req, res) => {
+  try {
+    if (req.query?.address === undefined || typeof req.query?.address !== "string") {
+      res.status(400);
+      res.send("Invalid body");
+      return;
+    }
+    const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(req.query.address);
+    const {nfts, fungibleTokens} = utils.splitAssets(assets);
+    const resBody = {
+      nfts,
+      fungibleTokens,
+      nanoErg: String(nanoErg),
+    }
+    res.status(200);
+    res.send(resBody);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while getting the user's assets");
+  }
+});
+
 export default userRouter;
