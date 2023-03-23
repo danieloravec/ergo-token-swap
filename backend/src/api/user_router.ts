@@ -32,9 +32,9 @@ userRouter.get('/', async (req, res) => {
 // For creating and updating users
 userRouter.post('/', async (req, res) => {
   try {
-    if (req.body?.address === undefined || req.body?.signature === undefined) {
+    if (req.body?.address === undefined) {
       res.status(400);
-      res.send('Invalid body');
+      res.send('Missing address');
       return;
     }
     if (!ErgoAddress.validate(req.body!.address)) {
@@ -51,11 +51,6 @@ userRouter.post('/', async (req, res) => {
       twitter: req.body.twitter,
       allowMessages: req.body.allowMessages,
     };
-    if (!utils.verifySignature(data, req.body.signature)) {
-      res.status(400);
-      res.send('Invalid data signature');
-      return;
-    }
 
     let user: User;
     try {
@@ -68,14 +63,24 @@ userRouter.post('/', async (req, res) => {
     }
 
     if(user) {
+      if (req.body?.signature === undefined || !utils.verifySignature(data, req.body.signature)) {
+        res.status(400);
+        res.send('Invalid data signature');
+        return;
+      }
       try {
-        await User.update({
+        const updatedUserData = {
           username: req.body.username ?? user.username,
           email: req.body.email ?? user.email,
           discord: req.body.discord ?? user.discord,
           twitter: req.body.twitter ?? user.twitter,
           allowMessages: req.body.allowMessages ?? user.allowMessages,
-        }, {where: {address: req.body.address}});
+        }
+        await User.update(updatedUserData, {where: {address: req.body.address}});
+        user = {
+          address: req.body.address,
+          ...updatedUserData
+        } as User;
       } catch (e) {
         console.error(e.message);
         res.status(500);
@@ -84,7 +89,7 @@ userRouter.post('/', async (req, res) => {
       }
     } else {
       try {
-        await User.create({
+        user = await User.create({
           address: req.body.address,
           username: req.body.username,
           email: req.body.email,
@@ -101,7 +106,7 @@ userRouter.post('/', async (req, res) => {
     }
 
     res.status(200);
-    res.send({address: req.body.address});
+    res.send(user);
   } catch (err) {
     console.error(err.message);
     res.status(500);

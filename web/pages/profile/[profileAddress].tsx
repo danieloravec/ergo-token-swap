@@ -22,24 +22,41 @@ export default function Profile(): JSX.Element {
   });
 
   useEffect(() => {
-    const fetchProfileInfo = async (): Promise<void> => {
+    const fetchProfileInfoMaybeCreate = async (): Promise<void> => {
       if (profileAddress === undefined) {
         return;
       }
-      console.log(`profileAddress: ${profileAddress}`);
       const profileInfoResponse = await backendRequest(
         `/user?address=${profileAddress}`
       );
       if (profileInfoResponse.status !== 200) {
-        console.error(profileInfoResponse);
-        setIsValid(false);
+        if (profileInfoResponse.body === 'User not found') {
+          const userCreateBody = {
+            address: profileAddress,
+          };
+          const userCreateResponse = await backendRequest(
+            '/user',
+            'POST',
+            userCreateBody
+          );
+          if (userCreateResponse.status !== 200) {
+            console.error(JSON.stringify(userCreateResponse));
+            setIsValid(false);
+            return;
+          }
+          setProfileInfo(userCreateResponse.body as ProfileInfo);
+        } else {
+          console.error(profileInfoResponse);
+          setIsValid(false);
+          return;
+        }
       } else {
-        setIsValid(true);
         setProfileInfo(profileInfoResponse.body as ProfileInfo);
       }
+      setIsValid(true);
       setIsReady(true);
     };
-    fetchProfileInfo().catch(console.error);
+    fetchProfileInfoMaybeCreate().catch(console.error);
   }, [profileAddress]);
 
   if (
