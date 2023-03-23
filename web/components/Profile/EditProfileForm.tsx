@@ -11,10 +11,10 @@ import { useWalletStore } from '@components/Wallet/hooks';
 const EditProfileFormContainer = styled.div`
   width: 100%;
   @media (min-width: 600px) {
-    width: 50%;
+    width: 80%;
   }
   @media (min-width: 1000px) {
-    width: 30%;
+    width: 50%;
   }
 `;
 
@@ -26,10 +26,14 @@ const LargeInput = styled(Input)`
   border-radius: 5px;
 `;
 
+const FormAlert = styled(Alert)`
+  margin-left: 0;
+`;
+
 export const EditProfileForm = (): JSX.Element => {
   const { address } = useWalletStore();
 
-  const [displayAlerts, setDisplayAlerts] = React.useState(false);
+  const [displayFormAlerts, setDisplayFormAlerts] = React.useState(false);
   const [discord, setDiscord] = React.useState<string | undefined>(undefined);
   const [discordError, setDiscordError] = React.useState<string | undefined>(
     undefined
@@ -73,7 +77,7 @@ export const EditProfileForm = (): JSX.Element => {
   const handleDiscordChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setDisplayAlerts(false);
+    setDisplayFormAlerts(false);
     const discordValue = event.target.value;
     setDiscord(event.target.value);
     if (/^[^#]{2,32}#\d{4}$/.test(discordValue)) {
@@ -88,7 +92,7 @@ export const EditProfileForm = (): JSX.Element => {
   const handleUsernameChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setDisplayAlerts(false);
+    setDisplayFormAlerts(false);
     const usernameValue = event.target.value;
     setUsername(usernameValue);
     if (/^[a-zA-Z0-9_]{2,32}$/.test(usernameValue)) {
@@ -103,7 +107,7 @@ export const EditProfileForm = (): JSX.Element => {
   const handleTwitterChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setDisplayAlerts(false);
+    setDisplayFormAlerts(false);
     const twitterValue = event.target.value;
     setTwitter(twitterValue);
     if (/^[a-zA-Z0-9_]{1,15}$/.test(twitterValue)) {
@@ -121,7 +125,7 @@ export const EditProfileForm = (): JSX.Element => {
       discordError !== undefined ||
       twitterError !== undefined
     ) {
-      setDisplayAlerts(true);
+      setDisplayFormAlerts(true);
       return;
     }
     const submitData = async (): Promise<void> => {
@@ -159,12 +163,16 @@ export const EditProfileForm = (): JSX.Element => {
     <EditProfileFormContainer>
       <Heading1 style={{ width: '100%' }}>EDIT PROFILE</Heading1>
       {saveMessage !== undefined && (
-        <Alert type={saveMessage.type}>{saveMessage.message}</Alert>
+        <FormAlert type={saveMessage.type} marginSides="0px">
+          {saveMessage.message}
+        </FormAlert>
       )}
       <FlexDiv>
         <FlexDivRow>
-          {displayAlerts && usernameError !== undefined && (
-            <Alert type="error">{usernameError}</Alert>
+          {displayFormAlerts && usernameError !== undefined && (
+            <FormAlert type="error" marginSides="0px">
+              {usernameError}
+            </FormAlert>
           )}
           <LargeInput
             type="text"
@@ -174,8 +182,10 @@ export const EditProfileForm = (): JSX.Element => {
           />
         </FlexDivRow>
         <FlexDivRow>
-          {displayAlerts && discordError !== undefined && (
-            <Alert type="error">{discordError}</Alert>
+          {displayFormAlerts && discordError !== undefined && (
+            <FormAlert type="error" marginSides="0px">
+              {discordError}
+            </FormAlert>
           )}
           <LargeInput
             type="text"
@@ -185,8 +195,10 @@ export const EditProfileForm = (): JSX.Element => {
           />
         </FlexDivRow>
         <FlexDivRow>
-          {displayAlerts && twitterError !== undefined && (
-            <Alert type="error">{twitterError}</Alert>
+          {displayFormAlerts && twitterError !== undefined && (
+            <FormAlert type="error" marginSides="0px">
+              {twitterError}
+            </FormAlert>
           )}
           <LargeInput
             type="text"
