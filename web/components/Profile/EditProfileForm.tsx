@@ -43,6 +43,9 @@ export const EditProfileForm = (): JSX.Element => {
     undefined
   );
   const [isMounted, setIsMounted] = React.useState(false);
+  const [saveMessage, setSaveMessage] = React.useState<
+    { message: string; type: 'success' | 'error' } | undefined
+  >(undefined);
 
   useEffect(() => {
     console.log(`address: ${address}`);
@@ -121,22 +124,43 @@ export const EditProfileForm = (): JSX.Element => {
       setDisplayAlerts(true);
       return;
     }
-    console.log('Not implemented');
-    // const submitData = async () => {
-    //   const body = {
-    //     address: address,
-    //     discord: discord,
-    //     twitter: twitter,
-    //     username: username,
-    //     signature: "DUMMY_SIGNATURE"
-    //   }
-    //   const response = await backendRequest("POST", "/user", body);
-    // }
+    const submitData = async (): Promise<void> => {
+      const body = {
+        address,
+        discord,
+        twitter,
+        username,
+        signature: 'DUMMY_SIGNATURE',
+      }; // TODO add email
+      try {
+        const response = await backendRequest('/user', 'POST', body);
+        if (response?.status !== 200) {
+          setSaveMessage({
+            message: `Error saving profile: ${response.message}`,
+            type: 'error',
+          });
+        } else {
+          setSaveMessage({
+            message: 'Profile saved successfully.',
+            type: 'success',
+          });
+        }
+      } catch (err) {
+        setSaveMessage({
+          message: `Unexpected error: ${JSON.stringify(err)}`,
+          type: 'error',
+        });
+      }
+    };
+    submitData().catch(console.error);
   };
 
   return (
     <EditProfileFormContainer>
       <Heading1 style={{ width: '100%' }}>EDIT PROFILE</Heading1>
+      {saveMessage !== undefined && (
+        <Alert type={saveMessage.type}>{saveMessage.message}</Alert>
+      )}
       <FlexDiv>
         <FlexDivRow>
           {displayAlerts && usernameError !== undefined && (

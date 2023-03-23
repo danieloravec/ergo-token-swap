@@ -101,7 +101,7 @@ userRouter.post('/', async (req, res) => {
     }
 
     res.status(200);
-    res.send(req.body.address);
+    res.send({address: req.body.address});
   } catch (err) {
     console.error(err.message);
     res.status(500);
