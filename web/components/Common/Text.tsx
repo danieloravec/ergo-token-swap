@@ -48,3 +48,8 @@ export const A = styled.a`
   color: ${(props) => props.theme.properties.colorPrimary};
   cursor: pointer;
 `;
+
+export const Input = styled.input`
+  background: ${(props) => props.theme.properties.colorBg};
+  color: ${(props) => props.theme.properties.colorBgText};
+`;

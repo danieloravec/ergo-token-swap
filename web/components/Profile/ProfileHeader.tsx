@@ -1,8 +1,5 @@
 import { type ProfileInfo } from '@data-types/profile';
-import {
-  CenteredDivVertical,
-  FlexDiv,
-} from '@components/Common/Alignment';
+import { CenteredDivVertical, FlexDiv } from '@components/Common/Alignment';
 import Image from 'next/image';
 import { Heading2, Text } from '@components/Common/Text';
 import styled, { useTheme } from 'styled-components';
@@ -13,6 +10,8 @@ import { spacing } from '@themes/spacing';
 import React from 'react';
 import { Twitter } from '@components/Icons/Twitter';
 import { Email } from '@components/Icons/Email';
+import { useWalletStore } from '@components/Wallet/hooks';
+import { useRouter } from 'next/router';
 
 const ProfileHeaderContainer = styled(FlexDiv)`
   width: 80%;
@@ -40,6 +39,9 @@ const AddressTextWrapper = styled(Text)`
 export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
   const theme = useTheme();
   const profilePhotoHeight = 100;
+  const { address } = useWalletStore();
+  const router = useRouter();
+
   return (
     <ProfileHeaderContainer>
       <FlexDiv style={{ width: `${profilePhotoHeight + spacing.spacing_m}px` }}>
@@ -47,7 +49,26 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
           <ProfileImage height={profilePhotoHeight} />
         </FlexDiv>
         <FlexDiv>
-          <ButtonTertiary>Edit</ButtonTertiary>
+          {address === props.data.address ? (
+            <ButtonTertiary
+              onClick={() => {
+                void (async (): Promise<void> => {
+                  await router.push('/profile/edit');
+                })();
+              }}
+            >
+              Edit
+            </ButtonTertiary>
+          ) : (
+            <ButtonTertiary
+              onClick={() => {
+                console.error('NOT IMPLEMENTED');
+              }}
+              disabled={props.data.allowMessages !== true}
+            >
+              Message
+            </ButtonTertiary>
+          )}
         </FlexDiv>
       </FlexDiv>
       <FlexDiv style={{ alignContent: 'flex-start', width: '80%' }}>
@@ -59,7 +80,9 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
             <AddressTextWrapper>{props.data.address}</AddressTextWrapper>
           </FlexDiv>
         </FlexDiv>
-        <FlexDiv style={{ marginTop: `${spacing.spacing_xxs}px` }}>
+        <FlexDiv
+          style={{ marginTop: `${spacing.spacing_xxs}px`, width: '100%' }}
+        >
           {props.data.discord !== null && (
             <FlexDiv>
               <CenteredDivVertical style={{ flexDirection: 'row' }}>
