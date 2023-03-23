@@ -1,8 +1,8 @@
-import { CenteredDiv, Div, MainSectionDiv } from '@components/Common/Alignment';
+import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import { TokenSelection } from '@components/Swap/TokenSelection';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
 import { type ParticipantInfo } from '@components/Swap/types';
 import { SwapButton } from '@components/Swap/SwapButton';
@@ -37,7 +37,7 @@ export function SwappingPhaseHost(props: {
   }
 
   return (
-    <MainSectionDiv>
+    <FlexDiv>
       {awaitingGuestSignature && (
         <Alert type="success">
           Please wait for the guest to validate and sign the transaction now.
@@ -118,6 +118,6 @@ export function SwappingPhaseHost(props: {
           }}
         />
       </CenteredDiv>
-    </MainSectionDiv>
+    </FlexDiv>
   );
 }

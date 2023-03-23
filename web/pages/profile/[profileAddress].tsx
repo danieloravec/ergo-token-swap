@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Div, MainSectionDiv } from '@components/Common/Alignment';
-import { LoadingPage } from '@components/Common/LoadingPage';
+import { Div } from '@components/Common/Alignment';
 import { backendRequest } from '@utils/utils';
 import { ProfileHeader } from '@components/Profile/ProfileHeader';
 import { type ProfileInfo } from '@data-types//profile';
-import { Nav } from '@components/Nav/Nav';
-import { Footer } from '@components/Footer/Footer';
+import { NotFoundPage } from '@components/Common/NotFoundPage';
 
 export default function Profile(): JSX.Element {
   const router = useRouter();
@@ -65,16 +63,12 @@ export default function Profile(): JSX.Element {
     typeof profileAddress !== 'string' ||
     !isValid
   ) {
-    return <LoadingPage />;
+    return <NotFoundPage />;
   }
 
   return (
     <Div>
-      <Nav />
-      <MainSectionDiv>
-        <ProfileHeader data={profileInfo} />
-      </MainSectionDiv>
-      <Footer />
+      <ProfileHeader data={profileInfo} />
     </Div>
   );
 }

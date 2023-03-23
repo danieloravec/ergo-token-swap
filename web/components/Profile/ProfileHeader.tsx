@@ -36,19 +36,30 @@ const AddressTextWrapper = styled(Text)`
   font-size: 20px;
 `;
 
+const AddressSectionWrapper = styled(FlexDiv).attrs(
+  (props: { leftContentWidthPx?: number }) => ({
+    leftContentWidthPx: props.leftContentWidthPx ?? 100,
+  })
+)`
+  align-content: flex-start;
+  width: ${(props) => `calc(100% - ${props.leftContentWidthPx}px)`};
+`;
+
 export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
   const theme = useTheme();
-  const profilePhotoHeight = 100;
   const { address } = useWalletStore();
   const router = useRouter();
 
+  const profilePhotoHeight = 100;
+  const totalPhotoSectionWidth = profilePhotoHeight + spacing.spacing_m;
+
   return (
     <ProfileHeaderContainer>
-      <FlexDiv style={{ width: `${profilePhotoHeight + spacing.spacing_m}px` }}>
+      <FlexDiv style={{ width: `${totalPhotoSectionWidth}px` }}>
         <FlexDiv style={{ width: '100%' }}>
           <ProfileImage height={profilePhotoHeight} />
         </FlexDiv>
-        <FlexDiv>
+        <FlexDiv style={{ width: '100%' }}>
           {address === props.data.address ? (
             <ButtonTertiary
               onClick={() => {
@@ -71,7 +82,7 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
           )}
         </FlexDiv>
       </FlexDiv>
-      <FlexDiv style={{ alignContent: 'flex-start', width: '80%' }}>
+      <AddressSectionWrapper leftContentWidthPx={totalPhotoSectionWidth}>
         <FlexDiv style={{ height: `${profilePhotoHeight}px` }}>
           <FlexDiv style={{ width: '100%' }}>
             <Heading2>PROFILE</Heading2>
@@ -81,7 +92,7 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
           </FlexDiv>
         </FlexDiv>
         <FlexDiv
-          style={{ marginTop: `${spacing.spacing_xxs}px`, width: '100%' }}
+          style={{ marginTop: `${spacing.spacing_xs}px`, width: '100%' }}
         >
           {props.data.discord !== null && (
             <FlexDiv>
@@ -114,7 +125,7 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
             </FlexDiv>
           )}
         </FlexDiv>
-      </FlexDiv>
+      </AddressSectionWrapper>
     </ProfileHeaderContainer>
   );
 };

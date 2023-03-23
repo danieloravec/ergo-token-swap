@@ -1,12 +1,10 @@
-import { Nav } from '@components/Nav/Nav';
 import React from 'react';
-import { Footer } from '@components/Footer/Footer';
 import { Accordion } from '@components/Common/Accordion';
 import {
   CenteredDiv,
   CenteredDivHorizontal,
   Div,
-  MainSectionDiv,
+  FlexDiv,
 } from '@components/Common/Alignment';
 import { Introduction } from '@components/Home/Introduction';
 import Image from 'next/image';
@@ -36,8 +34,7 @@ const ImageColumnContainer = styled.div`
 export default function Home(): JSX.Element {
   return (
     <Div>
-      <Nav />
-      <MainSectionDiv style={{ justifyContent: 'space-evenly' }}>
+      <FlexDiv style={{ justifyContent: 'space-evenly' }}>
         <CenteredDiv>
           <Alert type="warning">
             Before a specific feature this service uses gets merged into the
@@ -109,8 +106,7 @@ export default function Home(): JSX.Element {
             />
           </ImageColumnContainer>
         </CenteredDiv>
-      </MainSectionDiv>
-      <Footer />
+      </FlexDiv>
     </Div>
   );
 }
