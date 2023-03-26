@@ -39,6 +39,12 @@ export default function Home(): JSX.Element {
       <Nav />
       <MainSectionDiv style={{ justifyContent: 'space-evenly' }}>
         <CenteredDiv>
+          <Alert type="warning">
+            Before a specific feature this service uses gets merged into the
+            main release of Nautilus, you need to install a custom version of
+            the wallet. Please see "Which wallets are supported?" question in
+            FAQs below for more information.
+          </Alert>
           <Alert type="error">
             This is a beta version of single-tx-swap. Please only use tokens
             that don't have value for testing.
@@ -72,7 +78,11 @@ export default function Home(): JSX.Element {
                   answer:
                     'Features we need are currently only implemented in a beta release of Nautilus wallet. ' +
                     'If you would like to test this application, you have to install a beta release that can be found ' +
-                    'here: https://github.com/capt-nemo429/nautilus-wallet/releases/tag/v0.8.0-alpha.0',
+                    'here: https://github.com/capt-nemo429/nautilus-wallet/releases/tag/v0.8.0-alpha.0 ' +
+                    'A guide on how to install it can be found in this blog: https://bashvlas.com/blog/install-chrome-extension-in-developer-mode/\n' +
+                    'If the browser throws an error when loading the extension, you need to open the manifest.json file ' +
+                    '(you can find it directly in the unpacked directory) and change "version": "0.8.0-alpha.0" ' +
+                    'to "version": "0.8.0.0" (just delete the -alpha part) and then try loading the extension again.',
                 },
                 {
                   question: 'Are there any fees?',
