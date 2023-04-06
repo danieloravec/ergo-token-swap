@@ -6,7 +6,7 @@ import { FungibleList } from '@components/Profile/FungibleList';
 import { NftList } from '@components/Profile/NftList';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
-import { type Nft } from '@components/Swap/types';
+import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { backendRequest } from '@utils/utils';
 
 type Tabs = 'NFT' | 'Fungible';
@@ -47,9 +47,9 @@ const TabText = styled(Text)`
 export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
   const [selectedTab, setSelectedTab] = React.useState<Tabs>('NFT');
   const [rawNfts, setRawNfts] = React.useState<Nft[] | undefined>(undefined);
-  // const [rawFungibles, setRawFungibles] = React.useState<
-  //   FungibleToken[] | undefined
-  // >(undefined);
+  const [rawFungibles, setRawFungibles] = React.useState<
+    FungibleToken[] | undefined
+  >(undefined);
   // const [nanoErg, setNanoErg] = React.useState<bigint | undefined>(undefined);
   const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
@@ -61,7 +61,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
       );
       if (assetsResponse.status === 200) {
         setRawNfts(assetsResponse.body.nfts);
-        // setRawFungibles(assetsResponse.body.fungibleTokens);
+        setRawFungibles(assetsResponse.body.fungibleTokens);
         // setNanoErg(BigInt(assetsResponse.body.nanoErg));
       } else {
         console.error('Failed to fetch assets for profile');
@@ -94,10 +94,9 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
       </ProfileTabsWrapper>
       <Spacer size={spacing.spacing_m} vertical />
 
-      {selectedTab === 'NFT' ? (
-        <NftList targetAddress={props.profileAddress} rawNfts={rawNfts} />
-      ) : (
-        <FungibleList />
+      {selectedTab === 'NFT' && <NftList rawNfts={rawNfts} />}
+      {selectedTab === 'Fungible' && (
+        <FungibleList rawFungibles={rawFungibles} />
       )}
     </FlexDiv>
   );

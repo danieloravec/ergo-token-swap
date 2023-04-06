@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Heading3, Text, TextNavs, Strong } from '@components/Common/Text';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
@@ -54,7 +54,11 @@ export const NftDisplay = (props: {
   nft: Nft;
   isSelected: boolean;
   onClick: (tokenId: string) => void;
+  captionColor?: string;
 }): JSX.Element => {
+  const theme = useTheme();
+  const captionColor = props.captionColor ?? theme.properties.colorNavsText;
+
   const [unknownAssetType, setUnknownAssetType] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
 
@@ -109,17 +113,35 @@ export const NftDisplay = (props: {
         <Div>{Img}</Div>
       )}
       <CenteredDiv>
-        <TextNavs
+        <Text
           style={{
             marginBottom: spacing.spacing_xl,
             maxWidth: imgSize,
             overflowWrap: 'break-word',
+            color: captionColor,
           }}
         >
           {props.nft.name ?? '???'}
-        </TextNavs>
+        </Text>
       </CenteredDiv>
     </div>
+  );
+};
+
+export const FungibleTokenImage = (props: {
+  fungibleToken: FungibleToken;
+}): JSX.Element => {
+  return (
+    <Image
+      src={
+        assetIconMap[props.fungibleToken.tokenId] === undefined
+          ? `/icons/generic-coin.svg`
+          : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
+      }
+      alt={props.fungibleToken.name ?? 'token-image'}
+      width={80}
+      height={80}
+    />
   );
 };
 
@@ -153,20 +175,11 @@ function FungibleTokenDisplay(props: {
     <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
       <FungibleImageAndNameContainer>
         <Div>
-          <Image
-            src={
-              assetIconMap[props.fungibleToken.tokenId] === undefined
-                ? `/icons/generic-coin.svg`
-                : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
-            }
-            alt={props.fungibleToken.name ?? 'token-image'}
-            width={80}
-            height={80}
-          />
+          <FungibleTokenImage fungibleToken={props.fungibleToken} />
         </Div>
-        <TextNavs style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
+        <Text style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
           {props.fungibleToken.name ?? '???'}
-        </TextNavs>
+        </Text>
       </FungibleImageAndNameContainer>
       <Div>
         <TextNavs>
