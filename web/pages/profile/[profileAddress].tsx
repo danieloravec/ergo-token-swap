@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Div } from '@components/Common/Alignment';
+import { FlexDiv } from '@components/Common/Alignment';
 import { backendRequest } from '@utils/utils';
 import { ProfileHeader } from '@components/Profile/ProfileHeader';
 import { type ProfileInfo } from '@data-types//profile';
@@ -70,10 +70,10 @@ export default function Profile(): JSX.Element {
   }
 
   return (
-    <Div>
+    <FlexDiv style={{ width: '80%' }}>
       <ProfileHeader data={profileInfo} />
       <Spacer size={spacing.spacing_m} vertical />
       <ProfileTabs profileAddress={profileAddress} />
-    </Div>
+    </FlexDiv>
   );
 }

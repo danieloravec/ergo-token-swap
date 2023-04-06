@@ -7,7 +7,7 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
-import { explorerRequest } from '@ergo/utils';
+import { loadNftImageUrl } from '@utils/imageLoader';
 import { assetIconMap } from '@mappers/assetIconMap';
 
 const imgSize = 180;
@@ -50,41 +50,22 @@ const StrongSecondary = styled(Strong)`
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
-function NftDisplay(props: {
+export const NftDisplay = (props: {
   nft: Nft;
   isSelected: boolean;
   onClick: (tokenId: string) => void;
-}): JSX.Element {
+}): JSX.Element => {
   const [unknownAssetType, setUnknownAssetType] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (imageUrl === undefined) {
       const loadImage = async (): Promise<void> => {
-        const issuingBoxResponse = await explorerRequest(
-          `/assets/${props.nft.tokenId}/issuingBox`,
-          0
-        );
-        if (issuingBoxResponse !== undefined && issuingBoxResponse.length > 0) {
-          const registers = issuingBoxResponse[0].additionalRegisters;
-          // Make sure it is an NFT picture artwork using R7 and get the image from R9
-          if (
-            registers.R7 !== undefined &&
-            registers.R7 === '0e020101' &&
-            registers.R9 !== undefined
-          ) {
-            let url = Buffer.from(registers.R9.substring(4), 'hex').toString(
-              'utf-8'
-            );
-            if (url.startsWith('ipfs://')) {
-              url = 'https://ipfs.io/ipfs/' + url.substring(7);
-            } else if (url.startsWith('http://')) {
-              url = 'https://' + url.substring(7);
-            }
-            setImageUrl(url);
-          } else {
-            setUnknownAssetType(true);
-          }
+        const url = await loadNftImageUrl(props.nft.tokenId);
+        if (url !== undefined) {
+          setImageUrl(url);
+        } else {
+          setUnknownAssetType(true);
         }
       };
       loadImage().catch(console.error);
@@ -140,7 +121,7 @@ function NftDisplay(props: {
       </CenteredDiv>
     </div>
   );
-}
+};
 
 const FungibleImageAndNameContainer = styled.div`
   width: 80px;
