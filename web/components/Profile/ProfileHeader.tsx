@@ -85,7 +85,9 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
       <AddressSectionWrapper leftContentWidthPx={totalPhotoSectionWidth}>
         <FlexDiv style={{ height: `${profilePhotoHeight}px` }}>
           <FlexDiv style={{ width: '100%' }}>
-            <Heading2>PROFILE</Heading2>
+            <Heading2>
+              {props.data.username?.toUpperCase() ?? 'PROFILE'}
+            </Heading2>
           </FlexDiv>
           <FlexDiv style={{ width: '100%' }}>
             <AddressTextWrapper>{props.data.address}</AddressTextWrapper>
