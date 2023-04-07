@@ -1,6 +1,4 @@
-import { Nav } from '@components/Nav/Nav';
 import React, { useEffect, useState } from 'react';
-import { Footer } from '@components/Footer/Footer';
 import { WaitingPhaseHost } from '@components/Swap/WaitingPhaseHost';
 import { useRouter } from 'next/router';
 import { useWalletStore } from '@components/Wallet/hooks';
@@ -107,21 +105,18 @@ export default function Swap(): JSX.Element {
   ) {
     return (
       <Div>
-        <Nav />
         <SwappingPhaseHost
           wallet={wallet}
           tradingSessionId={tradingSessionId}
           hostInfo={hostInfo}
           guestInfo={guestInfo}
         />
-        <Footer />
       </Div>
     );
   }
 
   return (
     <Div>
-      <Nav />
       {address === hostInfo?.address && (
         <WaitingPhaseHost guestIsReady={guestInfo !== undefined} />
       )}
@@ -131,7 +126,6 @@ export default function Swap(): JSX.Element {
           tradingSessionId={tradingSessionId}
         />
       )}
-      <Footer />
     </Div>
   );
 }

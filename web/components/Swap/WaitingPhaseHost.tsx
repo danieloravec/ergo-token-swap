@@ -10,7 +10,7 @@ import React from 'react';
 import {
   CenteredDivHorizontal,
   CenteredDivVertical,
-  MainSectionDiv,
+  FlexDiv,
 } from '@components/Common/Alignment';
 
 export function WaitingPhaseHost(props: {
@@ -18,7 +18,7 @@ export function WaitingPhaseHost(props: {
 }): JSX.Element {
   const theme = useTheme();
   return (
-    <MainSectionDiv>
+    <FlexDiv>
       <CenteredDivVertical>
         <CenteredDivHorizontal>
           <Heading1>Welcome to your trading room!</Heading1>
@@ -37,6 +37,6 @@ export function WaitingPhaseHost(props: {
           <Hourglass width={128} height={128} fill={theme.properties.colorBg} />
         </CenteredDivHorizontal>
       </CenteredDivVertical>
-    </MainSectionDiv>
+    </FlexDiv>
   );
 }

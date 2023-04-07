@@ -1,7 +1,7 @@
 import {
   CenteredDivHorizontal,
   Div,
-  MainSectionDiv,
+  FlexDiv,
 } from '@components/Common/Alignment';
 import { config } from '@config';
 import { Heading1, TextCenterAlign, A } from '@components/Common/Text';
@@ -12,7 +12,7 @@ export const TradingSessionFinished = (props: {
   txId: string;
 }): JSX.Element => {
   return (
-    <MainSectionDiv>
+    <FlexDiv>
       <Div>
         <CenteredDivHorizontal>
           <Heading1>Success!</Heading1>
@@ -40,6 +40,6 @@ export const TradingSessionFinished = (props: {
           identiacal trading sessions.
         </TextCenterAlign>
       </CenteredDivHorizontal>
-    </MainSectionDiv>
+    </FlexDiv>
   );
 };

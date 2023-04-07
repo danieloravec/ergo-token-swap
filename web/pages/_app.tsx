@@ -7,6 +7,9 @@ import { ThemeProvider } from 'styled-components';
 import { useThemeStore } from '@components/hooks';
 import { config } from '@config';
 import { themes } from '@themes/themes';
+import { Nav } from '@components/Nav/Nav';
+import { Footer } from '@components/Footer/Footer';
+import { MainSectionDiv } from '@components/Common/Alignment';
 
 const chakraPetch = Chakra_Petch({
   weight: '500',
@@ -34,7 +37,11 @@ export default function App({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <main className={chakraPetch.className}>
       <ThemeProvider theme={themes[selectedThemeName]}>
-        <Component {...pageProps} />
+        <Nav />
+        <MainSectionDiv>
+          <Component {...pageProps} />
+        </MainSectionDiv>
+        <Footer />
       </ThemeProvider>
     </main>
   );

@@ -4,6 +4,8 @@ import { ConnectWalletButton } from '@components/Wallet/ConnectWalletButton';
 import styled from 'styled-components';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
+import { useWalletStore } from '@components/Wallet/hooks';
+import NoSsr from '@components/Common/NoSsr';
 
 const NavContainer = styled.div`
   display: block;
@@ -29,20 +31,27 @@ const ConnectWalletButtonContainer = styled.div`
 `;
 
 export function Nav(): JSX.Element {
+  const { address } = useWalletStore();
+
   return (
-    <NavContainer>
-      <Spacer size={spacing.spacing_xs} vertical />
-      <NavSubcontainer float="left">
-        <Spacer size={spacing.spacing_xs} vertical={false} />
-        <Logo />
-      </NavSubcontainer>
-      <NavSubcontainer float="right">
-        <NavLinkSpaced href="/">Home</NavLinkSpaced>
-        <ConnectWalletButtonContainer>
-          <ConnectWalletButton />
-        </ConnectWalletButtonContainer>
-        <Spacer size={spacing.spacing_xs} vertical={false} />
-      </NavSubcontainer>
-    </NavContainer>
+    <NoSsr>
+      <NavContainer>
+        <Spacer size={spacing.spacing_xs} vertical />
+        <NavSubcontainer float="left">
+          <Spacer size={spacing.spacing_xs} vertical={false} />
+          <Logo />
+        </NavSubcontainer>
+        <NavSubcontainer float="right">
+          {address !== undefined && (
+            <NavLinkSpaced href={`/profile/${address}`}>Profile</NavLinkSpaced>
+          )}
+          <NavLinkSpaced href="/">Home</NavLinkSpaced>
+          <ConnectWalletButtonContainer>
+            <ConnectWalletButton />
+          </ConnectWalletButtonContainer>
+          <Spacer size={spacing.spacing_xs} vertical={false} />
+        </NavSubcontainer>
+      </NavContainer>
+    </NoSsr>
   );
 }

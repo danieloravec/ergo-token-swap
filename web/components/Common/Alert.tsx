@@ -6,13 +6,17 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { Div } from '@components/Common/Alignment';
 
-const AlertBody = styled.div<{ type: string }>`
+const AlertBody = styled.div<{ type: string; marginSides?: string }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: calc(100% - 10px);
-  height: 50px;
-  margin: 10px;
+  min-height: 50px;
+  margin: ${(props) => {
+    const sideMargin =
+      props.marginSides !== undefined ? props.marginSides : '10px';
+    return `10px ${sideMargin} 10px ${sideMargin}`;
+  }};
   padding: 10px;
   border-radius: 5px;
   background-color: ${(props) =>
@@ -28,13 +32,14 @@ const PointerOnHover = styled.div`
 export const Alert = (props: {
   type: AlertType;
   children: ReactNode;
+  marginSides?: string;
 }): JSX.Element => {
   const [hide, setHide] = useState<boolean>(false);
   if (hide) {
     return <></>;
   }
   return (
-    <AlertBody type={props.type}>
+    <AlertBody type={props.type} marginSides={props.marginSides}>
       <TextNavs>
         <strong>{props.children}</strong>
       </TextNavs>

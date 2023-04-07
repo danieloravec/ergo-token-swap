@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Heading3, Text, TextNavs, Strong } from '@components/Common/Text';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
@@ -7,7 +7,7 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
-import { explorerRequest } from '@ergo/utils';
+import { loadNftImageUrl } from '@utils/imageLoader';
 import { assetIconMap } from '@mappers/assetIconMap';
 
 const imgSize = 180;
@@ -50,41 +50,26 @@ const StrongSecondary = styled(Strong)`
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
-function NftDisplay(props: {
+export const NftDisplay = (props: {
   nft: Nft;
   isSelected: boolean;
   onClick: (tokenId: string) => void;
-}): JSX.Element {
+  captionColor?: string;
+}): JSX.Element => {
+  const theme = useTheme();
+  const captionColor = props.captionColor ?? theme.properties.colorNavsText;
+
   const [unknownAssetType, setUnknownAssetType] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (imageUrl === undefined) {
       const loadImage = async (): Promise<void> => {
-        const issuingBoxResponse = await explorerRequest(
-          `/assets/${props.nft.tokenId}/issuingBox`,
-          0
-        );
-        if (issuingBoxResponse !== undefined && issuingBoxResponse.length > 0) {
-          const registers = issuingBoxResponse[0].additionalRegisters;
-          // Make sure it is an NFT picture artwork using R7 and get the image from R9
-          if (
-            registers.R7 !== undefined &&
-            registers.R7 === '0e020101' &&
-            registers.R9 !== undefined
-          ) {
-            let url = Buffer.from(registers.R9.substring(4), 'hex').toString(
-              'utf-8'
-            );
-            if (url.startsWith('ipfs://')) {
-              url = 'https://ipfs.io/ipfs/' + url.substring(7);
-            } else if (url.startsWith('http://')) {
-              url = 'https://' + url.substring(7);
-            }
-            setImageUrl(url);
-          } else {
-            setUnknownAssetType(true);
-          }
+        const url = await loadNftImageUrl(props.nft.tokenId);
+        if (url !== undefined) {
+          setImageUrl(url);
+        } else {
+          setUnknownAssetType(true);
         }
       };
       loadImage().catch(console.error);
@@ -128,19 +113,37 @@ function NftDisplay(props: {
         <Div>{Img}</Div>
       )}
       <CenteredDiv>
-        <TextNavs
+        <Text
           style={{
             marginBottom: spacing.spacing_xl,
             maxWidth: imgSize,
             overflowWrap: 'break-word',
+            color: captionColor,
           }}
         >
           {props.nft.name ?? '???'}
-        </TextNavs>
+        </Text>
       </CenteredDiv>
     </div>
   );
-}
+};
+
+export const FungibleTokenImage = (props: {
+  fungibleToken: FungibleToken;
+}): JSX.Element => {
+  return (
+    <Image
+      src={
+        assetIconMap[props.fungibleToken.tokenId] === undefined
+          ? `/icons/generic-coin.svg`
+          : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
+      }
+      alt={props.fungibleToken.name ?? 'token-image'}
+      width={80}
+      height={80}
+    />
+  );
+};
 
 const FungibleImageAndNameContainer = styled.div`
   width: 80px;
@@ -172,20 +175,11 @@ function FungibleTokenDisplay(props: {
     <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
       <FungibleImageAndNameContainer>
         <Div>
-          <Image
-            src={
-              assetIconMap[props.fungibleToken.tokenId] === undefined
-                ? `/icons/generic-coin.svg`
-                : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
-            }
-            alt={props.fungibleToken.name ?? 'token-image'}
-            width={80}
-            height={80}
-          />
+          <FungibleTokenImage fungibleToken={props.fungibleToken} />
         </Div>
-        <TextNavs style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
+        <Text style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
           {props.fungibleToken.name ?? '???'}
-        </TextNavs>
+        </Text>
       </FungibleImageAndNameContainer>
       <Div>
         <TextNavs>

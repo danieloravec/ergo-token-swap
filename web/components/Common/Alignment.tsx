@@ -47,3 +47,7 @@ export const MainSectionDiv = styled.div`
 `;
 
 export const Div = styled.div``;
+
+export const FlexDivRow = styled(FlexDiv)`
+  width: 100%;
+`;
