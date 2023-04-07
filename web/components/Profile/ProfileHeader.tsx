@@ -1,7 +1,7 @@
 import { type ProfileInfo } from '@data-types/profile';
 import { CenteredDivVertical, FlexDiv } from '@components/Common/Alignment';
 import Image from 'next/image';
-import { Heading2, Text } from '@components/Common/Text';
+import { A, Heading2, Text } from '@components/Common/Text';
 import styled, { useTheme } from 'styled-components';
 import { ButtonTertiary } from '@components/Common/Button';
 import { Discord } from '@components/Icons/Discord';
@@ -107,14 +107,19 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
             </FlexDiv>
           )}
           {props.data.twitter !== null && (
-            <FlexDiv>
-              <CenteredDivVertical style={{ flexDirection: 'row' }}>
-                <Twitter color={theme.properties.colorPrimary} />
-              </CenteredDivVertical>
-              <Spacer size={spacing.spacing_xxxs} vertical={false} />
-              <Text>{props.data.twitter}</Text>
-              <Spacer size={spacing.spacing_xs} vertical={false} />
-            </FlexDiv>
+            <A
+              href={`https://twitter.com/${props.data.twitter}`}
+              target="_blank"
+            >
+              <FlexDiv>
+                <CenteredDivVertical style={{ flexDirection: 'row' }}>
+                  <Twitter color={theme.properties.colorPrimary} />
+                </CenteredDivVertical>
+                <Spacer size={spacing.spacing_xxxs} vertical={false} />
+                <Text>{props.data.twitter}</Text>
+                <Spacer size={spacing.spacing_xs} vertical={false} />
+              </FlexDiv>
+            </A>
           )}
           {props.data.email !== null && (
             <FlexDiv>
