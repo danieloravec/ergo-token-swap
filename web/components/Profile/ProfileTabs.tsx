@@ -8,8 +8,10 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { backendRequest } from '@utils/utils';
+import { type Swap } from '@components/Profile/types';
+import { SwapHistory } from '@components/Profile/SwapHistory';
 
-type Tabs = 'NFT' | 'Fungible';
+type Tabs = 'NFT' | 'Fungible' | 'History';
 
 const ProfileTabsWrapper = styled(FlexDiv)`
   width: 100%;
@@ -50,6 +52,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
   const [rawFungibles, setRawFungibles] = React.useState<
     FungibleToken[] | undefined
   >(undefined);
+  const [history, setHistory] = React.useState<Swap[] | undefined>(undefined);
   // const [nanoErg, setNanoErg] = React.useState<bigint | undefined>(undefined);
   const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
@@ -67,13 +70,31 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
         console.error('Failed to fetch assets for profile');
         throw new Error('FAILED_ASSETS_FETCH');
       }
+    };
+
+    const fetchHistory = async (): Promise<void> => {
+      const historyResponse = await backendRequest(
+        `/user/history?address=${props.profileAddress}`,
+        'GET'
+      );
+      if (historyResponse.status === 200) {
+        setHistory(historyResponse.body);
+      } else {
+        console.error('Failed to fetch history for profile');
+        throw new Error('FAILED_HISTORY_FETCH');
+      }
+    };
+
+    const fetchTabsData = async (): Promise<void> => {
+      await Promise.all([fetchAssets(), fetchHistory()]);
       setIsLoaded(true);
     };
-    fetchAssets().catch(console.error);
+
+    fetchTabsData().catch(console.error);
   }, [isLoaded]);
 
   return (
-    <FlexDiv>
+    <FlexDiv style={{ width: '100%' }}>
       <ProfileTabsWrapper>
         <ProfileTab
           isSelected={selectedTab === 'NFT'}
@@ -91,12 +112,23 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
         >
           <TabText>Fungible</TabText>
         </ProfileTab>
+        <ProfileTab
+          isSelected={selectedTab === 'History'}
+          onClick={() => {
+            setSelectedTab('History');
+          }}
+        >
+          <TabText>History</TabText>
+        </ProfileTab>
       </ProfileTabsWrapper>
       <Spacer size={spacing.spacing_m} vertical />
 
       {selectedTab === 'NFT' && <NftList rawNfts={rawNfts} />}
       {selectedTab === 'Fungible' && (
         <FungibleList rawFungibles={rawFungibles} />
+      )}
+      {selectedTab === 'History' && (
+        <SwapHistory userAddr={props.profileAddress} history={history} />
       )}
     </FlexDiv>
   );
