@@ -1,8 +1,9 @@
 import Router from 'express'
 import * as utils from "@utils";
-import * as types from "@types";
 import User from "@db/models/user";
 import {ErgoAddress} from "@fleet-sdk/core";
+import TradingSession from "@db/models/trading_session";
+import {Op} from "sequelize";
 
 const userRouter = Router();
 
@@ -128,6 +129,53 @@ userRouter.get('/assets', async (req, res) => {
     console.log(err);
     res.status(500);
     res.send("Server-side error while getting the user's assets");
+  }
+});
+
+userRouter.get('/history', async (req, res) => {
+  try {
+    if (req.query?.address === undefined || typeof req.query?.address !== "string") {
+      res.status(400);
+      res.send("Invalid query");
+      return;
+    }
+    const limit = req.query?.limit === undefined ? 100 : Number(req.query?.limit);
+    const offset = req.query?.offset === undefined ? 0 : Number(req.query?.offset);
+
+    let user;
+    try {
+      user = await User.findOne({where: {address: req.query!.address}});
+    } catch (err) {
+      console.error(err.message);
+      res.status(500);
+      res.send("Server-side error while checking if user exists");
+      return;
+    }
+    if(!user) {
+      res.status(400);
+      res.send("User not found");
+      return;
+    }
+    const userSwapHistory = await TradingSession.findAll(
+      {
+        attributes: [['submitted_at', 'timestamp'], 'host_addr', 'guest_addr', 'tx_id'],
+        where: {
+          [Op.or]: [
+            { guestAddr: req.query!.address },
+            { hostAddr: req.query!.address }
+          ],
+          [Op.not]: {
+            txId: null
+          }
+        },
+        order: [['submittedAt', 'DESC']],
+      },
+    );
+    res.send(userSwapHistory);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while getting the user's history");
   }
 });
 
