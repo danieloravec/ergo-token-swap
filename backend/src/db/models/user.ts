@@ -9,6 +9,7 @@ interface UserAttributes {
   twitter: string;
   allowMessages: boolean;
   createdAt: Date;
+  authSecret?: string;
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
@@ -19,6 +20,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
   twitter: string;
   username: string;
   public readonly createdAt!: Date;
+  authSecret?: string;
 }
 
 User.init({
@@ -44,6 +46,9 @@ User.init({
   },
   createdAt: {
     type: DataTypes.DATE,
+  },
+  authSecret: {
+    type: DataTypes.STRING,
   }
 }, {
   timestamps: true,

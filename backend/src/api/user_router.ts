@@ -4,6 +4,11 @@ import User from "@db/models/user";
 import {ErgoAddress} from "@fleet-sdk/core";
 import TradingSession from "@db/models/trading_session";
 import {Op} from "sequelize";
+import * as crypto from "crypto";
+import * as jwt from "jsonwebtoken";
+import {config} from "@config";
+import {JwtPayload} from "jsonwebtoken";
+import {verifyJwt} from "@utils";
 
 const userRouter = Router();
 
@@ -30,6 +35,7 @@ userRouter.get('/', async (req, res) => {
 });
 
 // For creating and updating users
+// TODO incorporate auth flow into this
 userRouter.post('/', async (req, res) => {
   try {
     if (req.body?.address === undefined) {
@@ -63,7 +69,7 @@ userRouter.post('/', async (req, res) => {
     }
 
     if(user) {
-      if (req.body?.signature === undefined || !utils.verifySignature(data, req.body.signature)) {
+      if (req.body?.signature === undefined || !utils.verifySignature(JSON.stringify(data), req.body.signature)) {
         res.status(400);
         res.send('Invalid data signature');
         return;
@@ -181,6 +187,88 @@ userRouter.get('/history', async (req, res) => {
     console.log(err);
     res.status(500);
     res.send("Server-side error while getting the user's history");
+  }
+});
+
+userRouter.get('/auth', async (req, res) => {
+  try {
+    if (req.query?.address === undefined || typeof req.query?.address !== "string" || !ErgoAddress.validate(req.query!.address)) {
+      res.status(400);
+      res.send("Invalid address");
+      return;
+    }
+    const user = await User.findOne({where: {address: req.query!.address}});
+    if (!user) {
+      res.status(400);
+      res.send("User not found");
+      return;
+    }
+    const secret = crypto.randomBytes(16).toString('hex');
+    await User.update(
+      {
+        ...user,
+        authSecret: secret,
+      },
+      {where: {address: req.query!.address}}
+    );
+    res.status(200);
+    res.send(secret);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while preparing auth secret");
+  }
+});
+
+userRouter.post('/auth', async (req, res) => {
+  try {
+    if (
+      req.body?.address === undefined ||
+      typeof req.body?.address !== "string" ||
+      !ErgoAddress.validate(req.body!.address) ||
+      req.body?.signature === undefined ||
+      typeof req.body?.signature !== "string") {
+      res.status(400);
+      res.send("Invalid address");
+      return;
+    }
+    const user = await User.findOne({where: {address: req.body!.address}});
+    if (!user) {
+      res.status(400);
+      res.send("User not found");
+      return;
+    }
+    if (!utils.verifySignature(user.authSecret, req.body.signature)) {
+      res.status(400);
+      res.send("Invalid signature");
+      return;
+    }
+    const token = jwt.sign({address: req.query!.address, timestamp: Date.now()}, config.jwtSecret);
+    res.status(200);
+    res.send(token);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while preparing jwt");
+  }
+});
+
+userRouter.post('/auth/check', async (req, res) => {
+  try {
+    if (req.body?.address === undefined || typeof req.body?.address !== "string" || !ErgoAddress.validate(req.body!.address)) {
+      res.status(400);
+      res.send("Invalid address");
+      return;
+    }
+    let isAuthenticated = false;
+    if(req.body.jwt !== undefined || typeof req.body.jwt === "string") {
+      isAuthenticated = verifyJwt(req.body.address, req.body.jwt);
+    }
+    res.send({isAuthenticated});
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while validating jwt");
   }
 });
 
