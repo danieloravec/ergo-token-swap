@@ -11,6 +11,8 @@ interface ConfigType {
     dbHost: string;
     dbPassword: string;
     debug: boolean;
+    jwtSecret: string;
+    jwtLifespanMs: number;
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
@@ -21,4 +23,6 @@ export const config: ConfigType = {
     dbHost: process.env.DB_HOST as string,
     dbPassword: process.env.DB_PASSWORD as string,
     debug: process.env.DEBUG === 'true',
+    jwtSecret: process.env.JWT_SECRET as string,
+    jwtLifespanMs: Number(process.env.JWT_LIFESPAN_MS as string)
 };

@@ -4,6 +4,8 @@ import sequelizeConnection from "@db/config";
 import TradingSession from "@db/models/trading_session";
 import {Request} from "express";
 import fetch from "cross-fetch";
+import * as jwt from "jsonwebtoken";
+import {JwtPayload} from "jsonwebtoken";
 
 export async function explorerRequest(endpoint: string): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}${endpoint}`);
@@ -130,7 +132,17 @@ export const toHex = (str: string): string => {
     return Buffer.from(str).toString('hex');
 }
 
-export const verifySignature = (data: object, signature: string): boolean => {
+export const verifyJwt = (address: string, jwtStr: string): boolean => {
+    try {
+        const data = jwt.verify(jwtStr, config.jwtSecret) as JwtPayload;
+        return data.address === address && data.timestamp > Date.now() - config.jwtLifespanMs;
+    } catch (err) {
+        console.error("Invalid JWT");
+        return false;
+    }
+}
+
+export const verifySignature = (data: string, signature: string): boolean => {
     const serializedData = toHex(JSON.stringify(data));
     return true; // TODO implement signature verification once dApp connector's sign_data is available
 }
