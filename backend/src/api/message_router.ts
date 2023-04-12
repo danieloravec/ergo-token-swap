@@ -27,7 +27,13 @@ messageRouter.get('/', async (req, res) => {
       return;
     }
     const messages = await Message.findAll({
-      where: req.query?.sent === "true" ? {fromAddress: req.query.address} : {toAddress: req.query.address},
+      where:
+        req.query?.sent === "true"
+          ? {fromAddress: req.query.address}
+          : {
+            toAddress: req.query.address,
+            archived: false
+          },
       order: [['createdAt', 'DESC']],
       raw: true
     });
@@ -75,7 +81,6 @@ messageRouter.post('/', async (req, res) => {
         fromAddress: body.fromAddress,
         toAddress: body.toAddress,
         text: body.text,
-        seen: false
       });
     } catch (e) {
       console.error(e.message);

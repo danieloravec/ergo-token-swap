@@ -6,6 +6,7 @@ interface MessageAttributes {
   toAddress: string;
   text: string;
   seen: boolean;
+  archived: boolean;
 }
 
 class Message extends Model<MessageAttributes> implements MessageAttributes {
@@ -13,6 +14,7 @@ class Message extends Model<MessageAttributes> implements MessageAttributes {
   toAddress: string;
   text: string;
   seen: boolean;
+  archived: boolean;
 }
 
 Message.init({
@@ -27,7 +29,14 @@ Message.init({
   },
   seen: {
     type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   },
+  archived: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  }
 }, {
   timestamps: true,
   underscored: true,
