@@ -34,10 +34,10 @@ Message.init({
   sequelize: sequelizeConnection,
   indexes: [
     {
-      fields: ['fromAddress'],
+      fields: ['from_address'],
     },
     {
-      fields: ['toAddress'],
+      fields: ['to_address'],
     }
   ],
 })
