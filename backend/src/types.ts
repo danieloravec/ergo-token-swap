@@ -64,3 +64,11 @@ export const UserCreateBodySchema: Schema = {
         signature: 'string',
     }
 }
+
+export const MessageCreateBodySchema: Schema = {
+    fields: {
+        fromAddress: 'string',
+        toAddress: 'string',
+        text: 'string',
+    }
+}
