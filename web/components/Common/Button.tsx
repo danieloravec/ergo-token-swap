@@ -12,6 +12,7 @@ export const Button = styled.button`
   border-radius: 10px;
   background: ${(props) => props.theme.properties.colorPrimary};
   color: ${(props) => props.theme.properties.colorNavsText};
+  cursor: pointer;
 `;
 
 export const ButtonSecondary = styled(Button)`
