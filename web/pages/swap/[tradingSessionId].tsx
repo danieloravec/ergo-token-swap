@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { WaitingPhaseHost } from '@components/Swap/WaitingPhaseHost';
 import { useRouter } from 'next/router';
 import { useWalletStore } from '@components/Wallet/hooks';
-import { SwapWalletNotConnected } from '@components/Swap/SwapWalletNotConnected';
+import { WalletNotConnected } from '@components/Common/WalletNotConnected';
 import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
 import { SwappingPhaseHost } from '@components/Swap/SwappingPhaseHost';
@@ -84,7 +84,7 @@ export default function Swap(): JSX.Element {
   }
 
   if (address === undefined) {
-    return <SwapWalletNotConnected />;
+    return <WalletNotConnected />;
   }
   if (typeof tradingSessionId !== 'string') {
     return <div>Invalid trading session id</div>; // TODO use something more reasonable here

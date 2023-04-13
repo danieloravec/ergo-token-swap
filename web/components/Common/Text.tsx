@@ -55,3 +55,8 @@ export const Input = styled.input`
   background: ${(props) => props.theme.properties.colorBg};
   color: ${(props) => props.theme.properties.colorBgText};
 `;
+
+export const Textarea = styled.textarea`
+  background: ${(props) => props.theme.properties.colorBg};
+  color: ${(props) => props.theme.properties.colorBgText};
+`;
