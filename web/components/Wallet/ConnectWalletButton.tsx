@@ -2,6 +2,7 @@ import { useWalletConnect, useWalletStore } from '@components/Wallet/hooks';
 import { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
 import { Button } from '@components/Common/Button';
+import { backendRequest } from '@utils/utils';
 
 export function ConnectWalletButton(): JSX.Element {
   const [displayAddress, setDisplayAddress] = useState<string | undefined>(
@@ -25,9 +26,28 @@ export function ConnectWalletButton(): JSX.Element {
     );
   };
 
+  const createUserIfNotExists = async (address: string): Promise<void> => {
+    const profileInfoResponse = await backendRequest(
+      `/user?address=${address}`
+    );
+    if (profileInfoResponse.status !== 200) {
+      if (profileInfoResponse.body === 'User not found') {
+        const userCreateResponse = await backendRequest('/user', 'POST', {
+          address,
+        });
+        if (userCreateResponse.status !== 200) {
+          console.error(JSON.stringify(userCreateResponse));
+        }
+      } else {
+        console.error(profileInfoResponse);
+      }
+    }
+  };
+
   useEffect(() => {
     if (address !== undefined) {
       setDisplayAddress(shortenString(address, 11));
+      createUserIfNotExists(address).catch(console.error);
     }
     setConnectedWallet(wallet);
   }, [address, wallet]);

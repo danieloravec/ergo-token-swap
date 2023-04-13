@@ -73,6 +73,9 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
           ) : (
             <ButtonTertiary
               onClick={() => {
+                router
+                  .push(`/messages/send?recipient=${props.data.address}`)
+                  .catch(console.error);
                 console.error('NOT IMPLEMENTED');
               }}
               disabled={props.data.allowMessages !== true}

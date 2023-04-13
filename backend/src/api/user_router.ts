@@ -101,7 +101,7 @@ userRouter.post('/', async (req, res) => {
           email: req.body.email,
           discord: req.body.discord,
           twitter: req.body.twitter,
-          allowMessages: req.body.allowMessages,
+          allowMessages: true,
         });
       } catch (e) {
         console.error(e.message);
