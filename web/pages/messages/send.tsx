@@ -6,6 +6,9 @@ import React from 'react';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { WalletNotConnected } from '@components/Common/WalletNotConnected';
 import NoSsr from '@components/Common/NoSsr';
+import { authenticate, backendRequest } from '@utils/utils';
+import { Alert } from '@components/Common/Alert';
+import { useJwtAuth } from '@components/hooks';
 
 const MessageFormContainer = styled(FlexDiv)`
   width: 100%;
@@ -36,6 +39,14 @@ const WideTextarea = styled(Textarea)`
 
 const SendMessagePage = (): JSX.Element => {
   const { address } = useWalletStore();
+  const { wallet } = useWalletStore();
+  const { jwt, setJwt } = useJwtAuth();
+
+  const [error, setError] = React.useState<string | undefined>(undefined);
+  const [success, setSuccess] = React.useState<string | undefined>(undefined);
+  const [receiver, setReceiver] = React.useState<string | undefined>(undefined);
+  const [subject, setSubject] = React.useState<string | undefined>(undefined);
+  const [message, setMessage] = React.useState<string | undefined>(undefined);
 
   if (address === undefined) {
     return (
@@ -45,19 +56,73 @@ const SendMessagePage = (): JSX.Element => {
     );
   }
 
+  const handleMessageSend = async (): Promise<void> => {
+    setSuccess(undefined);
+    setError(undefined);
+
+    const authSuccessful = await authenticate(address, jwt, setJwt, wallet);
+    if (!authSuccessful) {
+      setError('Authentication failed');
+      return;
+    }
+    const messageSendRes = await backendRequest(
+      '/message',
+      'POST',
+      {
+        fromAddress: address,
+        toAddress: receiver,
+        subject,
+        text: message,
+      },
+      {
+        Authorization: jwt,
+      }
+    );
+    if (messageSendRes.status !== 200) {
+      setError(`Message send failed: ${JSON.stringify(messageSendRes.body)}`);
+    } else {
+      setSuccess('Message sent successfully');
+    }
+  };
+
   return (
     <NoSsr>
       <MessageFormContainer>
+        {error !== undefined && <Alert type="error">{error}</Alert>}
+        {success !== undefined && <Alert type="success">{success}</Alert>}
         <Heading1>SEND A MESSAGE</Heading1>
         <WideFlexDiv>
-          <WideInput placeholder="Receiver address" />
+          <WideInput
+            placeholder="Receiver address"
+            onChange={(e) => {
+              setReceiver(e.target.value);
+            }}
+          />
         </WideFlexDiv>
         <WideFlexDiv>
-          <WideInput placeholder="Subject" />
+          <WideInput
+            placeholder="Subject"
+            onChange={(e) => {
+              setSubject(e.target.value);
+            }}
+          />
         </WideFlexDiv>
-        <WideTextarea rows={10} placeholder="Message" />
+        <WideTextarea
+          rows={10}
+          placeholder="Message"
+          onChange={(e) => {
+            setMessage(e.target.value);
+          }}
+        />
         <WideFlexDiv>
-          <ButtonSecondary style={{ width: '100%' }}>Send</ButtonSecondary>
+          <ButtonSecondary
+            style={{ width: '100%' }}
+            onClick={() => {
+              handleMessageSend().catch(console.error);
+            }}
+          >
+            Send
+          </ButtonSecondary>
         </WideFlexDiv>
       </MessageFormContainer>
     </NoSsr>

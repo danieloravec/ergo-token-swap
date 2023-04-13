@@ -93,6 +93,16 @@ export class Wallet {
     return await this._walletApi.sign_tx_inputs(unsignedTx, indices);
   }
 
+  async signData(address: string, message: string): Promise<string> {
+    // TODO remove this and use the commented part instead once dApp sign_data is implemented in dApp connector
+    return 'INVALID_SIGNATURE_NOT_IMPLEMENTED';
+    // await this.init();
+    // if (this._walletApi === undefined) {
+    //   throw new Error('Wallet API not available');
+    // }
+    // return await this._walletApi.sign_data(address, message);
+  }
+
   async submitTx(signedTx: SignedTransaction): Promise<string> {
     await this.init();
     if (this._walletApi === undefined) {

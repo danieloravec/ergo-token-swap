@@ -25,3 +25,20 @@ export const useThemeStore = create<{
     }
   )
 );
+
+export const useJwtAuth = create<{
+  jwt: string;
+  setJwt: (token: string) => void;
+}>()(
+  persist(
+    (set, get) => ({
+      jwt: '',
+      setJwt: (token: string) => {
+        set({ jwt: token });
+      },
+    }),
+    {
+      name: 'jwt-storage',
+    }
+  )
+);
