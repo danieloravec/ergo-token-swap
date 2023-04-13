@@ -91,7 +91,7 @@ messageRouter.post('/', async (req, res) => {
       return;
     }
     res.status(200);
-    res.send('OK');
+    res.send({message: 'OK'});
   } catch (err) {
     console.error(err.message);
     res.status(500);

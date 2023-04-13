@@ -212,7 +212,7 @@ userRouter.get('/auth', async (req, res) => {
       {where: {address: req.query!.address}}
     );
     res.status(200);
-    res.send(secret);
+    res.send({secret});
   } catch (err) {
     console.log(err);
     res.status(500);
@@ -243,9 +243,9 @@ userRouter.post('/auth', async (req, res) => {
       res.send("Invalid signature");
       return;
     }
-    const token = jwt.sign({address: req.query!.address, timestamp: Date.now()}, config.jwtSecret);
+    const token = jwt.sign({address: req.body!.address, timestamp: Date.now()}, config.jwtSecret);
     res.status(200);
-    res.send(token);
+    res.send({jwt: token});
   } catch (err) {
     console.log(err);
     res.status(500);
