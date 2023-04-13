@@ -57,6 +57,7 @@ messageRouter.post('/', async (req, res) => {
     const body: {
       fromAddress: string,
       toAddress: string,
+      subject: string,
       text: string,
     } = req.body;
     if (!ErgoAddress.validate(body.fromAddress) || !ErgoAddress.validate(body.toAddress)) {
@@ -80,6 +81,7 @@ messageRouter.post('/', async (req, res) => {
       await Message.create({
         fromAddress: body.fromAddress,
         toAddress: body.toAddress,
+        subject: body.subject,
         text: body.text,
       });
     } catch (e) {
