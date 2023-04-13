@@ -26,19 +26,23 @@ messageRouter.get('/', async (req, res) => {
       res.send("User not found");
       return;
     }
-    const messages = await Message.findAll({
-      where:
-        req.query?.sent === "true"
-          ? {fromAddress: req.query.address}
-          : {
-            toAddress: req.query.address,
-            archived: false
-          },
+    const receivedMessages = await Message.findAll({
+      where: {
+        toAddress: req.query.address,
+        archived: false
+      },
       order: [['createdAt', 'DESC']],
       raw: true
     });
-    console.log(`Found messages: ${JSON.stringify(messages)}`);
-    res.send({messages});
+    const sentMessages = await Message.findAll({
+      where: {fromAddress: req.query.address},
+      order: [['createdAt', 'DESC']],
+      raw: true
+    });
+    res.send({
+      received: receivedMessages,
+      sent: sentMessages
+    });
   } catch (err) {
     console.error(err);
     res.status(500);
