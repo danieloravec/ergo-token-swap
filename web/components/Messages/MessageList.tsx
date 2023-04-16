@@ -1,11 +1,12 @@
 import { type Message } from '@data-types/messages';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
-import { Strong, Text } from '@components/Common/Text';
-import styled from 'styled-components';
+import { Strong, Text, A } from '@components/Common/Text';
+import styled, { useTheme } from 'styled-components';
 import { shortenString } from '@utils/formatters';
 import { ButtonTertiary } from '@components/Common/Button';
 import { spacing } from '@themes/spacing';
 import { Spacer } from '@components/Common/Spacer';
+import { Person } from '@components/Icons/Person';
 
 const MessageListItemContainer = styled(FlexDiv)`
   width: 100%;
@@ -17,8 +18,14 @@ const MessageListItem = (props: {
   message: Message;
   isReceivedList: boolean;
 }): JSX.Element => {
+  const theme = useTheme();
+
   const date = new Date(props.message.createdAt).toLocaleDateString();
   const time = new Date(props.message.createdAt).toLocaleTimeString();
+
+  const displayAddress = props.isReceivedList
+    ? props.message.fromAddress
+    : props.message.toAddress;
 
   const handleOpenMessage = (): void => {
     console.log('TODO: Open message');
@@ -28,13 +35,12 @@ const MessageListItem = (props: {
     <MessageListItemContainer>
       <FlexDiv style={{ width: '75%' }} onClick={handleOpenMessage}>
         <FlexDiv>
+          <A href={`/profile/${displayAddress}`} target="_blank">
+            <Person color={theme.properties.colorPrimary} />
+          </A>
+          <Spacer size={spacing.spacing_xxs} vertical={false} />
           <Text style={{ fontWeight: 'lighter' }}>
-            {shortenString(
-              props.isReceivedList
-                ? props.message.fromAddress
-                : props.message.toAddress,
-              16
-            )}
+            {shortenString(displayAddress, 16)}
           </Text>
         </FlexDiv>
         <Spacer size={spacing.spacing_m} vertical={false} />
