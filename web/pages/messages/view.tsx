@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type Message } from '@data-types/messages';
-import { authenticate, backendRequest } from '@utils/utils';
+import { type MessageStructure } from '@data-types/messages';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { useJwtAuth } from '@components/hooks';
 import { Heading1, Text } from '@components/Common/Text';
@@ -8,19 +7,13 @@ import { MessageList } from '@components/Messages/MessageList';
 import { FlexDiv } from '@components/Common/Alignment';
 import styled, { useTheme } from 'styled-components';
 import { Toggle } from '@components/Common/Toggle';
-import {
-  ButtonTertiary,
-} from '@components/Common/Button';
+import { ButtonTertiary } from '@components/Common/Button';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { useRouter } from 'next/router';
+import { loadMessages } from '@utils/dataLoader';
 
 type MessageType = 'received' | 'sent';
-
-interface MessageStructure {
-  sent: Message[];
-  received: Message[];
-}
 
 const Container = styled(FlexDiv)`
   width: 100%;
@@ -50,29 +43,10 @@ const ViewMessages = (): JSX.Element => {
   const [messages, setMessages] = useState<MessageStructure | undefined>();
 
   useEffect(() => {
-    const loadMessages = async (): Promise<void> => {
-      if (address === undefined) {
-        return;
-      }
-      const authSuccessful = await authenticate(address, jwt, setJwt, wallet);
-      if (!authSuccessful) {
-        console.error('Authentication failed');
-        return;
-      }
-      const messages = await backendRequest(
-        `/message?address=${address}`,
-        'GET',
-        undefined,
-        { Authorization: jwt }
-      );
-      if (messages.status !== 200 || messages.body === undefined) {
-        console.error('Failed to load messages');
-      } else {
-        setMessages(messages.body as MessageStructure);
-        setIsLoaded(true);
-      }
-    };
-    loadMessages().catch(console.error);
+    loadMessages(address, jwt, setJwt, wallet, (messages: MessageStructure) => {
+      setMessages(messages);
+      setIsLoaded(true);
+    }).catch(console.error);
   }, [isLoaded]);
 
   if (messages === undefined && !isLoaded) {

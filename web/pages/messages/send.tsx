@@ -55,6 +55,12 @@ const SendMessagePage = (): JSX.Element => {
     if (prefilledRecipient !== undefined) {
       setReceiver(prefilledRecipient as string);
     }
+    const prefilledSubject = router.query?.subject;
+    if (prefilledSubject !== undefined) {
+      setSubject(
+        Buffer.from(prefilledSubject as string, 'hex').toString('utf-8')
+      );
+    }
   });
 
   useEffect(() => {
@@ -120,6 +126,7 @@ const SendMessagePage = (): JSX.Element => {
         <WideFlexDiv>
           <WideInput
             placeholder="Subject"
+            value={subject}
             onChange={(e) => {
               setSubject(e.target.value);
             }}

@@ -60,8 +60,11 @@ export default function Profile(): JSX.Element {
     fetchProfileInfoMaybeCreate().catch(console.error);
   }, [profileAddress]);
 
+  if (!isReady) {
+    return <div>Loading...</div>;
+  }
+
   if (
-    !isReady ||
     profileInfo === undefined ||
     typeof profileAddress !== 'string' ||
     !isValid

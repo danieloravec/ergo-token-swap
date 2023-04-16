@@ -7,10 +7,11 @@ import { ButtonTertiary } from '@components/Common/Button';
 import { spacing } from '@themes/spacing';
 import { Spacer } from '@components/Common/Spacer';
 import { Person } from '@components/Icons/Person';
+import { useRouter } from 'next/router';
 
 const MessageListItemContainer = styled(FlexDiv)`
   width: 100%;
-  border: 1px solid #e0e0e0;
+  border: ${(props) => `1px solid ${props.theme.properties.colorBgText}`};
   padding: ${() => `${spacing.spacing_xs}px`};
 `;
 
@@ -19,6 +20,7 @@ const MessageListItem = (props: {
   isReceivedList: boolean;
 }): JSX.Element => {
   const theme = useTheme();
+  const router = useRouter();
 
   const date = new Date(props.message.createdAt).toLocaleDateString();
   const time = new Date(props.message.createdAt).toLocaleTimeString();
@@ -28,7 +30,7 @@ const MessageListItem = (props: {
     : props.message.toAddress;
 
   const handleOpenMessage = (): void => {
-    console.log('TODO: Open message');
+    router.push(`/messages/detail/${props.message.id}`).catch(console.error);
   };
 
   return (
@@ -49,7 +51,9 @@ const MessageListItem = (props: {
         </FlexDiv>
         <Spacer size={spacing.spacing_xs} vertical={false} />
         <FlexDiv style={{ marginLeft: 'auto' }}>
-          {date} {time}
+          <Text>
+            {date} {time}
+          </Text>
         </FlexDiv>
       </FlexDiv>
       <Spacer size={spacing.spacing_xs} vertical={false} />
