@@ -21,6 +21,7 @@ messageRouter.get('/', async (req, res) => {
       return;
     }
     const user = await User.findOne({where: {address: req.query.address}});
+    console.log(`\nUser with address ${req.query.address} is: ${JSON.stringify(user)}\n`)
     if(!user) {
       res.status(400);
       res.send("User not found");
