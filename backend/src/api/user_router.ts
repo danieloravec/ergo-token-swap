@@ -9,6 +9,7 @@ import * as jwt from "jsonwebtoken";
 import {config} from "@config";
 import {JwtPayload} from "jsonwebtoken";
 import {verifyJwt} from "@utils";
+import sequelizeConnection from "@db/config";
 
 const userRouter = Router();
 
@@ -38,6 +39,7 @@ userRouter.get('/', async (req, res) => {
 // TODO incorporate auth flow into this
 userRouter.post('/', async (req, res) => {
   try {
+    const t = await sequelizeConnection.transaction();
     if (req.body?.address === undefined) {
       res.status(400);
       res.send('Missing address');
@@ -60,8 +62,9 @@ userRouter.post('/', async (req, res) => {
 
     let user: User;
     try {
-      user = await User.findOne({where: {address: req.body.address}});
+      user = await User.findOne({where: {address: req.body.address}, transaction: t});
     } catch (err) {
+      await t.rollback();
       console.error(err.message);
       res.status(500);
       res.send("Server-side error while checking if user exists");
@@ -69,7 +72,14 @@ userRouter.post('/', async (req, res) => {
     }
 
     if(user) {
-      if (req.body?.signature === undefined || !utils.verifySignature(JSON.stringify(data), req.body.signature)) {
+      if(!req.body?.signature) {
+        await t.rollback();
+        res.status(200);
+        res.send(user);
+        return;
+      }
+      if (!utils.verifySignature(JSON.stringify(data), req.body.signature)) {
+        await t.rollback();
         res.status(400);
         res.send('Invalid data signature');
         return;
@@ -82,12 +92,13 @@ userRouter.post('/', async (req, res) => {
           twitter: req.body.twitter ?? user.twitter,
           allowMessages: req.body.allowMessages ?? user.allowMessages,
         }
-        await User.update(updatedUserData, {where: {address: req.body.address}});
+        await User.update(updatedUserData, {where: {address: req.body.address}, transaction: t});
         user = {
           address: req.body.address,
           ...updatedUserData
         } as User;
       } catch (e) {
+        await t.rollback();
         console.error(e.message);
         res.status(500);
         res.send("Error while updating the user");
@@ -101,16 +112,18 @@ userRouter.post('/', async (req, res) => {
           email: req.body.email,
           discord: req.body.discord,
           twitter: req.body.twitter,
-          allowMessages: req.body.allowMessages,
-        });
+          allowMessages: true,
+        }, {transaction: t});
       } catch (e) {
-        console.error(e.message);
+        await t.rollback();
+        console.error(JSON.stringify(e));
         res.status(500);
         res.send("Error while creating the user");
         return;
       }
     }
 
+    await t.commit();
     res.status(200);
     res.send(user);
   } catch (err) {
@@ -212,7 +225,7 @@ userRouter.get('/auth', async (req, res) => {
       {where: {address: req.query!.address}}
     );
     res.status(200);
-    res.send(secret);
+    res.send({secret});
   } catch (err) {
     console.log(err);
     res.status(500);
@@ -243,9 +256,9 @@ userRouter.post('/auth', async (req, res) => {
       res.send("Invalid signature");
       return;
     }
-    const token = jwt.sign({address: req.query!.address, timestamp: Date.now()}, config.jwtSecret);
+    const token = jwt.sign({address: req.body!.address, timestamp: Date.now()}, config.jwtSecret);
     res.status(200);
-    res.send(token);
+    res.send({jwt: token});
   } catch (err) {
     console.log(err);
     res.status(500);

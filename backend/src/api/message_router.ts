@@ -21,24 +21,29 @@ messageRouter.get('/', async (req, res) => {
       return;
     }
     const user = await User.findOne({where: {address: req.query.address}});
+    console.log(`\nUser with address ${req.query.address} is: ${JSON.stringify(user)}\n`)
     if(!user) {
       res.status(400);
       res.send("User not found");
       return;
     }
-    const messages = await Message.findAll({
-      where:
-        req.query?.sent === "true"
-          ? {fromAddress: req.query.address}
-          : {
-            toAddress: req.query.address,
-            archived: false
-          },
+    const receivedMessages = await Message.findAll({
+      where: {
+        toAddress: req.query.address,
+        archived: false
+      },
       order: [['createdAt', 'DESC']],
       raw: true
     });
-    console.log(`Found messages: ${JSON.stringify(messages)}`);
-    res.send({messages});
+    const sentMessages = await Message.findAll({
+      where: {fromAddress: req.query.address},
+      order: [['createdAt', 'DESC']],
+      raw: true
+    });
+    res.send({
+      received: receivedMessages,
+      sent: sentMessages
+    });
   } catch (err) {
     console.error(err);
     res.status(500);
@@ -57,6 +62,7 @@ messageRouter.post('/', async (req, res) => {
     const body: {
       fromAddress: string,
       toAddress: string,
+      subject: string,
       text: string,
     } = req.body;
     if (!ErgoAddress.validate(body.fromAddress) || !ErgoAddress.validate(body.toAddress)) {
@@ -80,6 +86,7 @@ messageRouter.post('/', async (req, res) => {
       await Message.create({
         fromAddress: body.fromAddress,
         toAddress: body.toAddress,
+        subject: body.subject,
         text: body.text,
       });
     } catch (e) {
@@ -89,7 +96,7 @@ messageRouter.post('/', async (req, res) => {
       return;
     }
     res.status(200);
-    res.send('OK');
+    res.send({message: 'OK'});
   } catch (err) {
     console.error(err.message);
     res.status(500);

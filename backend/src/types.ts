@@ -69,6 +69,7 @@ export const MessageCreateBodySchema: Schema = {
     fields: {
         fromAddress: 'string',
         toAddress: 'string',
+        subject: 'string',
         text: 'string',
     }
 }

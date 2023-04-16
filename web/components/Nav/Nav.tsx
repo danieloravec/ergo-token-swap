@@ -42,10 +42,13 @@ export function Nav(): JSX.Element {
           <Logo />
         </NavSubcontainer>
         <NavSubcontainer float="right">
+          <NavLinkSpaced href="/">Home</NavLinkSpaced>
           {address !== undefined && (
             <NavLinkSpaced href={`/profile/${address}`}>Profile</NavLinkSpaced>
           )}
-          <NavLinkSpaced href="/">Home</NavLinkSpaced>
+          {address !== undefined && (
+            <NavLinkSpaced href="/messages/view">Messages</NavLinkSpaced>
+          )}
           <ConnectWalletButtonContainer>
             <ConnectWalletButton />
           </ConnectWalletButtonContainer>

@@ -4,6 +4,7 @@ import sequelizeConnection from '@db/config'
 interface MessageAttributes {
   fromAddress: string;
   toAddress: string;
+  subject: string;
   text: string;
   seen: boolean;
   archived: boolean;
@@ -12,6 +13,7 @@ interface MessageAttributes {
 class Message extends Model<MessageAttributes> implements MessageAttributes {
   fromAddress: string;
   toAddress: string;
+  subject: string;
   text: string;
   seen: boolean;
   archived: boolean;
@@ -23,6 +25,9 @@ Message.init({
   },
   toAddress: {
     type: DataTypes.STRING(51),
+  },
+  subject: {
+    type: DataTypes.STRING(200),
   },
   text: {
     type: DataTypes.STRING(1000),
