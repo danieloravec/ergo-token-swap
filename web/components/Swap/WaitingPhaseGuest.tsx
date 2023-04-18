@@ -1,17 +1,14 @@
 import styled, { useTheme } from 'styled-components';
 import {
   Heading1,
-  Heading3,
   OrderedList,
   TextPrimaryWrapper,
-  A,
 } from '@components/Common/Text';
 import { Hourglass } from '@components/Icons/Hourglass';
 import React, { useEffect, useState } from 'react';
 import {
   CenteredDivHorizontal,
   CenteredDivVertical,
-  Div,
   FlexDiv,
 } from '@components/Common/Alignment';
 import { backendRequest } from '@utils/utils';
@@ -22,8 +19,8 @@ import {
 } from '@fleet-sdk/common';
 import { type Wallet } from '@ergo/wallet';
 import { type Amount, type Box } from '@fleet-sdk/core';
-import { combineSignedInputs } from '@components/Swap/utils';
-import { config } from '@config';
+import { combineSignedInputs, fetchFinishedTxId } from '@components/Swap/utils';
+import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 
 const WaitingPhaseHostContainer = styled.div`
   display: flex;
@@ -71,20 +68,8 @@ export function WaitingPhaseGuest(props: {
 
   useEffect(() => {
     const fetchIsFinished = async (): Promise<void> => {
-      const isFinishedResponse = await backendRequest(
-        `/tx?secret=${props.tradingSessionId}`
-      );
-      if (
-        isFinishedResponse.status !== 200 ||
-        isFinishedResponse?.body?.submitted === undefined
-      ) {
-        console.error('Failed to get isFinished');
-        setSubmittedTxId(undefined);
-      } else if (isFinishedResponse.body.submitted === true) {
-        setSubmittedTxId(isFinishedResponse.body.txId);
-      } else {
-        setSubmittedTxId(undefined);
-      }
+      const maybeTxId = await fetchFinishedTxId(props.tradingSessionId);
+      setSubmittedTxId(maybeTxId);
       setIsLoaded(true);
     };
     fetchIsFinished().catch(console.error);
@@ -183,6 +168,10 @@ export function WaitingPhaseGuest(props: {
     finalizeGuestSigningAndSubmit().catch(console.error);
   }, [unsignedTx]);
 
+  if (submittedTxId !== undefined) {
+    return <TradingSessionFinished txId={submittedTxId} />;
+  }
+
   return (
     <WaitingPhaseHostContainer>
       <CenteredDivVertical>
@@ -192,33 +181,12 @@ export function WaitingPhaseGuest(props: {
             <TextPrimaryWrapper>{props.tradingSessionId}</TextPrimaryWrapper>!
           </Heading1>
         </CenteredDivHorizontal>
-        {submittedTxId !== undefined ? (
-          <CenteredDivHorizontal>
-            <Heading3>
-              The session transaction was{' '}
-              <A
-                target="_blank"
-                href={`${config.explorerFrontendUrl}/en/transactions/${submittedTxId}`}
-              >
-                submitted
-              </A>
-              .
-            </Heading3>
-          </CenteredDivHorizontal>
-        ) : (
-          <Div>
-            <CenteredDivHorizontal>
-              <WaitingPhaseGuestGuide />
-            </CenteredDivHorizontal>
-            <CenteredDivHorizontal>
-              <Hourglass
-                width={128}
-                height={128}
-                fill={theme.properties.colorBg}
-              />
-            </CenteredDivHorizontal>
-          </Div>
-        )}
+        <CenteredDivHorizontal>
+          <WaitingPhaseGuestGuide />
+        </CenteredDivHorizontal>
+        <CenteredDivHorizontal>
+          <Hourglass width={128} height={128} fill={theme.properties.colorBg} />
+        </CenteredDivHorizontal>
       </CenteredDivVertical>
     </WaitingPhaseHostContainer>
   );

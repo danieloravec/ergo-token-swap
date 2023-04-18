@@ -1,7 +1,7 @@
 import {
+  CenteredDiv,
   CenteredDivHorizontal,
   Div,
-  FlexDiv,
 } from '@components/Common/Alignment';
 import { config } from '@config';
 import { Heading1, TextCenterAlign, A } from '@components/Common/Text';
@@ -12,20 +12,20 @@ export const TradingSessionFinished = (props: {
   txId: string;
 }): JSX.Element => {
   return (
-    <FlexDiv>
+    <CenteredDiv>
       <Div>
         <CenteredDivHorizontal>
           <Heading1>Success!</Heading1>
         </CenteredDivHorizontal>
         <CenteredDivHorizontal>
           <TextCenterAlign>
-            The{' '}
+            The&nbsp;
             <A
               href={`${config.explorerFrontendUrl}/en/transactions/${props.txId}`}
             >
               transaction
-            </A>{' '}
-            was submitted successfully.
+            </A>
+            &nbsp; was submitted successfully.
           </TextCenterAlign>
         </CenteredDivHorizontal>
         <CenteredDivHorizontal>
@@ -36,10 +36,9 @@ export const TradingSessionFinished = (props: {
       <CenteredDivHorizontal>
         <TextCenterAlign>
           If the transaction is not confirmed within 1 hour, please open a new
-          trading session and try again. No funds can be lost by opening new
-          identiacal trading sessions.
+          trading session and try again.
         </TextCenterAlign>
       </CenteredDivHorizontal>
-    </FlexDiv>
+    </CenteredDiv>
   );
 };

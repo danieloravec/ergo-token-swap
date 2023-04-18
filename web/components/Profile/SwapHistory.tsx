@@ -58,8 +58,10 @@ const SwapHistoryTableEntry = (props: {
 
       <CenteredDivHorizontal style={{ width: '30%' }}>
         <CenteredDivHorizontal style={{ width: '100%' }}>
-          {swapTimestampDt.toLocaleDateString()}{' '}
-          {swapTimestampDt.toLocaleTimeString()}
+          <Text>
+            {swapTimestampDt.toLocaleDateString()}{' '}
+            {swapTimestampDt.toLocaleTimeString()}
+          </Text>
         </CenteredDivHorizontal>
       </CenteredDivHorizontal>
     </FlexDiv>
