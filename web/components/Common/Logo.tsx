@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
+import { Text } from 'components/Common/Text';
+import { CenteredDivHorizontal } from '@components/Common/Alignment';
 
 const LogoContainer = styled.div`
   display: flex;
@@ -18,7 +20,10 @@ export function Logo(): JSX.Element {
         redirectHome().catch(console.error);
       }}
     >
-      <Image src="/logo.png" alt="logo" width="100" height="50" />
+      <CenteredDivHorizontal>
+        <Text style={{ fontSize: '22px' }}>SingleTxSwap</Text>
+      </CenteredDivHorizontal>
+      <Image src="/logo.png" alt="logo" width="60" height="60" />
     </LogoContainer>
   );
 }
