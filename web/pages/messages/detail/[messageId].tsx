@@ -44,15 +44,21 @@ export const MessageDetail = (): JSX.Element => {
       : message?.fromAddress;
 
   useEffect(() => {
-    loadMessages(address, jwt, setJwt, wallet, (messages: MessageStructure) => {
-      for (const m of messages.sent.concat(messages.received)) {
-        if (String(m.id) === messageId) {
-          setMessage(m);
-          break;
+    loadMessages(
+      address,
+      setJwt,
+      wallet,
+      (messages: MessageStructure) => {
+        for (const m of messages.sent.concat(messages.received)) {
+          if (String(m.id) === messageId) {
+            setMessage(m);
+            break;
+          }
         }
-      }
-      setIsLoaded(true);
-    }).catch(console.error);
+        setIsLoaded(true);
+      },
+      jwt
+    ).catch(console.error);
   }, [isLoaded]);
 
   if (!isLoaded) {

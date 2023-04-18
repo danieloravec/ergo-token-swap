@@ -12,6 +12,7 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { useRouter } from 'next/router';
 import { loadMessages } from '@utils/dataLoader';
+import NoSsr from '@components/Common/NoSsr';
 
 type MessageType = 'received' | 'sent';
 
@@ -43,14 +44,34 @@ const ViewMessages = (): JSX.Element => {
   const [messages, setMessages] = useState<MessageStructure | undefined>();
 
   useEffect(() => {
-    loadMessages(address, jwt, setJwt, wallet, (messages: MessageStructure) => {
-      setMessages(messages);
-      setIsLoaded(true);
-    }).catch(console.error);
-  }, [isLoaded]);
+    loadMessages(
+      address,
+      setJwt,
+      wallet,
+      (messages: MessageStructure) => {
+        setMessages(messages);
+        setIsLoaded(true);
+      },
+      jwt
+    ).catch(console.error);
+  }, [address, jwt, isLoaded]);
 
-  if (messages === undefined && !isLoaded) {
-    return <Text>Loading messages...</Text>;
+  if (address === undefined) {
+    return (
+      <NoSsr>
+        <FlexDiv>
+          <Text>Please connect your wallet to view your messages.</Text>
+        </FlexDiv>
+      </NoSsr>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <NoSsr>
+        <Text>Loading messages...</Text>
+      </NoSsr>
+    );
   }
 
   return (

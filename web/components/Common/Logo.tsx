@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { Text } from 'components/Common/Text';
 import { CenteredDivHorizontal } from '@components/Common/Alignment';
@@ -11,6 +11,7 @@ const LogoContainer = styled.div`
 
 export function Logo(): JSX.Element {
   const router = useRouter();
+  const theme = useTheme();
   return (
     <LogoContainer
       onClick={() => {
@@ -21,7 +22,11 @@ export function Logo(): JSX.Element {
       }}
     >
       <CenteredDivHorizontal>
-        <Text style={{ fontSize: '22px' }}>SingleTxSwap</Text>
+        <Text
+          style={{ color: theme.properties.colorNavsText, fontSize: '22px' }}
+        >
+          SingleTxSwap
+        </Text>
       </CenteredDivHorizontal>
       <Image src="/logo.png" alt="logo" width="60" height="60" />
     </LogoContainer>
