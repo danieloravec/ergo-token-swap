@@ -2,12 +2,13 @@ import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import { TokenSelection } from '@components/Swap/TokenSelection';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
 import { type ParticipantInfo } from '@components/Swap/types';
 import { SwapButton } from '@components/Swap/SwapButton';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { Alert } from '@components/Common/Alert';
+import { fetchFinishedTxId } from '@components/Swap/utils';
 
 export function SwappingPhaseHost(props: {
   wallet: Wallet;
@@ -31,6 +32,14 @@ export function SwappingPhaseHost(props: {
   const [selectedNanoErgB, setSelectedNanoErgB] = useState(BigInt(0));
   const [awaitingGuestSignature, setAwaitingGuestSignature] = useState(false);
   const [txId, setTxId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchIsFinished = async (): Promise<void> => {
+      const maybeTxId = await fetchFinishedTxId(props.tradingSessionId);
+      setTxId(maybeTxId);
+    };
+    fetchIsFinished().catch(console.error);
+  });
 
   if (txId !== undefined) {
     return <TradingSessionFinished txId={txId} />;
