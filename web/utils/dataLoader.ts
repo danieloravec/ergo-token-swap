@@ -1,4 +1,8 @@
-import { authenticate, backendRequest } from '@utils/utils';
+import {
+  authenticate,
+  backendRequest,
+  createUserIfNotExists,
+} from '@utils/utils';
 import { type Wallet } from '@ergo/wallet';
 import { type MessageStructure } from '@data-types/messages';
 
@@ -12,6 +16,7 @@ export const loadMessages = async (
   if (address === undefined) {
     return;
   }
+  await createUserIfNotExists(address);
   const authSuccessful = await authenticate(address, jwt, setJwt, wallet);
   if (!authSuccessful) {
     console.error('Authentication failed');

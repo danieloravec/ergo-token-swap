@@ -74,3 +74,19 @@ export const authenticate = async (
   setJwt(jwtRes.body.jwt as string);
   return true;
 };
+
+export const createUserIfNotExists = async (address: string): Promise<void> => {
+  const profileInfoResponse = await backendRequest(`/user?address=${address}`);
+  if (profileInfoResponse.status !== 200) {
+    if (profileInfoResponse.body === 'User not found') {
+      const userCreateResponse = await backendRequest('/user', 'POST', {
+        address,
+      });
+      if (userCreateResponse.status !== 200) {
+        console.error(JSON.stringify(userCreateResponse));
+      }
+    } else {
+      console.error(profileInfoResponse);
+    }
+  }
+};
