@@ -23,7 +23,7 @@ export const NftList = (props: { rawNfts: Nft[] | undefined }): JSX.Element => {
     <FlexDiv>
       {props.rawNfts.map((nft, index) => {
         return (
-          <NftDisplaySlot>
+          <NftDisplaySlot key={nft.tokenId}>
             <NftDisplay
               nft={nft}
               key={nft.tokenId}

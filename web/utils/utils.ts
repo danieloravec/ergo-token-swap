@@ -33,23 +33,37 @@ export const backendRequest = async (
 
 export const authenticate = async (
   address: string,
-  jwt: string,
   setJwt: (token: string) => void,
+  jwt?: string,
   wallet?: Wallet
 ): Promise<boolean> => {
   if (wallet === undefined) {
     throw new Error('WALLET_UNDEFINED');
   }
-  const isAuthenticatedRes = await backendRequest('/user/auth/check', 'POST', {
-    address,
-    jwt,
-  });
-  if (isAuthenticatedRes.status !== 200) {
-    console.error(isAuthenticatedRes);
-    return false; // Cannot authenticate, server unavailable, etc
+
+  try {
+    await createUserIfNotExists(address);
+  } catch (err) {
+    console.error(`Creating user failed: ${JSON.stringify(err)}`);
+    return false;
   }
-  if (isAuthenticatedRes.body?.isAuthenticated === true) {
-    return true;
+
+  if (jwt !== undefined) {
+    const isAuthenticatedRes = await backendRequest(
+      '/user/auth/check',
+      'POST',
+      {
+        address,
+        jwt,
+      }
+    );
+    if (isAuthenticatedRes.status !== 200) {
+      console.error(isAuthenticatedRes);
+      return false; // Cannot authenticate, server unavailable, etc
+    }
+    if (isAuthenticatedRes.body?.isAuthenticated === true) {
+      return true;
+    }
   }
 
   // User not authenticated, yet, let's generate them a jwt

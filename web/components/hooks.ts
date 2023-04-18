@@ -27,13 +27,13 @@ export const useThemeStore = create<{
 );
 
 export const useJwtAuth = create<{
-  jwt: string;
+  jwt?: string;
   setJwt: (token: string) => void;
 }>()(
   persist(
     (set, get) => ({
-      jwt: '',
-      setJwt: (token: string) => {
+      jwt: undefined,
+      setJwt: (token?: string) => {
         set({ jwt: token });
       },
     }),

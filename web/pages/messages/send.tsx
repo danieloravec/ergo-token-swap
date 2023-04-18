@@ -68,7 +68,7 @@ const SendMessagePage = (): JSX.Element => {
       if (address === undefined) {
         return;
       }
-      const authSuccessful = await authenticate(address, jwt, setJwt, wallet);
+      const authSuccessful = await authenticate(address, setJwt, jwt, wallet);
       if (!authSuccessful) {
         setError('Authentication failed');
       }
@@ -117,7 +117,7 @@ const SendMessagePage = (): JSX.Element => {
         <WideFlexDiv>
           <WideInput
             placeholder="Receiver address"
-            value={receiver}
+            value={receiver ?? ''}
             onChange={(e) => {
               setReceiver(e.target.value);
             }}
@@ -126,7 +126,7 @@ const SendMessagePage = (): JSX.Element => {
         <WideFlexDiv>
           <WideInput
             placeholder="Subject"
-            value={subject}
+            value={subject ?? ''}
             onChange={(e) => {
               setSubject(e.target.value);
             }}
