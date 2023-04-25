@@ -3,13 +3,14 @@ import * as utils from "@utils";
 import User from "@db/models/user";
 import {ErgoAddress} from "@fleet-sdk/core";
 import TradingSession from "@db/models/trading_session";
-import {Op} from "sequelize";
+import {Op, QueryTypes} from "sequelize";
 import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 import {config} from "@config";
 import {JwtPayload} from "jsonwebtoken";
 import {verifyJwt} from "@utils";
 import sequelizeConnection from "@db/config";
+import UserAssetStats from "@db/models/user_asset_stats";
 
 const userRouter = Router();
 
@@ -282,6 +283,35 @@ userRouter.post('/auth/check', async (req, res) => {
     console.log(err);
     res.status(500);
     res.send("Server-side error while validating jwt");
+  }
+});
+
+userRouter.get('/stats', async (req, res) => {
+  try {
+    if(req.query?.address === undefined || typeof req.query?.address !== "string" || !ErgoAddress.validate(req.query!.address)) {
+      res.status(400);
+      res.send("Invalid address");
+      return;
+    }
+    const userStats = await sequelizeConnection.query(
+      'SELECT a.tokenId AS tokenId, u.address AS address, uas.amount_bought as amount_bought, uas.amount_sold as amount_sold' +
+      'FROM assets a' +
+      'JOIN user_asset_stats uas ON a.tokenId = uas.tokenId' +
+      'JOIN users u ON uas.user_address = u.address' +
+      'WHERE u.address = :address' +
+      'ORDER BY uas.amount_bought DESC',
+      {
+        replacements: { address: req.query!.address },
+        type: QueryTypes.SELECT,
+        raw: true,
+      }
+    );
+    console.log(`stats found: ${JSON.stringify(userStats)}`);
+    res.send(userStats);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while getting the user's stats");
   }
 });
 
