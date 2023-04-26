@@ -5,6 +5,7 @@ const sequelizeConnection = new Sequelize(config.dbName, config.dbUser, config.d
     host: config.dbHost,
     dialect: 'postgres' as Dialect,
     port: Number(config.dbPort), // We can trust the environment
+    logging: false,
 });
 
 export default sequelizeConnection;
