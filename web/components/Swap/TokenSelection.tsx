@@ -263,7 +263,6 @@ export function TokenSelection(props: {
     }
   };
   const handleFungibleChange = (tokenId: string, newAmount: bigint): void => {
-    console.log(`Fungible changed to: ${newAmount}`);
     const updatedFungibleAmounts = {
       ...selectedFungibleAmounts,
       [tokenId]: newAmount,

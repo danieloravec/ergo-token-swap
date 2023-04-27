@@ -92,8 +92,6 @@ export function WaitingPhaseGuest(props: {
         partialTxResponse?.body?.inputIndicesGuest !== undefined &&
         partialTxResponse?.body?.signedInputsHost !== undefined
       ) {
-        console.log(`GONNA SET`);
-        console.log(partialTxResponse.body.unsignedTx);
         setUnsignedTx(partialTxResponse.body.unsignedTx);
         setInputIndicesHost(partialTxResponse.body.inputIndicesHost);
         setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
@@ -153,8 +151,9 @@ export function WaitingPhaseGuest(props: {
           return box;
         }),
       };
+
       await props.wallet.submitTx(signedTx);
-      console.log(`submitted txId: ${signedTx.id}`);
+
       try {
         await backendRequest(`/tx/register`, 'POST', {
           secret: props.tradingSessionId,
