@@ -294,11 +294,11 @@ userRouter.get('/stats', async (req, res) => {
       return;
     }
     const userStats = await sequelizeConnection.query(
-      'SELECT a.tokenId AS tokenId, u.address AS address, uas.amount_bought as amount_bought, uas.amount_sold as amount_sold' +
-      'FROM assets a' +
-      'JOIN user_asset_stats uas ON a.tokenId = uas.tokenId' +
-      'JOIN users u ON uas.user_address = u.address' +
-      'WHERE u.address = :address' +
+      'SELECT uas.token_id, uas.amount_bought, uas.amount_sold, ' +
+      'CASE WHEN a.is_verified IS NULL THEN false ELSE a.is_verified END as is_verified ' +
+      'FROM user_asset_stats uas ' +
+      'LEFT JOIN assets a ON uas.token_id = a.token_id ' +
+      'WHERE uas.user_address = :address ' +
       'ORDER BY uas.amount_bought DESC',
       {
         replacements: { address: req.query!.address },
