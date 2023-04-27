@@ -8,10 +8,17 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { backendRequest } from '@utils/utils';
-import { type Swap } from '@components/Profile/types';
+import {
+  type FungibleStats,
+  type NftStats,
+  type Swap,
+} from '@components/Profile/types';
 import { SwapHistory } from '@components/Profile/SwapHistory';
+import { loadNftImageUrl } from '@utils/imageLoader';
+import { explorerRequest } from '@ergo/utils';
+import { Statistics } from '@components/Profile/Statistics';
 
-type Tabs = 'NFT' | 'Fungible' | 'History';
+type Tabs = 'NFT' | 'Fungible' | 'History' | 'Statistics';
 
 const ProfileTabsWrapper = styled(FlexDiv)`
   width: 100%;
@@ -53,6 +60,12 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
     FungibleToken[] | undefined
   >(undefined);
   const [history, setHistory] = React.useState<Swap[] | undefined>(undefined);
+  const [nftStats, setNftStats] = React.useState<NftStats[] | undefined>(
+    undefined
+  );
+  const [fungibleStats, setFungibleStats] = React.useState<
+    FungibleStats[] | undefined
+  >(undefined);
   // const [nanoErg, setNanoErg] = React.useState<bigint | undefined>(undefined);
   const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
@@ -85,8 +98,51 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
       }
     };
 
+    const fetchStats = async (): Promise<void> => {
+      const statsResponse = await backendRequest(
+        `/user/stats?address=${props.profileAddress}`,
+        'GET'
+      );
+      const fetchedNftStats: NftStats[] = [];
+      const fetchedFungibleStats: FungibleStats[] = [];
+      if (statsResponse.status === 200 && statsResponse.body !== undefined) {
+        for (const asset of statsResponse.body) {
+          const assetInfo = await explorerRequest(`/tokens/${asset.token_id}`);
+          const stats = {
+            amountBought: BigInt(asset.amount_bought),
+            amountSold: BigInt(asset.amount_sold),
+          };
+
+          if (assetInfo.emissionAmount === 1) {
+            // NFT
+            const maybeNftImgUrl = await loadNftImageUrl(asset.token_id);
+            fetchedNftStats.push({
+              nft: {
+                tokenId: asset.token_id,
+                name: assetInfo.name,
+                imageUrl: maybeNftImgUrl,
+              },
+              stats,
+            });
+          } else {
+            // Fungible token
+            fetchedFungibleStats.push({
+              fungibleToken: {
+                tokenId: asset.token_id,
+                name: assetInfo.name,
+                decimals: assetInfo.decimals,
+              },
+              stats,
+            });
+          }
+        }
+      }
+      setNftStats(fetchedNftStats);
+      setFungibleStats(fetchedFungibleStats);
+    };
+
     const fetchTabsData = async (): Promise<void> => {
-      await Promise.all([fetchAssets(), fetchHistory()]);
+      await Promise.all([fetchAssets(), fetchHistory(), fetchStats()]);
       setIsLoaded(true);
     };
 
@@ -104,6 +160,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
         >
           <TabText>NFT</TabText>
         </ProfileTab>
+
         <ProfileTab
           isSelected={selectedTab === 'Fungible'}
           onClick={() => {
@@ -112,6 +169,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
         >
           <TabText>Fungible</TabText>
         </ProfileTab>
+
         <ProfileTab
           isSelected={selectedTab === 'History'}
           onClick={() => {
@@ -119,6 +177,15 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
           }}
         >
           <TabText>History</TabText>
+        </ProfileTab>
+
+        <ProfileTab
+          isSelected={selectedTab === 'Statistics'}
+          onClick={() => {
+            setSelectedTab('Statistics');
+          }}
+        >
+          <TabText>Statistics</TabText>
         </ProfileTab>
       </ProfileTabsWrapper>
       <Spacer size={spacing.spacing_m} vertical />
@@ -129,6 +196,13 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
       )}
       {selectedTab === 'History' && (
         <SwapHistory userAddr={props.profileAddress} history={history} />
+      )}
+      {selectedTab === 'Statistics' && (
+        <Statistics
+          userAddr={props.profileAddress}
+          nftStats={nftStats ?? []}
+          fungibleStats={fungibleStats ?? []}
+        />
       )}
     </FlexDiv>
   );
