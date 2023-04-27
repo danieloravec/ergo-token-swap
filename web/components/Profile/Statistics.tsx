@@ -102,14 +102,14 @@ const FungibleVolumeTable = (props: {
 }): JSX.Element => {
   if (props.stats.length === 0) {
     return (
-      <FlexDiv>
+      <FlexDiv style={{ width: '100%' }}>
         <Text>No fungible tokens traded yet...</Text>
       </FlexDiv>
     );
   }
 
   return (
-    <FlexDiv>
+    <FlexDiv style={{ width: '100%' }}>
       {props.stats.map((stat) => {
         return (
           <FungibleVolumeTableEntry
@@ -176,14 +176,14 @@ const NftVolumeTableEntry = (props: { stat: NftStats }): JSX.Element => {
 const NftVolumeTable = (props: { stats: NftStats[] }): JSX.Element => {
   if (props.stats.length === 0) {
     return (
-      <FlexDiv>
+      <FlexDiv style={{ width: '100%' }}>
         <Text>No NFTs traded yet...</Text>
       </FlexDiv>
     );
   }
 
   return (
-    <FlexDiv>
+    <FlexDiv style={{ width: '100%' }}>
       {props.stats.map((stat) => {
         return <NftVolumeTableEntry stat={stat} key={stat.nft.tokenId} />;
       })}
