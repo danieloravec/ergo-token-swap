@@ -2,6 +2,7 @@ import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
 interface MessageAttributes {
+  id: number;
   fromAddress: string;
   toAddress: string;
   subject: string;
@@ -11,6 +12,7 @@ interface MessageAttributes {
 }
 
 class Message extends Model<MessageAttributes> implements MessageAttributes {
+  id: number;
   fromAddress: string;
   toAddress: string;
   subject: string;
@@ -20,6 +22,11 @@ class Message extends Model<MessageAttributes> implements MessageAttributes {
 }
 
 Message.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   fromAddress: {
     type: DataTypes.STRING(51),
   },

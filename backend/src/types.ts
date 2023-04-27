@@ -73,3 +73,9 @@ export const MessageCreateBodySchema: Schema = {
         text: 'string',
     }
 }
+
+export const MessageDeleteBodySchema: Schema = {
+    fields: {
+        id: 'number',
+    }
+}
