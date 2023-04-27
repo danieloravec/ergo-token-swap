@@ -2,6 +2,8 @@ import TradingSession from '@db/models/trading_session';
 import User from '@db/models/user';
 import {config} from '@config';
 import Message from "@db/models/message";
+import Asset from "@db/models/asset";
+import UserAssetStats from "@db/models/user_asset_stats";
 
 TradingSession.sync({force: config.debug, logging: console.log}).then(() => {
   console.log("TradingSessions synced");
@@ -13,4 +15,12 @@ User.sync({force: config.debug, logging: console.log}).then(() => {
 
 Message.sync({force: config.debug, logging: console.log}).then(() => {
   console.log("Messages synced");
+});
+
+Asset.sync({force: config.debug, logging: console.log}).then(() => {
+  console.log("Assets synced");
+});
+
+UserAssetStats.sync({force: config.debug, logging: console.log}).then(() => {
+  console.log("UserAssetStats synced");
 });

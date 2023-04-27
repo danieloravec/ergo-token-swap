@@ -60,7 +60,10 @@ export async function buildUnsignedMultisigSwapTx({
 
   const outputs = [
     new OutputBuilder(
-      allNanoErgA - nanoErgToReceiveByBFromA - config.serviceFeeNanoErg,
+      allNanoErgA -
+        nanoErgToReceiveByBFromA -
+        config.serviceFeeNanoErg +
+        config.minNanoErgValue,
       addressA
     ).addTokens([
       ...Object.keys(totalAssetsToReceiveByA).map((tokenId) => ({
@@ -69,7 +72,10 @@ export async function buildUnsignedMultisigSwapTx({
       })),
     ]),
     new OutputBuilder(
-      allNanoErgB - nanoErgToReceiveByAFromB - config.serviceFeeNanoErg,
+      allNanoErgB -
+        nanoErgToReceiveByAFromB -
+        config.serviceFeeNanoErg +
+        config.minNanoErgValue,
       addressB
     ).addTokens([
       ...Object.keys(totalAssetsToReceiveByB).map((tokenId) => ({
@@ -127,28 +133,3 @@ export async function buildUnsignedMultisigSwapTx({
     inputIndicesB,
   };
 }
-
-// export async function buildTxExample(wallet: Wallet): Promise<void> {
-//   const address = await wallet.getAddress();
-//   console.log(`address: ${address}`);
-//
-//   const creationHeight = await wallet.getCurrentHeight();
-//   const inputs = await utils.getInputs(address);
-//
-//   const unsignedTransaction = new TransactionBuilder(creationHeight)
-//     .from(inputs)
-//     .to(
-//       new OutputBuilder(
-//         BigInt(1000000000),
-//         '9ez4QZZnrhRnXcFa4xupxtSU1cnkq7FaGPbRx2ygxe6ZGg5wBLR'
-//       )
-//     )
-//     .sendChangeTo(address)
-//     .payMinFee()
-//     .build('EIP-12');
-//
-//   const signedTransaction = await wallet.signTx(unsignedTransaction);
-//
-//   const txId = await wallet.submitTx(signedTransaction);
-//   console.log(`txId: ${txId}`);
-// }

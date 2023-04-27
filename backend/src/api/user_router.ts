@@ -3,13 +3,14 @@ import * as utils from "@utils";
 import User from "@db/models/user";
 import {ErgoAddress} from "@fleet-sdk/core";
 import TradingSession from "@db/models/trading_session";
-import {Op} from "sequelize";
+import {Op, QueryTypes} from "sequelize";
 import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 import {config} from "@config";
 import {JwtPayload} from "jsonwebtoken";
 import {verifyJwt} from "@utils";
 import sequelizeConnection from "@db/config";
+import UserAssetStats from "@db/models/user_asset_stats";
 
 const userRouter = Router();
 
@@ -282,6 +283,35 @@ userRouter.post('/auth/check', async (req, res) => {
     console.log(err);
     res.status(500);
     res.send("Server-side error while validating jwt");
+  }
+});
+
+userRouter.get('/stats', async (req, res) => {
+  try {
+    if(req.query?.address === undefined || typeof req.query?.address !== "string" || !ErgoAddress.validate(req.query!.address)) {
+      res.status(400);
+      res.send("Invalid address");
+      return;
+    }
+    const userStats = await sequelizeConnection.query(
+      'SELECT uas.token_id, uas.amount_bought, uas.amount_sold, ' +
+      'CASE WHEN a.is_verified IS NULL THEN false ELSE a.is_verified END as is_verified ' +
+      'FROM user_asset_stats uas ' +
+      'LEFT JOIN assets a ON uas.token_id = a.token_id ' +
+      'WHERE uas.user_address = :address ' +
+      'ORDER BY uas.amount_bought DESC',
+      {
+        replacements: { address: req.query!.address },
+        type: QueryTypes.SELECT,
+        raw: true,
+      }
+    );
+    console.log(`stats found: ${JSON.stringify(userStats)}`);
+    res.send(userStats);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Server-side error while getting the user's stats");
   }
 });
 

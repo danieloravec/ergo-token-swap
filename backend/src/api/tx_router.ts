@@ -101,6 +101,9 @@ txRouter.post('/register', async (req, res) => {
       submittedAt: new Date(),
       txId: body.txId,
     });
+
+    await utils.updateStats(body.secret);
+
     if(status !== 200) {
       res.status(status);
       res.send(message);
