@@ -104,4 +104,47 @@ messageRouter.post('/', async (req, res) => {
   }
 });
 
+messageRouter.delete('/', async (req, res) => {
+  try {
+    const bodyIsValid = await utils.validateObject(req.body, types.MessageDeleteBodySchema);
+    if (!bodyIsValid) {
+      res.status(400);
+      res.send('Invalid body');
+      return;
+    }
+    const body: {
+      id: number,
+    } = req.body;
+
+    const message = await Message.findOne({where: {id: body.id}});
+    if (!message) {
+      res.status(404);
+      res.send({message: 'Message not found'});
+      return;
+    }
+
+    const jwt = req.header("Authorization");
+    if(jwt === undefined || !utils.verifyJwt(message.toAddress, jwt)) {
+      res.status(401);
+      res.send("Unauthorized");
+      return;
+    }
+
+    try {
+      await Message.destroy({where: {id: body.id}});
+    } catch (e) {
+      console.error(e.message);
+      res.status(500);
+      res.send("Error while deleting a message");
+      return;
+    }
+    res.status(200);
+    res.send({message: 'OK'});
+  } catch (err) {
+    console.error(err.message);
+    res.status(500);
+    res.send("Server-side error while deleting a message");
+  }
+});
+
 export default messageRouter;
