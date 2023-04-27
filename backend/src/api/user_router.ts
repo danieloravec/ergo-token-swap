@@ -306,7 +306,6 @@ userRouter.get('/stats', async (req, res) => {
         raw: true,
       }
     );
-    console.log(`stats found: ${JSON.stringify(userStats)}`);
     res.send(userStats);
   } catch (err) {
     console.log(err);
