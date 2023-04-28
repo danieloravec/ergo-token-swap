@@ -6,8 +6,7 @@ import {Request} from "express";
 import fetch from "cross-fetch";
 import * as jwt from "jsonwebtoken";
 import {JwtPayload} from "jsonwebtoken";
-import {ErgoAddress, TokenAmount} from "@fleet-sdk/core";
-import {BIGINT} from "sequelize";
+import {TokenAmount} from "@fleet-sdk/core";
 import {EIP12UnsignedTransaction} from "@fleet-sdk/common";
 import UserAssetStats from "@db/models/user_asset_stats";
 
