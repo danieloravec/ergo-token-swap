@@ -30,13 +30,16 @@ messageRouter.get('/', async (req, res) => {
     const receivedMessages = await Message.findAll({
       where: {
         toAddress: req.query.address,
-        archived: false
+        receiverArchived: false
       },
       order: [['createdAt', 'DESC']],
       raw: true
     });
     const sentMessages = await Message.findAll({
-      where: {fromAddress: req.query.address},
+      where: {
+        fromAddress: req.query.address,
+        senderArchived: false,
+      },
       order: [['createdAt', 'DESC']],
       raw: true
     });
@@ -130,20 +133,90 @@ messageRouter.delete('/', async (req, res) => {
       return;
     }
 
-    try {
-      await Message.destroy({where: {id: body.id}});
-    } catch (e) {
-      console.error(e.message);
-      res.status(500);
-      res.send("Error while deleting a message");
-      return;
-    }
+    await Message.destroy({where: {id: body.id}});
+
     res.status(200);
     res.send({message: 'OK'});
   } catch (err) {
     console.error(err.message);
     res.status(500);
     res.send("Server-side error while deleting a message");
+  }
+});
+
+messageRouter.put('/archive', async (req, res) => {
+  try {
+    const messageId = Number(req.query?.id);
+    if (Number.isNaN(messageId)) {
+      res.status(400);
+      res.send('Invalid query');
+      return;
+    }
+
+    const message = await Message.findOne({where: {id: messageId}});
+    if (!message) {
+      res.status(404);
+      res.send({message: 'Message not found'});
+      return;
+    }
+
+    const jwt = req.header("Authorization");
+    const senderIsAuthorized = jwt !== undefined && utils.verifyJwt(message.fromAddress, jwt);
+    const receiverIsAuthorized = jwt !== undefined && utils.verifyJwt(message.toAddress, jwt);
+    if(!senderIsAuthorized && !receiverIsAuthorized) {
+      res.status(401);
+      res.send("Unauthorized");
+      return;
+    }
+
+    if (senderIsAuthorized) {
+      await Message.update({senderArchived: true}, {where: {id: messageId}});
+    } else {
+      await Message.update({receiverArchived: true}, {where: {id: messageId}});
+    }
+
+    res.status(200);
+    res.send({message: 'OK'});
+  } catch (err) {
+    console.error(err.message);
+    res.status(500);
+    res.send("Server-side error while archiving a message");
+  }
+});
+
+// TODO validate this endpoint. The archiving one probably works. Then add this to FE
+messageRouter.put('/seen', async (req, res) => {
+  try {
+    const messageId =  Number(req.query?.id);
+    const newSeenValue = req.body?.seen;
+    if (Number.isNaN(messageId) || typeof newSeenValue !== 'boolean') {
+      res.status(400);
+      res.send('Invalid query or body');
+      return;
+    }
+
+    const message = await Message.findOne({where: {id: messageId}});
+    if (!message) {
+      res.status(404);
+      res.send({message: 'Message not found'});
+      return;
+    }
+
+    const jwt = req.header("Authorization");
+    if(jwt === undefined || !utils.verifyJwt(message.toAddress, jwt)) {
+      res.status(401);
+      res.send("Unauthorized");
+      return;
+    }
+
+    await Message.update({seen: newSeenValue}, {where: {id: messageId}})
+    res.status(200);
+    res.send({message: 'OK'});
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500);
+    res.send("Server-side error while marking message as seen / unseen");
   }
 });
 

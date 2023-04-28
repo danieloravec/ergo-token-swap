@@ -18,6 +18,7 @@ const MessageListItemContainer = styled(FlexDiv)`
 const MessageListItem = (props: {
   message: Message;
   isReceivedList: boolean;
+  messageArchiveFn: (id: number) => void;
 }): JSX.Element => {
   const theme = useTheme();
   const router = useRouter();
@@ -34,7 +35,14 @@ const MessageListItem = (props: {
   };
 
   return (
-    <MessageListItemContainer>
+    <MessageListItemContainer
+      style={{
+        background:
+          props.isReceivedList && props.message.seen
+            ? theme.properties.colorBgGreyed
+            : theme.properties.colorBg,
+      }}
+    >
       <FlexDiv style={{ width: '75%' }} onClick={handleOpenMessage}>
         <FlexDiv>
           <A href={`/profile/${displayAddress}`} target="_blank">
@@ -60,10 +68,10 @@ const MessageListItem = (props: {
       <FlexDiv style={{ marginLeft: 'auto' }}>
         <ButtonTertiary
           onClick={() => {
-            console.log('TODO: Archive message');
+            props.messageArchiveFn(props.message.id);
           }}
         >
-          Delete
+          Archive
         </ButtonTertiary>
       </FlexDiv>
     </MessageListItemContainer>
@@ -73,6 +81,7 @@ const MessageListItem = (props: {
 export const MessageList = (props: {
   messages: Message[];
   isReceivedList: boolean;
+  messageArchiveFn: (id: number) => void;
 }): JSX.Element => {
   if (props.messages.length === 0) {
     return (
@@ -87,6 +96,7 @@ export const MessageList = (props: {
         <MessageListItem
           message={message}
           isReceivedList={props.isReceivedList}
+          messageArchiveFn={props.messageArchiveFn}
           key={i}
         />
       ))}

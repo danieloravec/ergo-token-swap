@@ -5,20 +5,22 @@ interface MessageAttributes {
   id: number;
   fromAddress: string;
   toAddress: string;
+  senderArchived: boolean;
+  receiverArchived: boolean;
   subject: string;
   text: string;
   seen: boolean;
-  archived: boolean;
 }
 
 class Message extends Model<MessageAttributes> implements MessageAttributes {
   id: number;
   fromAddress: string;
   toAddress: string;
+  senderArchived: boolean;
+  receiverArchived: boolean;
   subject: string;
   text: string;
   seen: boolean;
-  archived: boolean;
 }
 
 Message.init({
@@ -33,6 +35,16 @@ Message.init({
   toAddress: {
     type: DataTypes.STRING(51),
   },
+  senderArchived: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  receiverArchived: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   subject: {
     type: DataTypes.STRING(200),
   },
@@ -40,11 +52,6 @@ Message.init({
     type: DataTypes.STRING(1000),
   },
   seen: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
-  archived: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,

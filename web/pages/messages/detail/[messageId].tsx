@@ -9,7 +9,13 @@ import { Heading1, Strong, Text } from '@components/Common/Text';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import styled, { useTheme } from 'styled-components';
-import { ButtonSecondary } from '@components/Common/Button';
+import {
+  ButtonSecondary,
+  ButtonTertiarySquared,
+} from '@components/Common/Button';
+import { markMessage } from '@utils/messageUtils';
+import { type AlertType } from '@themes/themes';
+import { Alert } from '@components/Common/Alert';
 
 const MessageDetailContainer = styled(FlexDiv)`
   font-size: 1.2rem;
@@ -37,6 +43,9 @@ export const MessageDetail = (): JSX.Element => {
   const { messageId } = router.query;
   const [isLoaded, setIsLoaded] = useState(false);
   const [message, setMessage] = useState<Message | undefined>(undefined);
+  const [alertMessage, setAlertMessage] = useState<
+    { type: AlertType; message: string } | undefined
+  >(undefined);
 
   const replyAddress =
     message?.fromAddress === address
@@ -59,6 +68,9 @@ export const MessageDetail = (): JSX.Element => {
       },
       jwt
     ).catch(console.error);
+    if (message !== undefined) {
+      markMessage(message.id, true, jwt ?? '').catch(console.error);
+    }
   }, [isLoaded]);
 
   if (!isLoaded) {
@@ -71,6 +83,9 @@ export const MessageDetail = (): JSX.Element => {
 
   return (
     <CenteredDivHorizontal>
+      {alertMessage !== undefined && (
+        <Alert type={alertMessage.type}>{alertMessage.message}</Alert>
+      )}
       <MessageDetailContainer>
         <FlexDiv style={{ width: '100%' }}>
           <Heading1>MESSAGE DETAIL</Heading1>
@@ -112,6 +127,29 @@ export const MessageDetail = (): JSX.Element => {
         {replyAddress !== undefined && (
           <FlexDiv style={{ width: '100%' }}>
             <FlexDiv style={{ marginLeft: 'auto' }}>
+              <ButtonTertiarySquared
+                onClick={() => {
+                  const markAndSetMessage = async (): Promise<void> => {
+                    const markSuccess = await markMessage(
+                      message.id,
+                      false,
+                      jwt ?? ''
+                    );
+                    setAlertMessage({
+                      type: markSuccess ? 'success' : 'error',
+                      message: markSuccess
+                        ? 'Message marked as unread.'
+                        : 'Error while marking message as unread',
+                    });
+                  };
+                  markAndSetMessage().catch(console.error);
+                }}
+              >
+                Mark as unread
+              </ButtonTertiarySquared>
+
+              <Spacer size={spacing.spacing_xxs} vertical={false} />
+
               <ButtonSecondary
                 onClick={() => {
                   router
