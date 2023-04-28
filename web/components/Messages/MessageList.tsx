@@ -35,7 +35,14 @@ const MessageListItem = (props: {
   };
 
   return (
-    <MessageListItemContainer>
+    <MessageListItemContainer
+      style={{
+        background:
+          props.isReceivedList && props.message.seen
+            ? theme.properties.colorBgGreyed
+            : theme.properties.colorBg,
+      }}
+    >
       <FlexDiv style={{ width: '75%' }} onClick={handleOpenMessage}>
         <FlexDiv>
           <A href={`/profile/${displayAddress}`} target="_blank">

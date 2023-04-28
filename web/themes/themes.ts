@@ -6,6 +6,7 @@ export interface Theme {
   name: SupportedThemeName;
   properties: {
     colorBg: string;
+    colorBgGreyed: string;
     colorNavs: string;
     colorPrimary: string;
     colorSecondary: string;
@@ -25,6 +26,7 @@ export const LightTheme: Theme = {
   name: 'light',
   properties: {
     colorBg: '#e4dede', // beige
+    colorBgGreyed: '#b4aeae',
     colorNavs: '#222831', // dark gray
     colorPrimary: '#038cbd', // light blue
     colorSecondary: '#c08146', // orange
@@ -44,6 +46,7 @@ export const DarkTheme: Theme = {
   name: 'dark',
   properties: {
     colorBg: '#222831',
+    colorBgGreyed: '#121821',
     colorNavs: '#323841',
     colorPrimary: '#038cbd',
     colorSecondary: '#c08146',

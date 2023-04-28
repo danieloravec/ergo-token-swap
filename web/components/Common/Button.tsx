@@ -26,3 +26,9 @@ export const ButtonTertiary = styled(Button)`
   width: 100px;
   height: 25px;
 `;
+
+export const ButtonTertiarySquared = styled(Button)`
+  background: none;
+  color: ${(props) => props.theme.properties.colorBgText};
+  border-radius: 10px;
+`;
