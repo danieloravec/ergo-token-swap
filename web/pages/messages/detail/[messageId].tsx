@@ -127,26 +127,28 @@ export const MessageDetail = (): JSX.Element => {
         {replyAddress !== undefined && (
           <FlexDiv style={{ width: '100%' }}>
             <FlexDiv style={{ marginLeft: 'auto' }}>
-              <ButtonTertiarySquared
-                onClick={() => {
-                  const markAndSetMessage = async (): Promise<void> => {
-                    const markSuccess = await markMessage(
-                      message.id,
-                      false,
-                      jwt ?? ''
-                    );
-                    setAlertMessage({
-                      type: markSuccess ? 'success' : 'error',
-                      message: markSuccess
-                        ? 'Message marked as unread.'
-                        : 'Error while marking message as unread',
-                    });
-                  };
-                  markAndSetMessage().catch(console.error);
-                }}
-              >
-                Mark as unread
-              </ButtonTertiarySquared>
+              {address === message.toAddress && (
+                <ButtonTertiarySquared
+                  onClick={() => {
+                    const markAndSetMessage = async (): Promise<void> => {
+                      const markSuccess = await markMessage(
+                        message.id,
+                        false,
+                        jwt ?? ''
+                      );
+                      setAlertMessage({
+                        type: markSuccess ? 'success' : 'error',
+                        message: markSuccess
+                          ? 'Message marked as unread.'
+                          : 'Error while marking message as unread',
+                      });
+                    };
+                    markAndSetMessage().catch(console.error);
+                  }}
+                >
+                  Mark as unread
+                </ButtonTertiarySquared>
+              )}
 
               <Spacer size={spacing.spacing_xxs} vertical={false} />
 

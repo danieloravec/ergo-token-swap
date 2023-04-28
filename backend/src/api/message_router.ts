@@ -184,7 +184,6 @@ messageRouter.put('/archive', async (req, res) => {
   }
 });
 
-// TODO validate this endpoint. The archiving one probably works. Then add this to FE
 messageRouter.put('/seen', async (req, res) => {
   try {
     const messageId =  Number(req.query?.id);

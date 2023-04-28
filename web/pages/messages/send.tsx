@@ -1,4 +1,4 @@
-import { FlexDiv } from '@components/Common/Alignment';
+import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
 import { Heading1, Input, Textarea } from '@components/Common/Text';
 import { ButtonSecondary } from '@components/Common/Button';
 import styled from 'styled-components';
@@ -110,46 +110,48 @@ const SendMessagePage = (): JSX.Element => {
 
   return (
     <NoSsr>
-      <MessageFormContainer>
+      <CenteredDivHorizontal>
         {error !== undefined && <Alert type="error">{error}</Alert>}
         {success !== undefined && <Alert type="success">{success}</Alert>}
-        <Heading1>SEND A MESSAGE</Heading1>
-        <WideFlexDiv>
-          <WideInput
-            placeholder="Receiver address"
-            value={receiver ?? ''}
+        <MessageFormContainer>
+          <Heading1>SEND A MESSAGE</Heading1>
+          <WideFlexDiv>
+            <WideInput
+              placeholder="Receiver address"
+              value={receiver ?? ''}
+              onChange={(e) => {
+                setReceiver(e.target.value);
+              }}
+            />
+          </WideFlexDiv>
+          <WideFlexDiv>
+            <WideInput
+              placeholder="Subject"
+              value={subject ?? ''}
+              onChange={(e) => {
+                setSubject(e.target.value);
+              }}
+            />
+          </WideFlexDiv>
+          <WideTextarea
+            rows={10}
+            placeholder="Message"
             onChange={(e) => {
-              setReceiver(e.target.value);
+              setMessage(e.target.value);
             }}
           />
-        </WideFlexDiv>
-        <WideFlexDiv>
-          <WideInput
-            placeholder="Subject"
-            value={subject ?? ''}
-            onChange={(e) => {
-              setSubject(e.target.value);
-            }}
-          />
-        </WideFlexDiv>
-        <WideTextarea
-          rows={10}
-          placeholder="Message"
-          onChange={(e) => {
-            setMessage(e.target.value);
-          }}
-        />
-        <WideFlexDiv>
-          <ButtonSecondary
-            style={{ width: '100%' }}
-            onClick={() => {
-              handleMessageSend().catch(console.error);
-            }}
-          >
-            Send
-          </ButtonSecondary>
-        </WideFlexDiv>
-      </MessageFormContainer>
+          <WideFlexDiv>
+            <ButtonSecondary
+              style={{ width: '100%' }}
+              onClick={() => {
+                handleMessageSend().catch(console.error);
+              }}
+            >
+              Send
+            </ButtonSecondary>
+          </WideFlexDiv>
+        </MessageFormContainer>
+      </CenteredDivHorizontal>
     </NoSsr>
   );
 };
