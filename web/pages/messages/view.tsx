@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type MessageStructure } from '@data-types/messages';
+import { type Message, type MessageStructure } from '@data-types/messages';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { useJwtAuth } from '@components/hooks';
 import { Heading1, Text } from '@components/Common/Text';
@@ -13,6 +13,7 @@ import { spacing } from '@themes/spacing';
 import { useRouter } from 'next/router';
 import { loadMessages } from '@utils/dataLoader';
 import NoSsr from '@components/Common/NoSsr';
+import { backendRequest } from '@utils/utils';
 
 type MessageType = 'received' | 'sent';
 
@@ -55,6 +56,39 @@ const ViewMessages = (): JSX.Element => {
       jwt
     ).catch(console.error);
   }, [address, jwt, isLoaded]);
+
+  const handleMessageArchivation = (id: number): void => {
+    const archiveMessage = async (messageId: number): Promise<void> => {
+      const archivationResult = await backendRequest(
+        `/message/archive?id=${id}`,
+        'PUT',
+        undefined,
+        {
+          Authorization: jwt,
+        }
+      );
+      if (archivationResult.status !== 200) {
+        console.error(
+          `Error deleting message: ${JSON.stringify(archivationResult)}`
+        );
+      } else {
+        if (messages === undefined) {
+          return;
+        }
+        const newSent = messages.sent.filter(
+          (m: Message) => m.id !== messageId
+        );
+        const newReceived = messages.received.filter(
+          (m: Message) => m.id !== messageId
+        );
+        setMessages({
+          sent: newSent,
+          received: newReceived,
+        });
+      }
+    };
+    archiveMessage(id).catch(console.error);
+  };
 
   if (address === undefined) {
     return (
@@ -120,6 +154,7 @@ const ViewMessages = (): JSX.Element => {
               ? messages?.received ?? []
               : messages?.sent ?? []
           }
+          messageArchiveFn={handleMessageArchivation}
           isReceivedList={type === 'received'}
         />
       </FlexDiv>
