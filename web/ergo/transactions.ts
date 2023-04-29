@@ -60,7 +60,8 @@ export async function buildUnsignedMultisigSwapTx({
 
   const outputs = [
     new OutputBuilder(
-      allNanoErgA -
+      allNanoErgA +
+        nanoErgToReceiveByAFromB -
         nanoErgToReceiveByBFromA -
         config.serviceFeeNanoErg +
         config.minNanoErgValue,
@@ -72,7 +73,8 @@ export async function buildUnsignedMultisigSwapTx({
       })),
     ]),
     new OutputBuilder(
-      allNanoErgB -
+      allNanoErgB +
+        nanoErgToReceiveByBFromA -
         nanoErgToReceiveByAFromB -
         config.serviceFeeNanoErg +
         config.minNanoErgValue,
