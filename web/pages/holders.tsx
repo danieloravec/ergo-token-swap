@@ -13,6 +13,7 @@ import { spacing } from '@themes/spacing';
 import styled from 'styled-components';
 import { ProfileHeader } from '@components/Profile/ProfileHeader';
 import { type ProfileInfo } from '@data-types/profile';
+import { Alert } from '@components/Common/Alert';
 
 const TokenIdInput = styled(Input)`
   width: 100%;
@@ -22,6 +23,7 @@ const TokenIdInput = styled(Input)`
 
 const HoldersSearchForm = (props: {
   onResultsFound: (results: ProfileInfo[]) => void;
+  setError: (error: string) => void;
 }): JSX.Element => {
   const [isSearching, setIsSearching] = useState(false);
   const [tokenId, setTokenId] = useState('');
@@ -33,9 +35,9 @@ const HoldersSearchForm = (props: {
         `/holder?tokenId=${tokenId}`
       );
       if (holdersResponse.status !== 200) {
-        console.error(
-          `Error getting holders: ${JSON.stringify(holdersResponse)}`
-        );
+        props.setError('Error getting holders. Is the Token ID valid?');
+        setIsSearching(false);
+        return;
       }
       setIsSearching(false);
       props.onResultsFound(holdersResponse.body);
@@ -101,15 +103,19 @@ const HoldersList = (props: { holders: ProfileInfo[] }): JSX.Element => {
 
 const FindHolders = (): JSX.Element => {
   const [holders, setHolders] = useState<ProfileInfo[] | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   return (
     <CenteredDiv>
+      {error !== undefined && <Alert type="error">{error}</Alert>}
+
       <Heading1>FIND TOKENS OWNER CONTACT INFO</Heading1>
 
       <HoldersSearchForm
         onResultsFound={(results: ProfileInfo[]) => {
           setHolders(results);
         }}
+        setError={setError}
       />
 
       <Spacer size={spacing.spacing_m} vertical />
