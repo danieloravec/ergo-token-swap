@@ -12,13 +12,16 @@ import { Twitter } from '@components/Icons/Twitter';
 import { Email } from '@components/Icons/Email';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { useRouter } from 'next/router';
+import { ExternalLink } from '@components/Icons/ExternalLink';
+import { config } from '@config';
+import { shortenString } from '@utils/formatters';
 
 const ProfileHeaderContainer = styled(FlexDiv)`
   width: 80%;
   height: 150px;
 `;
 
-const ProfileImage = (props: { height: number }): JSX.Element => {
+export const ProfileImage = (props: { height: number }): JSX.Element => {
   return (
     <FlexDiv>
       <Image
@@ -93,13 +96,24 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
             </Heading2>
           </FlexDiv>
           <FlexDiv style={{ width: '100%' }}>
-            <AddressTextWrapper>{props.data.address}</AddressTextWrapper>
+            <AddressTextWrapper>
+              {shortenString(props.data.address, 32)}
+            </AddressTextWrapper>
+            <Spacer size={spacing.spacing_xxxs} vertical={false} />
+            <CenteredDivVertical>
+              <A
+                href={`${config.explorerFrontendUrl}/en/addresses/${props.data.address}`}
+                target="_blank"
+              >
+                <ExternalLink color={theme.properties.colorPrimary} />
+              </A>
+            </CenteredDivVertical>
           </FlexDiv>
         </FlexDiv>
         <FlexDiv
           style={{ marginTop: `${spacing.spacing_xs}px`, width: '100%' }}
         >
-          {props.data.discord !== null && (
+          {props.data.discord !== null && props.data.discord !== undefined && (
             <FlexDiv>
               <CenteredDivVertical style={{ flexDirection: 'row' }}>
                 <Discord color={theme.properties.colorPrimary} />
@@ -109,7 +123,7 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
               <Spacer size={spacing.spacing_xs} vertical={false} />
             </FlexDiv>
           )}
-          {props.data.twitter !== null && (
+          {props.data.twitter !== null && props.data.twitter !== undefined && (
             <A
               href={`https://twitter.com/${props.data.twitter}`}
               target="_blank"
@@ -124,7 +138,7 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
               </FlexDiv>
             </A>
           )}
-          {props.data.email !== null && (
+          {props.data.email !== null && props.data.email !== undefined && (
             <FlexDiv>
               <CenteredDivVertical style={{ flexDirection: 'row' }}>
                 <Email color={theme.properties.colorPrimary} />

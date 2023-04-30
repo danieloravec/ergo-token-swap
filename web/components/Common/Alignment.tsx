@@ -19,6 +19,8 @@ export const CenteredDivVertical = styled.div`
   height: 100%;
   align-items: center;
   align-content: center;
+  margin-top: auto;
+  margin-bottom: auto;
 `;
 
 export const CenteredDiv = styled(CenteredDivHorizontal)`

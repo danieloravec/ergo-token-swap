@@ -60,6 +60,9 @@ User.init({
       unique: true,
     },
   ],
+  defaultScope: {
+    attributes: { exclude: ['authSecret'] },
+  }
 })
 
 export default User;

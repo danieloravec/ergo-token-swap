@@ -5,6 +5,6 @@ export interface ProfileInfo {
   discord?: string;
   twitter?: string;
   allowMessages?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
