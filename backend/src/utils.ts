@@ -10,7 +10,7 @@ import {TokenAmount} from "@fleet-sdk/core";
 import {EIP12UnsignedTransaction} from "@fleet-sdk/common";
 import UserAssetStats from "@db/models/user_asset_stats";
 
-export async function explorerRequest(endpoint: string, apiVersion: number = 1): Promise<any> {
+export async function explorerRequest(endpoint: string, apiVersion: number = 0): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}/v${apiVersion}${endpoint}`);
     return await res.json();
 }

@@ -9,6 +9,7 @@ import { SwapButton } from '@components/Swap/SwapButton';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { Alert } from '@components/Common/Alert';
 import { fetchFinishedTxId } from '@components/Swap/utils';
+import { StrongBg, StrongNavs } from '@components/Common/Text';
 
 export function SwappingPhaseHost(props: {
   wallet: Wallet;
@@ -58,12 +59,12 @@ export function SwappingPhaseHost(props: {
           description="YOUR WALLET"
           headingNft={
             <span>
-              Select tokens to <strong>send</strong> by clicking them.
+              Select tokens to <StrongNavs>send</StrongNavs> by clicking them.
             </span>
           }
           headingFungible={
             <span>
-              Specify amounts of tokens to <strong>send</strong>.
+              Specify amounts of tokens to <StrongNavs>send</StrongNavs>.
             </span>
           }
           nfts={props.hostInfo.nfts}
@@ -105,12 +106,12 @@ export function SwappingPhaseHost(props: {
           description="GUEST WALLET"
           headingNft={
             <span>
-              Select tokens to <strong>receive</strong> by clicking them.
+              Select tokens to <StrongBg>receive</StrongBg> by clicking them.
             </span>
           }
           headingFungible={
             <span>
-              Specify amounts of tokens to <strong>receive</strong>.
+              Specify amounts of tokens to <StrongBg>receive</StrongBg>.
             </span>
           }
           nfts={props.guestInfo.nfts}

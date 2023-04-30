@@ -1,5 +1,11 @@
 import styled, { useTheme } from 'styled-components';
-import { Heading3, Text, TextNavs, Strong } from '@components/Common/Text';
+import {
+  Heading3,
+  Text,
+  TextNavs,
+  StrongBg,
+  StrongNavs,
+} from '@components/Common/Text';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import Image from 'next/image';
@@ -46,7 +52,7 @@ const ImageSelectedOverlay = styled(CenteredDiv)`
   margin-top: ${() => `${-imgSize - 8}px`};
 `;
 
-const StrongSecondary = styled(Strong)`
+const StrongSecondary = styled(StrongBg)`
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
@@ -78,7 +84,13 @@ export const NftDisplay = (props: {
 
   const Img =
     imageUrl === undefined ? (
-      <CenteredDiv style={{ width: `${imgSize}px`, height: `${imgSize}px` }}>
+      <CenteredDiv
+        style={{
+          width: `${imgSize}px`,
+          height: `${imgSize}px`,
+          border: `1px solid ${theme.properties.colorBgText}`,
+        }}
+      >
         <TextNavs>
           {unknownAssetType ? 'UNKNOWN ASSET TYPE' : 'IMAGE LOADING...'}
         </TextNavs>
@@ -185,7 +197,7 @@ function FungibleTokenDisplay(props: {
         <TextNavs>
           <FlexDiv>
             <TextNavs>
-              <Strong>Available: </Strong>
+              <StrongNavs>Available: </StrongNavs>
             </TextNavs>
             <Spacer size={spacing.spacing_xxs} vertical={false} />
             {Number(
@@ -199,7 +211,7 @@ function FungibleTokenDisplay(props: {
         </TextNavs>
         <TextNavs>
           <FlexDiv>
-            <Strong>Selected: </Strong>
+            <StrongNavs>Selected: </StrongNavs>
             <Spacer size={spacing.spacing_xxs} vertical={false} />
             <input
               style={{ width: '100px' }}

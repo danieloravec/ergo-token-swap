@@ -42,8 +42,12 @@ export const OrderedList = styled.ol`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
 
-export const Strong = styled.strong`
+export const StrongBg = styled.strong`
   color: ${(props) => props.theme.properties.colorBgText};
+`;
+
+export const StrongNavs = styled.strong`
+  color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
 export const A = styled.a`

@@ -5,7 +5,7 @@ import { useWalletStore } from '@components/Wallet/hooks';
 import { useJwtAuth } from '@components/hooks';
 import { loadMessages } from '@utils/dataLoader';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
-import { Heading1, Strong, Text } from '@components/Common/Text';
+import { Heading1, StrongBg, Text } from '@components/Common/Text';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import styled, { useTheme } from 'styled-components';
@@ -94,7 +94,7 @@ export const MessageDetail = (): JSX.Element => {
 
         <FlexDiv style={{ width: '100%' }}>
           <Spacer size={spacing.spacing_m} vertical={false} />
-          <Strong>Subject:</Strong>
+          <StrongBg>Subject:</StrongBg>
           <Spacer size={spacing.spacing_xxs} vertical={false} />
           <Text>{message.subject}</Text>
         </FlexDiv>
@@ -102,7 +102,7 @@ export const MessageDetail = (): JSX.Element => {
 
         <FlexDiv style={{ width: '100%' }}>
           <Spacer size={spacing.spacing_m} vertical={false} />
-          <Strong>From: </Strong>
+          <StrongBg>From: </StrongBg>
           <Spacer size={spacing.spacing_xxs} vertical={false} />
           <Text>{message.fromAddress}</Text>
         </FlexDiv>
@@ -110,7 +110,7 @@ export const MessageDetail = (): JSX.Element => {
 
         <FlexDiv style={{ width: '100%' }}>
           <Spacer size={spacing.spacing_m} vertical={false} />
-          <Strong>To: </Strong>
+          <StrongBg>To: </StrongBg>
           <Spacer size={spacing.spacing_xxs} vertical={false} />
           <Text>{message.toAddress}</Text>
         </FlexDiv>

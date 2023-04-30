@@ -1,7 +1,7 @@
 import React from 'react';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
 import { Toggle } from '@components/Common/Toggle';
-import { A, Heading2, Strong, Text } from '@components/Common/Text';
+import { A, Heading2, StrongBg, Text } from '@components/Common/Text';
 import { useTheme } from 'styled-components';
 import { type FungibleStats, type NftStats } from '@components/Profile/types';
 import {
@@ -23,7 +23,7 @@ const VolumeDeltasDisplay = (props: {
   const theme = useTheme();
 
   return (
-    <Strong style={{ fontSize: '20px' }}>
+    <StrongBg style={{ fontSize: '20px' }}>
       <span
         style={{
           color:
@@ -45,7 +45,7 @@ const VolumeDeltasDisplay = (props: {
       >
         -{String(decimalize(props.amountSold, props.decimals))}
       </span>
-    </Strong>
+    </StrongBg>
   );
 };
 
@@ -68,7 +68,7 @@ const FungibleVolumeTableEntry = (props: {
       </FlexDiv>
 
       <CenteredDivHorizontal style={{ width: '20%' }}>
-        <Strong>{props.stat.fungibleToken.name}</Strong>
+        <StrongBg>{props.stat.fungibleToken.name}</StrongBg>
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '40%' }}>

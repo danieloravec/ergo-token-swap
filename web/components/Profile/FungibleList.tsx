@@ -1,4 +1,4 @@
-import { A, Strong, Text } from '@components/Common/Text';
+import { A, StrongBg, Text } from '@components/Common/Text';
 import { type FungibleToken } from '@components/Swap/types';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
 import { FungibleTokenImage } from '@components/Swap/TokenSelection';
@@ -26,7 +26,7 @@ const FungibleTokenTableEntry = (props: {
       </FlexDiv>
 
       <CenteredDivHorizontal style={{ width: '20%' }}>
-        <Strong>{props.fungibleToken.name}</Strong>
+        <StrongBg>{props.fungibleToken.name}</StrongBg>
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '40%' }}>
@@ -45,11 +45,11 @@ const FungibleTokenTableEntry = (props: {
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '20%' }}>
-        <Strong>
+        <StrongBg>
           {String(
             decimalize(props.fungibleToken.amount, props.fungibleToken.decimals)
           )}
-        </Strong>
+        </StrongBg>
       </CenteredDivHorizontal>
     </FlexDiv>
   );
