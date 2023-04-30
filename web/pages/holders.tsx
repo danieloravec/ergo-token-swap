@@ -23,10 +23,12 @@ const TokenIdInput = styled(Input)`
 const HoldersSearchForm = (props: {
   onResultsFound: (results: ProfileInfo[]) => void;
 }): JSX.Element => {
+  const [isSearching, setIsSearching] = useState(false);
   const [tokenId, setTokenId] = useState('');
 
   const handleSubmit = (): void => {
     const getHolders = async (): Promise<void> => {
+      setIsSearching(true);
       const holdersResponse = await backendRequest(
         `/holder?tokenId=${tokenId}`
       );
@@ -35,6 +37,7 @@ const HoldersSearchForm = (props: {
           `Error getting holders: ${JSON.stringify(holdersResponse)}`
         );
       }
+      setIsSearching(false);
       props.onResultsFound(holdersResponse.body);
     };
     getHolders().catch(console.error);
@@ -61,7 +64,9 @@ const HoldersSearchForm = (props: {
       <Spacer size={spacing.spacing_xs} vertical={false} />
 
       <FlexDiv>
-        <ButtonSecondary onClick={handleSubmit}>Search</ButtonSecondary>
+        <ButtonSecondary disabled={isSearching} onClick={handleSubmit}>
+          {isSearching ? 'Please wait...' : 'Search'}
+        </ButtonSecondary>
       </FlexDiv>
     </CenteredDivHorizontal>
   );
@@ -70,7 +75,9 @@ const HoldersSearchForm = (props: {
 const HoldersListEntryContainer = styled(FlexDiv)`
   padding: ${() => `${spacing.spacing_xxs}px`};
   margin-bottom: ${() => `${spacing.spacing_xxs}px`};
-  border: 1px solid black;
+  border: ${(props) => {
+    return `1px solid ${props.theme.properties.colorBgText}`;
+  }};
   border-radius: 10px;
   min-height: 80px;
 `;
