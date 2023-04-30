@@ -81,7 +81,7 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
                   .catch(console.error);
                 console.error('NOT IMPLEMENTED');
               }}
-              disabled={props.data.allowMessages !== true}
+              disabled={props.data.allowMessages === false}
             >
               Message
             </ButtonTertiary>

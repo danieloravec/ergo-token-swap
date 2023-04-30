@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React, { type ReactNode, useState } from 'react';
 import { type AlertType } from '@themes/themes';
-import { TextNavs } from '@components/Common/Text';
+import { StrongNavs, TextNavs } from '@components/Common/Text';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { Div } from '@components/Common/Alignment';
@@ -41,7 +41,7 @@ export const Alert = (props: {
   return (
     <AlertBody type={props.type} marginSides={props.marginSides}>
       <TextNavs>
-        <strong>{props.children}</strong>
+        <StrongNavs>{props.children}</StrongNavs>
       </TextNavs>
       <Div>
         <PointerOnHover

@@ -1,6 +1,6 @@
 import { type Message } from '@data-types/messages';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
-import { Strong, Text, A } from '@components/Common/Text';
+import { StrongBg, Text, A } from '@components/Common/Text';
 import styled, { useTheme } from 'styled-components';
 import { shortenString } from '@utils/formatters';
 import { ButtonTertiary } from '@components/Common/Button';
@@ -55,7 +55,7 @@ const MessageListItem = (props: {
         </FlexDiv>
         <Spacer size={spacing.spacing_m} vertical={false} />
         <FlexDiv style={{ marginRight: 'auto', overflow: 'hidden' }}>
-          <Strong>{props.message.subject}</Strong>
+          <StrongBg>{props.message.subject}</StrongBg>
         </FlexDiv>
         <Spacer size={spacing.spacing_xs} vertical={false} />
         <FlexDiv style={{ marginLeft: 'auto' }}>

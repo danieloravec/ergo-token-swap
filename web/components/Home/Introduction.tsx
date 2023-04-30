@@ -1,4 +1,4 @@
-import { Heading1, OrderedList } from '@components/Common/Text';
+import { Heading1, OrderedList, StrongBg } from '@components/Common/Text';
 import styled from 'styled-components';
 import { Button } from '@components/Common/Button';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
@@ -8,7 +8,7 @@ import { useWalletStore } from '@components/Wallet/hooks';
 import { type Wallet } from '@ergo/wallet';
 import { backendRequest } from '@utils/utils';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const IntroductionContainer = styled.div`
   width: 550px;
@@ -46,7 +46,7 @@ export function Introduction(): JSX.Element {
         <OrderedList style={{ fontSize: '20px' }}>
           <li>Connect your wallet (button in the upper right corner).</li>
           <li>
-            Push <strong>Start Trading Session</strong> the button below.
+            Push the <StrongBg>Start Trading Session</StrongBg> button below.
           </li>
           <li>A private room for you and the other party will be created. </li>
           <li>Send them a generated link and wait for them to connect.</li>

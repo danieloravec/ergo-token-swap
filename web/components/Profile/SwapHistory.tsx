@@ -2,7 +2,7 @@ import { type Swap } from '@components/Profile/types';
 import { Person } from '@components/Icons/Person';
 import { useTheme } from 'styled-components';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
-import { Strong, Text, A } from '@components/Common/Text';
+import { Text, A, StrongBg } from '@components/Common/Text';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { shortenString } from '@utils/formatters';
@@ -34,7 +34,7 @@ const SwapHistoryTableEntry = (props: {
           width: '10%',
         }}
       >
-        <Strong>{role}</Strong>
+        <StrongBg>{role}</StrongBg>
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '30%' }}>

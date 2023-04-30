@@ -49,6 +49,7 @@ export function Nav(): JSX.Element {
           {address !== undefined && (
             <NavLinkSpaced href="/messages/view">Messages</NavLinkSpaced>
           )}
+          <NavLinkSpaced href="/holders">HolderSearch</NavLinkSpaced>
           <ConnectWalletButtonContainer>
             <ConnectWalletButton />
           </ConnectWalletButtonContainer>
