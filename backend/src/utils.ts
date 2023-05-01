@@ -248,13 +248,16 @@ export const verifyJwt = (address: string, jwtStr: string): boolean => {
         const data = jwt.verify(jwtStr, config.jwtSecret) as JwtPayload;
         return data.address === address && data.timestamp > Date.now() - config.jwtLifespanMs;
     } catch (err) {
-        console.error("Invalid JWT");
+        console.error(`Invalid JWT: ${err}`);
         return false;
     }
 }
 
-export const verifySignature = (data: string, signature: string): boolean => {
-    const serializedData = toHex(JSON.stringify(data));
+export const verifySignature = (data: string, signature?: string): boolean => {
+    if (signature === undefined) {
+        return false;
+    }
+    // const serializedData = toHex(JSON.stringify(data));
     return true; // TODO implement signature verification once dApp connector's sign_data is available
 }
 
