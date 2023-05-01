@@ -7,7 +7,7 @@ import { ButtonTertiary } from '@components/Common/Button';
 import { Discord } from '@components/Icons/Discord';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Twitter } from '@components/Icons/Twitter';
 import { Email } from '@components/Icons/Email';
 import { useWalletStore } from '@components/Wallet/hooks';
@@ -15,6 +15,9 @@ import { useRouter } from 'next/router';
 import { ExternalLink } from '@components/Icons/ExternalLink';
 import { config } from '@config';
 import { shortenString } from '@utils/formatters';
+import { Favourite } from '@components/Icons/Favourite';
+import { backendRequest } from '@utils/utils';
+import { useJwtAuth } from '@components/hooks';
 
 const ProfileHeaderContainer = styled(FlexDiv)`
   width: 80%;
@@ -48,13 +51,70 @@ const AddressSectionWrapper = styled(FlexDiv).attrs(
   width: ${(props) => `calc(100% - ${props.leftContentWidthPx}px)`};
 `;
 
-export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
+export const ProfileHeader = (props: {
+  data: ProfileInfo;
+  disableFavourite?: boolean;
+  onNameClick?: () => void;
+}): JSX.Element => {
   const theme = useTheme();
   const { address } = useWalletStore();
   const router = useRouter();
+  const { jwt } = useJwtAuth();
+
+  const [isFavourited, setIsFavourited] = useState<boolean>(false);
 
   const profilePhotoHeight = 100;
   const totalPhotoSectionWidth = profilePhotoHeight + spacing.spacing_m;
+
+  const handleFavouriteClick = (): void => {
+    const addOrRemoveFavourite = async (
+      action: 'ADD' | 'REMOVE'
+    ): Promise<void> => {
+      if (address === undefined) {
+        return;
+      }
+      const addOrRemoveFavouriteResponse = await backendRequest(
+        '/user/follow',
+        action === 'ADD' ? 'POST' : 'DELETE',
+        {
+          fromAddress: address,
+          toAddress: props.data.address,
+        },
+        {
+          Authorization: jwt ?? '',
+        }
+      );
+      if (addOrRemoveFavouriteResponse.status !== 200) {
+        console.error(
+          `Failed to add or remove favourite: ${addOrRemoveFavouriteResponse}`
+        );
+      } else {
+        setIsFavourited(addOrRemoveFavouriteResponse.body.followed);
+      }
+    };
+    if (isFavourited) {
+      addOrRemoveFavourite('REMOVE').catch(console.error);
+    } else {
+      addOrRemoveFavourite('ADD').catch(console.error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchIsFavourited = async (): Promise<void> => {
+      if (address === undefined) {
+        return;
+      }
+      const isFavouritedResponse = await backendRequest(
+        `/user/follow/specific?fromAddress=${address}&toAddress=${props.data.address}`
+      );
+      if (isFavouritedResponse.status !== 200) {
+        console.error(`Failed to fetch isFavourited: ${isFavouritedResponse}`);
+      } else {
+        setIsFavourited(isFavouritedResponse.body.followed);
+      }
+    };
+    fetchIsFavourited().catch(console.error);
+  }, [isFavourited]);
 
   return (
     <ProfileHeaderContainer>
@@ -91,9 +151,27 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
       <AddressSectionWrapper leftContentWidthPx={totalPhotoSectionWidth}>
         <FlexDiv style={{ height: `${profilePhotoHeight}px` }}>
           <FlexDiv style={{ width: '100%' }}>
-            <Heading2>
-              {props.data.username?.toUpperCase() ?? 'PROFILE'}
-            </Heading2>
+            {address !== undefined &&
+              address !== props.data.address &&
+              props.disableFavourite !== true && (
+                <FlexDiv onClick={handleFavouriteClick}>
+                  <Favourite
+                    full={isFavourited}
+                    size="32"
+                    color={
+                      isFavourited
+                        ? theme.properties.colorSecondary
+                        : theme.properties.colorBgText
+                    }
+                  />
+                  <Spacer size={spacing.spacing_xxs} vertical={false} />
+                </FlexDiv>
+              )}
+            <FlexDiv style={{ width: '80%' }} onClick={props.onNameClick}>
+              <Heading2>
+                {props.data.username?.toUpperCase() ?? 'PROFILE'}
+              </Heading2>
+            </FlexDiv>
           </FlexDiv>
           <FlexDiv style={{ width: '100%' }}>
             <AddressTextWrapper>

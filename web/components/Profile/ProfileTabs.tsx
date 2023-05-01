@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FlexDiv } from '@components/Common/Alignment';
 import styled from 'styled-components';
 import { Text } from '@components/Common/Text';
@@ -17,8 +17,10 @@ import { SwapHistory } from '@components/Profile/SwapHistory';
 import { loadNftImageUrl } from '@utils/imageLoader';
 import { explorerRequest } from '@ergo/utils';
 import { Statistics } from '@components/Profile/Statistics';
+import { type ProfileInfo } from '@data-types/profile';
+import { Follows } from '@components/Profile/Follows';
 
-type Tabs = 'NFT' | 'Fungible' | 'History' | 'Statistics';
+type Tabs = 'NFT' | 'Fungible' | 'History' | 'Statistics' | 'Follows';
 
 const ProfileTabsWrapper = styled(FlexDiv)`
   width: 100%;
@@ -54,22 +56,22 @@ const TabText = styled(Text)`
 `;
 
 export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
-  const [selectedTab, setSelectedTab] = React.useState<Tabs>('NFT');
-  const [rawNfts, setRawNfts] = React.useState<Nft[] | undefined>(undefined);
-  const [rawFungibles, setRawFungibles] = React.useState<
-    FungibleToken[] | undefined
-  >(undefined);
-  const [history, setHistory] = React.useState<Swap[] | undefined>(undefined);
-  const [nftStats, setNftStats] = React.useState<NftStats[] | undefined>(
+  const [selectedTab, setSelectedTab] = useState<Tabs>('NFT');
+  const [rawNfts, setRawNfts] = useState<Nft[] | undefined>(undefined);
+  const [rawFungibles, setRawFungibles] = useState<FungibleToken[] | undefined>(
     undefined
   );
-  const [fungibleStats, setFungibleStats] = React.useState<
+  const [history, setHistory] = useState<Swap[] | undefined>(undefined);
+  const [nftStats, setNftStats] = useState<NftStats[] | undefined>(undefined);
+  const [fungibleStats, setFungibleStats] = useState<
     FungibleStats[] | undefined
   >(undefined);
   // const [nanoErg, setNanoErg] = React.useState<bigint | undefined>(undefined);
-  const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
+  const [follows, setFollows] = useState<ProfileInfo[] | undefined>(undefined);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log('use effect');
     const fetchAssets = async (): Promise<void> => {
       const assetsResponse = await backendRequest(
         `/user/assets?address=${props.profileAddress}`,
@@ -141,13 +143,31 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
       setFungibleStats(fetchedFungibleStats);
     };
 
+    const fetchFollows = async (): Promise<void> => {
+      const followsResponse = await backendRequest(
+        `/user/follow?fromAddress=${props.profileAddress}`,
+        'GET'
+      );
+      if (followsResponse.status === 200) {
+        setFollows(followsResponse.body);
+      } else {
+        console.error('Failed to fetch follows for profile');
+        throw new Error('FAILED_FOLLOWS_FETCH');
+      }
+    };
+
     const fetchTabsData = async (): Promise<void> => {
-      await Promise.all([fetchAssets(), fetchHistory(), fetchStats()]);
+      await Promise.all([
+        fetchAssets(),
+        fetchHistory(),
+        fetchStats(),
+        fetchFollows(),
+      ]);
       setIsLoaded(true);
     };
 
     fetchTabsData().catch(console.error);
-  }, [isLoaded]);
+  }, [isLoaded, props.profileAddress]);
 
   return (
     <FlexDiv style={{ width: '100%' }}>
@@ -187,6 +207,15 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
         >
           <TabText>Statistics</TabText>
         </ProfileTab>
+
+        <ProfileTab
+          isSelected={selectedTab === 'Follows'}
+          onClick={() => {
+            setSelectedTab('Follows');
+          }}
+        >
+          <TabText>Follows</TabText>
+        </ProfileTab>
       </ProfileTabsWrapper>
       <Spacer size={spacing.spacing_m} vertical />
 
@@ -204,6 +233,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
           fungibleStats={fungibleStats ?? []}
         />
       )}
+      {selectedTab === 'Follows' && <Follows follows={follows} />}
     </FlexDiv>
   );
 };

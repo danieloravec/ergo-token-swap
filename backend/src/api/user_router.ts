@@ -272,6 +272,69 @@ userRouter.get('/stats', async (req, res) => {
   }
 });
 
+userRouter.get('/follow/specific', async (req: Request, res: Response) => {
+  try {
+    const fromAddress = req.query.fromAddress as string;
+    const toAddress = req.query.toAddress as string;
+    if (!utils.ensureAddressValid(req, res, fromAddress)) {
+      return;
+    }
+    if (!utils.ensureAddressValid(req, res, toAddress)) {
+      return;
+    }
+
+    const follow = await Follow.findOne({
+      where: {
+        fromAddress,
+        toAddress,
+      },
+      raw: true,
+    });
+
+    res.send({
+      followed: !!follow
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      message: "Server-side error while getting follow info"
+    })
+  }
+});
+
+userRouter.get('/follow', async (req: Request, res: Response) => {
+  try {
+    const fromAddress = req.query.fromAddress as string;
+    if (!utils.ensureAddressValid(req, res, fromAddress)) {
+      return;
+    }
+
+    const friends = await sequelizeConnection.query(
+      'SELECT * ' +
+      'FROM users u ' +
+      'WHERE u.address IN ( ' +
+      '  SELECT f.to_address ' +
+      '  FROM follows f ' +
+      '  WHERE f.from_address = :fromAddress' +
+      ')',
+      {
+        replacements: { fromAddress },
+        type: QueryTypes.SELECT,
+        raw: true,
+      }
+    );
+
+    res.send(friends);
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      message: "Server-side error while getting follow info"
+    })
+  }
+});
+
 userRouter.post('/follow', async (req: Request, res: Response) => {
   try {
     const user = await utils.ensureFollowBodyValidReturnUser(req, res);
@@ -288,7 +351,7 @@ userRouter.post('/follow', async (req: Request, res: Response) => {
       toAddress: req.body.toAddress
     });
 
-    res.send({message: 'OK'});
+    res.send({followed: true});
   } catch (err) {
     console.error(err);
     res.status(500);
@@ -309,14 +372,22 @@ userRouter.delete('/follow', async (req: Request, res: Response) => {
       return;
     }
 
-    await Follow.destroy({
+    const affected = await Follow.destroy({
       where: {
         fromAddress: req.body.fromAddress,
         toAddress: req.body.toAddress,
       }
-    })
+    });
 
-    res.send({message: 'OK'});
+    if (affected === 0) {
+      res.status(400);
+      res.send({
+        message: "Follow relationship does not exist"
+      });
+      return;
+    }
+
+    res.send({followed: false});
   } catch (err) {
     res.status(500);
     res.send({
