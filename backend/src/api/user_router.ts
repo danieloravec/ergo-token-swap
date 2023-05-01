@@ -1,32 +1,28 @@
-import Router from 'express'
+import Router, {Request, Response} from 'express'
 import * as utils from "@utils";
 import User from "@db/models/user";
-import {ErgoAddress} from "@fleet-sdk/core";
 import TradingSession from "@db/models/trading_session";
 import {Op, QueryTypes} from "sequelize";
 import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 import {config} from "@config";
-import {JwtPayload} from "jsonwebtoken";
-import {verifyJwt} from "@utils";
+import {ensureAuth, verifyJwt} from "@utils";
 import sequelizeConnection from "@db/config";
-import UserAssetStats from "@db/models/user_asset_stats";
+import * as types from "@types";
+import Follow from "@db/models/follow";
 
 const userRouter = Router();
 
 userRouter.get('/', async (req, res) => {
     try {
-      if(req.query?.address === undefined || typeof req.query?.address !== "string") {
-        res.status(400);
-        res.send("Invalid body");
+      if (!utils.ensureAddressValid(req, res, req.query?.address as string | undefined)) {
         return;
       }
-      const user = await User.findOne({where: {address: req.query!.address}});
-      if(!user) {
-        res.status(400);
-        res.send("User not found");
+      const user = await utils.getUserOrSend400(req, res, req.query!.address as string);
+      if (!user) {
         return;
       }
+
       res.status(200);
       res.send(user);
     } catch (err) {
@@ -41,14 +37,7 @@ userRouter.get('/', async (req, res) => {
 userRouter.post('/', async (req, res) => {
   try {
     const t = await sequelizeConnection.transaction();
-    if (req.body?.address === undefined) {
-      res.status(400);
-      res.send('Missing address');
-      return;
-    }
-    if (!ErgoAddress.validate(req.body!.address)) {
-      res.status(400);
-      res.send("Invalid address");
+    if (!utils.ensureAddressValid(req, res, req.body?.address)) {
       return;
     }
 
@@ -136,12 +125,11 @@ userRouter.post('/', async (req, res) => {
 
 userRouter.get('/assets', async (req, res) => {
   try {
-    if (req.query?.address === undefined || typeof req.query?.address !== "string") {
-      res.status(400);
-      res.send("Invalid body");
+    if (!utils.ensureAddressValid(req, res, req.query?.address as string | undefined)) {
       return;
     }
-    const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(req.query.address);
+    const address = req.query!.address as string;
+    const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(address);
     const {nfts, fungibleTokens} = utils.splitAssets(assets);
     const resBody = {
       nfts,
@@ -159,26 +147,13 @@ userRouter.get('/assets', async (req, res) => {
 
 userRouter.get('/history', async (req, res) => {
   try {
-    if (req.query?.address === undefined || typeof req.query?.address !== "string") {
-      res.status(400);
-      res.send("Invalid query");
+    if (!utils.ensureAddressValid(req, res, req.query?.address as string | undefined)) {
       return;
     }
-    const limit = req.query?.limit === undefined ? 100 : Number(req.query?.limit);
-    const offset = req.query?.offset === undefined ? 0 : Number(req.query?.offset);
+    const address = req.query!.address as string;
 
-    let user;
-    try {
-      user = await User.findOne({where: {address: req.query!.address}});
-    } catch (err) {
-      console.error(err.message);
-      res.status(500);
-      res.send("Server-side error while checking if user exists");
-      return;
-    }
-    if(!user) {
-      res.status(400);
-      res.send("User not found");
+    const user = await utils.getUserOrSend400(req, res, address);
+    if (!user) {
       return;
     }
     const userSwapHistory = await TradingSession.findAll(
@@ -186,8 +161,8 @@ userRouter.get('/history', async (req, res) => {
         attributes: [['submitted_at', 'timestamp'], 'host_addr', 'guest_addr', 'tx_id'],
         where: {
           [Op.or]: [
-            { guestAddr: req.query!.address },
-            { hostAddr: req.query!.address }
+            { guestAddr: address },
+            { hostAddr: address }
           ],
           [Op.not]: {
             txId: null
@@ -206,15 +181,11 @@ userRouter.get('/history', async (req, res) => {
 
 userRouter.get('/auth', async (req, res) => {
   try {
-    if (req.query?.address === undefined || typeof req.query?.address !== "string" || !ErgoAddress.validate(req.query!.address)) {
-      res.status(400);
-      res.send("Invalid address");
+    if (!utils.ensureAddressValid(req, res, req.query?.address as string | undefined)) {
       return;
     }
-    const user = await User.findOne({where: {address: req.query!.address}});
+    const user = await utils.getUserOrSend400(req, res, req.query!.address as string);
     if (!user) {
-      res.status(400);
-      res.send("User not found");
       return;
     }
     const secret = crypto.randomBytes(16).toString('hex');
@@ -223,7 +194,7 @@ userRouter.get('/auth', async (req, res) => {
         ...user,
         authSecret: secret,
       },
-      {where: {address: req.query!.address}}
+      {where: {address: req.query!.address as string}}
     );
     res.status(200);
     res.send({secret});
@@ -236,20 +207,11 @@ userRouter.get('/auth', async (req, res) => {
 
 userRouter.post('/auth', async (req, res) => {
   try {
-    if (
-      req.body?.address === undefined ||
-      typeof req.body?.address !== "string" ||
-      !ErgoAddress.validate(req.body!.address) ||
-      req.body?.signature === undefined ||
-      typeof req.body?.signature !== "string") {
-      res.status(400);
-      res.send("Invalid address");
+    if (!utils.ensureAddressValid(req, res, req.body?.address)) {
       return;
     }
-    const user = await User.findOne({where: {address: req.body!.address}});
+    const user = await utils.getUserOrSend400(req, res, req.body!.address);
     if (!user) {
-      res.status(400);
-      res.send("User not found");
       return;
     }
     if (!utils.verifySignature(user.authSecret, req.body.signature)) {
@@ -269,13 +231,11 @@ userRouter.post('/auth', async (req, res) => {
 
 userRouter.post('/auth/check', async (req, res) => {
   try {
-    if (req.body?.address === undefined || typeof req.body?.address !== "string" || !ErgoAddress.validate(req.body!.address)) {
-      res.status(400);
-      res.send("Invalid address");
+    if (!utils.ensureAddressValid(req, res, req.body?.address)) {
       return;
     }
     let isAuthenticated = false;
-    if(req.body.jwt !== undefined || typeof req.body.jwt === "string") {
+    if(req.body.jwt !== undefined && typeof req.body.jwt === "string") {
       isAuthenticated = verifyJwt(req.body.address, req.body.jwt);
     }
     res.send({isAuthenticated});
@@ -288,9 +248,7 @@ userRouter.post('/auth/check', async (req, res) => {
 
 userRouter.get('/stats', async (req, res) => {
   try {
-    if(req.query?.address === undefined || typeof req.query?.address !== "string" || !ErgoAddress.validate(req.query!.address)) {
-      res.status(400);
-      res.send("Invalid address");
+    if (!utils.ensureAddressValid(req, res, req.query?.address as string | undefined)) {
       return;
     }
     const userStats = await sequelizeConnection.query(
@@ -311,6 +269,59 @@ userRouter.get('/stats', async (req, res) => {
     console.log(err);
     res.status(500);
     res.send("Server-side error while getting the user's stats");
+  }
+});
+
+userRouter.post('/follow', async (req: Request, res: Response) => {
+  try {
+    const user = await utils.ensureFollowBodyValidReturnUser(req, res);
+    if (!user) {
+      return;
+    }
+
+    if (!utils.ensureAuth(req, res, req.body.fromAddress)) {
+      return;
+    }
+
+    await Follow.create({
+      fromAddress: req.body.fromAddress,
+      toAddress: req.body.toAddress
+    });
+
+    res.send({message: 'OK'});
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      message: 'Server-side error while adding a follow'
+    });
+  }
+});
+
+userRouter.delete('/follow', async (req: Request, res: Response) => {
+  try {
+    const user = await utils.ensureFollowBodyValidReturnUser(req, res);
+    if (!user) {
+      return;
+    }
+
+    if (!utils.ensureAuth(req, res, req.body.fromAddress)) {
+      return;
+    }
+
+    await Follow.destroy({
+      where: {
+        fromAddress: req.body.fromAddress,
+        toAddress: req.body.toAddress,
+      }
+    })
+
+    res.send({message: 'OK'});
+  } catch (err) {
+    res.status(500);
+    res.send({
+      message: "Server-side error while removing a follow"
+    })
   }
 });
 

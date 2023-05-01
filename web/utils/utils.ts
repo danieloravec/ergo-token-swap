@@ -22,7 +22,7 @@ export const backendRequest = async (
   if (response.status !== 200) {
     return {
       status: response.status,
-      body: await response.text(),
+      body: await response.json(),
     };
   }
   return {
@@ -92,7 +92,7 @@ export const authenticate = async (
 export const createUserIfNotExists = async (address: string): Promise<void> => {
   const profileInfoResponse = await backendRequest(`/user?address=${address}`);
   if (profileInfoResponse.status !== 200) {
-    if (profileInfoResponse.body === 'User not found') {
+    if (profileInfoResponse.body.message === 'User not found') {
       const userCreateResponse = await backendRequest('/user', 'POST', {
         address,
       });

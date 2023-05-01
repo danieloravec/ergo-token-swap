@@ -79,3 +79,10 @@ export const MessageDeleteBodySchema: Schema = {
         id: 'number',
     }
 }
+
+export const FollowBodySchema: Schema = {
+    fields: {
+        fromAddress: 'string',
+        toAddress: 'string',
+    }
+}
