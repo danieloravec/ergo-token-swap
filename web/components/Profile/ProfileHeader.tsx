@@ -51,7 +51,11 @@ const AddressSectionWrapper = styled(FlexDiv).attrs(
   width: ${(props) => `calc(100% - ${props.leftContentWidthPx}px)`};
 `;
 
-export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
+export const ProfileHeader = (props: {
+  data: ProfileInfo;
+  disableFavourite?: boolean;
+  onNameClick?: () => void;
+}): JSX.Element => {
   const theme = useTheme();
   const { address } = useWalletStore();
   const router = useRouter();
@@ -147,21 +151,23 @@ export const ProfileHeader = (props: { data: ProfileInfo }): JSX.Element => {
       <AddressSectionWrapper leftContentWidthPx={totalPhotoSectionWidth}>
         <FlexDiv style={{ height: `${profilePhotoHeight}px` }}>
           <FlexDiv style={{ width: '100%' }}>
-            {address !== undefined && (
-              <FlexDiv onClick={handleFavouriteClick}>
-                <Favourite
-                  full={isFavourited}
-                  size="32"
-                  color={
-                    isFavourited
-                      ? theme.properties.colorSecondary
-                      : theme.properties.colorBgText
-                  }
-                />
-                <Spacer size={spacing.spacing_xxs} vertical={false} />
-              </FlexDiv>
-            )}
-            <FlexDiv style={{ width: '80%' }}>
+            {address !== undefined &&
+              address !== props.data.address &&
+              props.disableFavourite !== true && (
+                <FlexDiv onClick={handleFavouriteClick}>
+                  <Favourite
+                    full={isFavourited}
+                    size="32"
+                    color={
+                      isFavourited
+                        ? theme.properties.colorSecondary
+                        : theme.properties.colorBgText
+                    }
+                  />
+                  <Spacer size={spacing.spacing_xxs} vertical={false} />
+                </FlexDiv>
+              )}
+            <FlexDiv style={{ width: '80%' }} onClick={props.onNameClick}>
               <Heading2>
                 {props.data.username?.toUpperCase() ?? 'PROFILE'}
               </Heading2>
