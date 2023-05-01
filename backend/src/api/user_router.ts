@@ -314,4 +314,57 @@ userRouter.get('/stats', async (req, res) => {
   }
 });
 
+userRouter.post('/follow', async (req: Request, res: Response) => {
+  try {
+    const user = await utils.ensureFollowBodyValidReturnUser(req, res);
+    if (!user) {
+      return;
+    }
+
+    if (!utils.ensureAuth(req, res, req.body.fromAddress)) {
+      return;
+    }
+
+    await Follow.create({
+      fromAddress: req.body.fromAddress,
+      toAddress: req.body.toAddress
+    });
+
+    res.send({message: 'OK'});
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      message: 'Server-side error while adding a follow'
+    });
+  }
+});
+
+userRouter.delete('/follow', async (req: Request, res: Response) => {
+  try {
+    const user = await utils.ensureFollowBodyValidReturnUser(req, res);
+    if (!user) {
+      return;
+    }
+
+    if (!utils.ensureAuth(req, res, req.body.fromAddress)) {
+      return;
+    }
+
+    await Follow.destroy({
+      where: {
+        fromAddress: req.body.fromAddress,
+        toAddress: req.body.toAddress,
+      }
+    })
+
+    res.send({message: 'OK'});
+  } catch (err) {
+    res.status(500);
+    res.send({
+      message: "Server-side error while removing a follow"
+    })
+  }
+});
+
 export default userRouter;

@@ -2,13 +2,16 @@ import {config} from "@config";
 import {Asset, Schema, Nft, FungibleToken} from "@types";
 import sequelizeConnection from "@db/config";
 import TradingSession from "@db/models/trading_session";
-import {Request} from "express";
+import {Request, Response} from "express";
 import fetch from "cross-fetch";
 import * as jwt from "jsonwebtoken";
 import {JwtPayload} from "jsonwebtoken";
-import {TokenAmount} from "@fleet-sdk/core";
+import {ErgoAddress, TokenAmount} from "@fleet-sdk/core";
 import {EIP12UnsignedTransaction} from "@fleet-sdk/common";
 import UserAssetStats from "@db/models/user_asset_stats";
+import User from "@db/models/user";
+import {Transaction} from "sequelize";
+import * as types from "@types";
 
 export async function explorerRequest(endpoint: string, apiVersion: number = 0): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}/v${apiVersion}${endpoint}`);
@@ -292,4 +295,61 @@ export const assetDifference = (assetAmountsA: TokenAmount<string>[], assetAmoun
     }
 
     return result;
+}
+
+export const ensureAuth = (req: Request, res: Response, address?: string): boolean => {
+    if (!address) {
+        return false;
+    }
+    const token = req.header("Authorization");
+    if(token === undefined || !verifyJwt(address, token)) {
+        res.status(401);
+        res.send("Unauthorized");
+        return false;
+    }
+    return true;
+}
+
+export const getUserOrSend400 = async (req: Request, res: Response, address: string, transaction?: Transaction): Promise<User> => {
+    try {
+        const user = await User.findOne({
+            where: {address},
+            transaction
+        })
+        if (!user) {
+            res.status(400);
+            res.send({message: 'User not found'});
+        }
+        return user;
+    } catch (err) {
+        console.error(err);
+        if (transaction !== undefined) {
+            await transaction.rollback();
+        }
+    }
+}
+
+export const ensureAddressValid = (req: Request, res: Response, address?: string): boolean => {
+    if (address === undefined || !ErgoAddress.validate(address)) {
+        res.status(400);
+        res.send({message: 'Invalid address'});
+        return false;
+    }
+    return true;
+}
+
+export const ensureFollowBodyValidReturnUser = async (req: Request, res: Response): Promise<User | undefined> => {
+    const bodyIsValid = await validateObject(req.body, types.FollowBodySchema);
+    if (!bodyIsValid) {
+        res.status(400);
+        res.send({message: 'Invalid body'});
+        return;
+    }
+    if (!ensureAddressValid(req, res, req.body.fromAddress)) {
+        return;
+    }
+    if (!ensureAddressValid(req, res, req.body.toAddress)) {
+        return;
+    }
+    return await  getUserOrSend400(req, res, req.body.fromAddress);
 }
