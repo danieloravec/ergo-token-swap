@@ -6,6 +6,7 @@ import txRouter from "@api/tx_router";
 import userRouter from "@api/user_router";
 import messageRouter from "@api/message_router";
 import holderRouter from "@api/holder_router";
+import collectionRouter from "@api/collection_router";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/tx', txRouter);
 app.use('/user', userRouter);
 app.use('/message', messageRouter);
 app.use('/holder', holderRouter);
+app.use('/collection', collectionRouter);
 
 app.get('/', (req, res) => {
     res.send("Ergo token swap API /");
