@@ -15,6 +15,8 @@ import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { loadNftImageUrl } from '@utils/imageLoader';
 import { assetIconMap } from '@mappers/assetIconMap';
+import { getMintAddressByTokenId } from '@utils/verifyUtils';
+import { backendRequest } from '@utils/utils';
 
 const imgSize = 180;
 
@@ -56,6 +58,34 @@ const StrongSecondary = styled(StrongBg)`
   color: ${(props) => props.theme.properties.colorNavsText};
 `;
 
+const UnverifiedWarning = (): JSX.Element => {
+  const theme = useTheme();
+
+  return (
+    <span style={{ color: theme.properties.colorSecondary }}>UNVERIFIED</span>
+  );
+};
+
+const CollectionName = (props: { name: string }): JSX.Element => {
+  const theme = useTheme();
+
+  return (
+    <StrongBg style={{ color: theme.properties.colorPrimary }}>
+      {props.name}
+    </StrongBg>
+  );
+};
+
+const VerificationLoading = (): JSX.Element => {
+  const theme = useTheme();
+
+  return (
+    <span style={{ color: theme.properties.alertColors.info }}>
+      Loading verification...
+    </span>
+  );
+};
+
 export const NftDisplay = (props: {
   nft: Nft;
   isSelected: boolean;
@@ -67,6 +97,11 @@ export const NftDisplay = (props: {
 
   const [unknownAssetType, setUnknownAssetType] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [mintAddress, setMintAddress] = useState<string | undefined>(undefined);
+  const [collectionName, setCollectionName] = useState<string | undefined>(
+    undefined
+  );
+  const [collectionNameLoaded, setCollectionNameLoaded] = useState(false);
 
   useEffect(() => {
     if (imageUrl === undefined) {
@@ -81,6 +116,46 @@ export const NftDisplay = (props: {
       loadImage().catch(console.error);
     }
   });
+
+  useEffect(() => {
+    const fetchMintAddress = async (): Promise<void> => {
+      const mintAddress = await getMintAddressByTokenId(props.nft.tokenId);
+      if (mintAddress !== undefined) {
+        setMintAddress(mintAddress);
+      }
+    };
+    fetchMintAddress().catch(console.error);
+  }, [props.nft]);
+
+  useEffect(() => {
+    const fetchVerifiedMintAddress = async (): Promise<void> => {
+      if (mintAddress === undefined) {
+        return;
+      }
+      const collectionByMintAddressResponse = await backendRequest(
+        `/collection/byMintingAddresses?mintingAddresses=${JSON.stringify([
+          mintAddress,
+        ])}`
+      );
+      if (collectionByMintAddressResponse.status !== 200) {
+        console.error(
+          `Error fetching collection name: ${JSON.stringify(
+            collectionByMintAddressResponse
+          )}`
+        );
+        return;
+      }
+      const collectionName =
+        collectionByMintAddressResponse.body?.collectionsByMintAddress[
+          mintAddress
+        ]?.name;
+      if (collectionName !== undefined) {
+        setCollectionName(collectionName);
+      }
+      setCollectionNameLoaded(true);
+    };
+    fetchVerifiedMintAddress().catch(console.error);
+  }, [props.nft, mintAddress]);
 
   const Img =
     imageUrl === undefined ? (
@@ -107,7 +182,12 @@ export const NftDisplay = (props: {
       />
     );
   return (
-    <div>
+    <div
+      style={{
+        border: `1px solid ${theme.properties.colorNavs}`,
+        marginBottom: `${spacing.spacing_s}px`,
+      }}
+    >
       {props.isSelected ? (
         <Div>
           {Img}
@@ -125,7 +205,7 @@ export const NftDisplay = (props: {
         <Div>{Img}</Div>
       )}
       <CenteredDiv>
-        <Text
+        <FlexDiv
           style={{
             marginBottom: spacing.spacing_xl,
             maxWidth: imgSize,
@@ -133,8 +213,21 @@ export const NftDisplay = (props: {
             color: captionColor,
           }}
         >
-          {props.nft.name ?? '???'}
-        </Text>
+          <FlexDiv>
+            [
+            {collectionNameLoaded ? (
+              collectionName === undefined ? (
+                <UnverifiedWarning />
+              ) : (
+                <CollectionName name={collectionName} />
+              )
+            ) : (
+              <VerificationLoading />
+            )}
+            ]
+          </FlexDiv>
+          <FlexDiv style={{ width: '100%' }}>{props.nft.name ?? '???'}</FlexDiv>
+        </FlexDiv>
       </CenteredDiv>
     </div>
   );

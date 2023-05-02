@@ -10,14 +10,14 @@ const NftDisplaySlot = styled(FlexDiv)`
 `;
 
 export const NftList = (props: { rawNfts: Nft[] | undefined }): JSX.Element => {
+  const theme = useTheme();
+
   if (props.rawNfts === undefined) {
     return <Text>Error while loading NFTs...</Text>;
   }
   if (props.rawNfts.length === 0) {
     return <Text>No NFTs found</Text>;
   }
-
-  const theme = useTheme();
 
   return (
     <FlexDiv>
