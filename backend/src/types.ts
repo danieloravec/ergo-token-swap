@@ -86,3 +86,12 @@ export const FollowBodySchema: Schema = {
         toAddress: 'string',
     }
 }
+
+export const CollectionCreateBodySchema: Schema = {
+    fields: {
+        adminAuthSecret: 'string',
+        name: 'string',
+        description: 'string',
+        mintingAddresses: 'object',
+    }
+}
