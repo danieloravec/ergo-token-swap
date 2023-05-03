@@ -16,6 +16,7 @@ interface ConfigType {
     jwtSecret: string;
     jwtLifespanMs: number;
     network: Network;
+    adminSecret: string;
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
@@ -29,4 +30,5 @@ export const config: ConfigType = {
     jwtSecret: process.env.JWT_SECRET as string,
     jwtLifespanMs: Number(process.env.JWT_LIFESPAN_MS as string),
     network: process.env.NETWORK === "MAINNET" ? Network.Mainnet : Network.Testnet,
+    adminSecret: process.env.ADMIN_SECRET as string,
 };
