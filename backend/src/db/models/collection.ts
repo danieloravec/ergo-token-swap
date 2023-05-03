@@ -28,6 +28,12 @@ Collection.init({
   timestamps: true,
   underscored: true,
   sequelize: sequelizeConnection,
+  indexes: [
+    {
+      fields: ['name'],
+      unique: true,
+    }
+  ]
 })
 
 export default Collection;

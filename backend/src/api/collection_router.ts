@@ -8,6 +8,19 @@ import {ensureAdminAuth} from "../utils/adminUtils";
 
 const collectionRouter = Router();
 
+collectionRouter.get('/', async (req, res) => {
+  try {
+    const collections = await Collection.findAll({
+      raw: true
+    });
+    res.send({collections});
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send("Server-side error while getting collections");
+  }
+});
+
 collectionRouter.post(`/`, async (req, res) => {
   try {
     if (!ensureAdminAuth(req, res)) {
