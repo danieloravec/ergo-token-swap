@@ -40,16 +40,32 @@ collectionRouter.post(`/`, async (req, res) => {
       }
     }
 
-    const existingCollection = await Collection.findOne({
+    const existingCollectionName = await Collection.findOne({
       where: {
         name: body.name
       },
       raw: true
     });
-    if (existingCollection) {
+    if (existingCollectionName) {
       res.status(400);
       res.send({message: "Collection with this name already exists"});
       return;
+    }
+
+    for (const mintingAddress of body.mintingAddresses) {
+      const existingCollection = await Collection.findOne({
+        where: {
+          mintingAddresses: {
+            [Op.contains]: [mintingAddress]
+          }
+        },
+        raw: true
+      });
+      if (existingCollection) {
+        res.status(400);
+        res.send({message: "Collection with this minting address already exists"});
+        return;
+      }
     }
     const collection = await Collection.create({
       name: body.name,
@@ -61,7 +77,7 @@ collectionRouter.post(`/`, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500);
-    res.send("Server-side error while adding a verified collection");
+    res.send(`Server-side error while adding a verified collection: ${JSON.stringify(err)}`);
   }
 });
 

@@ -16,6 +16,7 @@ class Collection extends Model<CollectionAttributes> implements CollectionAttrib
 Collection.init({
   name: {
     type: DataTypes.STRING,
+    unique: true,
     allowNull: false,
   },
   description: {
@@ -28,12 +29,6 @@ Collection.init({
   timestamps: true,
   underscored: true,
   sequelize: sequelizeConnection,
-  indexes: [
-    {
-      fields: ['name'],
-      unique: true,
-    }
-  ]
 })
 
 export default Collection;
