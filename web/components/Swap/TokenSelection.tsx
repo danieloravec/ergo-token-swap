@@ -1,22 +1,12 @@
-import styled, { useTheme } from 'styled-components';
-import {
-  Heading3,
-  Text,
-  TextNavs,
-  StrongBg,
-  StrongNavs,
-} from '@components/Common/Text';
-import React, { type ReactNode, useEffect, useState } from 'react';
-import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
-import Image from 'next/image';
-import { Spacer } from '@components/Common/Spacer';
+import styled from 'styled-components';
+import { Heading3, TextNavs } from '@components/Common/Text';
+import React, { type ReactNode, useState } from 'react';
+import { Div, FlexDiv } from '@components/Common/Alignment';
 import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
-import { loadNftImageUrl } from '@utils/imageLoader';
-import { assetIconMap } from '@mappers/assetIconMap';
-
-const imgSize = 180;
+import { NftDisplay } from '@components/Tokens/NftDisplay';
+import { FungibleTokenDisplay } from '@components/Tokens/FungibleTokenDisplay';
 
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
@@ -44,187 +34,6 @@ const TokenSelectionHeading = styled.div<{ width: number }>`
   position: relative;
   align-content: center;
 `;
-
-const ImageSelectedOverlay = styled(CenteredDiv)`
-  backdrop-filter: blur(4px) grayscale(100%) brightness(0.4);
-  width: ${() => `${imgSize}px`};
-  height: ${() => `${imgSize + 8}px`};
-  margin-top: ${() => `${-imgSize - 8}px`};
-`;
-
-const StrongSecondary = styled(StrongBg)`
-  color: ${(props) => props.theme.properties.colorNavsText};
-`;
-
-export const NftDisplay = (props: {
-  nft: Nft;
-  isSelected: boolean;
-  onClick: (tokenId: string) => void;
-  captionColor?: string;
-}): JSX.Element => {
-  const theme = useTheme();
-  const captionColor = props.captionColor ?? theme.properties.colorNavsText;
-
-  const [unknownAssetType, setUnknownAssetType] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (imageUrl === undefined) {
-      const loadImage = async (): Promise<void> => {
-        const url = await loadNftImageUrl(props.nft.tokenId);
-        if (url !== undefined) {
-          setImageUrl(url);
-        } else {
-          setUnknownAssetType(true);
-        }
-      };
-      loadImage().catch(console.error);
-    }
-  });
-
-  const Img =
-    imageUrl === undefined ? (
-      <CenteredDiv
-        style={{
-          width: `${imgSize}px`,
-          height: `${imgSize}px`,
-          border: `1px solid ${theme.properties.colorBgText}`,
-        }}
-      >
-        <TextNavs>
-          {unknownAssetType ? 'UNKNOWN ASSET TYPE' : 'IMAGE LOADING...'}
-        </TextNavs>
-      </CenteredDiv>
-    ) : (
-      <Image
-        src={imageUrl}
-        alt={props.nft.name ?? 'nft-image'}
-        width={imgSize}
-        height={imgSize}
-        onClick={() => {
-          props.onClick(props.nft.tokenId);
-        }}
-      />
-    );
-  return (
-    <div>
-      {props.isSelected ? (
-        <Div>
-          {Img}
-          <ImageSelectedOverlay
-            onClick={() => {
-              props.onClick(props.nft.tokenId);
-            }}
-          >
-            <Text>
-              <StrongSecondary>DESELECT</StrongSecondary>
-            </Text>
-          </ImageSelectedOverlay>
-        </Div>
-      ) : (
-        <Div>{Img}</Div>
-      )}
-      <CenteredDiv>
-        <Text
-          style={{
-            marginBottom: spacing.spacing_xl,
-            maxWidth: imgSize,
-            overflowWrap: 'break-word',
-            color: captionColor,
-          }}
-        >
-          {props.nft.name ?? '???'}
-        </Text>
-      </CenteredDiv>
-    </div>
-  );
-};
-
-export const FungibleTokenImage = (props: {
-  fungibleToken: FungibleToken;
-}): JSX.Element => {
-  return (
-    <Image
-      src={
-        assetIconMap[props.fungibleToken.tokenId] === undefined
-          ? `/icons/generic-coin.svg`
-          : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
-      }
-      alt={props.fungibleToken.name ?? 'token-image'}
-      width={80}
-      height={80}
-    />
-  );
-};
-
-const FungibleImageAndNameContainer = styled.div`
-  width: 80px;
-`;
-
-function FungibleTokenDisplay(props: {
-  fungibleToken: FungibleToken;
-  initialValue: bigint;
-  onChange: (newAmount: bigint) => void;
-}): JSX.Element {
-  const [displayAmt, setDisplayAmt] = useState(
-    Number(props.initialValue) / Math.pow(10, props.fungibleToken.decimals)
-  );
-  const handleChange = (event: React.FormEvent<HTMLInputElement>): void => {
-    const newDisplayValue = Number(event.currentTarget.value);
-    const newValueScaled = BigInt(
-      Math.floor(newDisplayValue * Math.pow(10, props.fungibleToken.decimals))
-    );
-    if (
-      newDisplayValue < BigInt(0) ||
-      newValueScaled > props.fungibleToken.amount
-    ) {
-      return;
-    }
-    setDisplayAmt(newDisplayValue);
-    props.onChange(newValueScaled);
-  };
-  return (
-    <FlexDiv style={{ alignItems: 'center', paddingBottom: '20px' }}>
-      <FungibleImageAndNameContainer>
-        <Div>
-          <FungibleTokenImage fungibleToken={props.fungibleToken} />
-        </Div>
-        <Text style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
-          {props.fungibleToken.name ?? '???'}
-        </Text>
-      </FungibleImageAndNameContainer>
-      <Div>
-        <TextNavs>
-          <FlexDiv>
-            <TextNavs>
-              <StrongNavs>Available: </StrongNavs>
-            </TextNavs>
-            <Spacer size={spacing.spacing_xxs} vertical={false} />
-            {Number(
-              Number(props.fungibleToken.amount) /
-                Math.pow(10, props.fungibleToken.decimals)
-            ).toLocaleString('en-US', {
-              maximumFractionDigits: props.fungibleToken.decimals,
-              minimumFractionDigits: props.fungibleToken.decimals,
-            })}
-          </FlexDiv>
-        </TextNavs>
-        <TextNavs>
-          <FlexDiv>
-            <StrongNavs>Selected: </StrongNavs>
-            <Spacer size={spacing.spacing_xxs} vertical={false} />
-            <input
-              style={{ width: '100px' }}
-              value={String(displayAmt)}
-              type="number"
-              onChange={handleChange}
-            />
-          </FlexDiv>
-        </TextNavs>
-      </Div>
-    </FlexDiv>
-  );
-}
 
 const recordFromNftTokenIds = (
   nftTokenIds: string[]
@@ -324,6 +133,7 @@ export function TokenSelection(props: {
           props.nfts.map((nft) => (
             <NftDisplay
               nft={nft}
+              imgSize={180}
               key={nft.tokenId}
               onClick={toggleNftSelected}
               isSelected={selectedNftIds.includes(nft.tokenId)}

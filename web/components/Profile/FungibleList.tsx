@@ -1,13 +1,13 @@
 import { A, StrongBg, Text } from '@components/Common/Text';
 import { type FungibleToken } from '@components/Swap/types';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
-import { FungibleTokenImage } from '@components/Swap/TokenSelection';
 import { config } from '@config';
 import { ExternalLink } from '@components/Icons/ExternalLink';
 import { useTheme } from 'styled-components';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { decimalize, shortenString } from '@utils/formatters';
+import { FungibleTokenImage } from '@components/Tokens/FungibleTokenDisplay';
 
 const FungibleTokenTableEntry = (props: {
   fungibleToken: FungibleToken;
