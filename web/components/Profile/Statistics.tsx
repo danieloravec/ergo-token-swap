@@ -4,10 +4,8 @@ import { Toggle } from '@components/Common/Toggle';
 import { A, Heading2, StrongBg, Text } from '@components/Common/Text';
 import { useTheme } from 'styled-components';
 import { type FungibleStats, type NftStats } from '@components/Profile/types';
-import {
-  FungibleTokenImage,
-  NftDisplay,
-} from '@components/Swap/TokenSelection';
+import { NftDisplay } from '@components/Tokens/NftDisplay';
+import { FungibleTokenImage } from '@components/Tokens/FungibleTokenDisplay';
 import { config } from '@config';
 import { ExternalLink } from '@components/Icons/ExternalLink';
 import { Spacer } from '@components/Common/Spacer';
@@ -141,6 +139,7 @@ const NftVolumeTableEntry = (props: { stat: NftStats }): JSX.Element => {
         <NftDisplay
           nft={nft}
           key={nft.tokenId}
+          imgSize={180}
           isSelected={false}
           onClick={() => {}}
           captionColor={theme.properties.colorBgText}
