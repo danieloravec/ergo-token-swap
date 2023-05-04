@@ -54,7 +54,6 @@ const AddressSectionWrapper = styled(FlexDiv).attrs(
 export const ProfileHeader = (props: {
   data: ProfileInfo;
   disableFavourite?: boolean;
-  onNameClick?: () => void;
 }): JSX.Element => {
   const theme = useTheme();
   const { address } = useWalletStore();
@@ -86,7 +85,9 @@ export const ProfileHeader = (props: {
       );
       if (addOrRemoveFavouriteResponse.status !== 200) {
         console.error(
-          `Failed to add or remove favourite: ${addOrRemoveFavouriteResponse}`
+          `Failed to add or remove favourite: ${JSON.stringify(
+            addOrRemoveFavouriteResponse
+          )}`
         );
       } else {
         setIsFavourited(addOrRemoveFavouriteResponse.body.followed);
@@ -114,7 +115,7 @@ export const ProfileHeader = (props: {
       }
     };
     fetchIsFavourited().catch(console.error);
-  }, [isFavourited]);
+  });
 
   return (
     <ProfileHeaderContainer>
@@ -167,7 +168,15 @@ export const ProfileHeader = (props: {
                   <Spacer size={spacing.spacing_xxs} vertical={false} />
                 </FlexDiv>
               )}
-            <FlexDiv style={{ width: '80%' }} onClick={props.onNameClick}>
+            <FlexDiv
+              style={{ width: '80%' }}
+              onClick={() => {
+                const redirectToProfile = async (): Promise<void> => {
+                  await router.push(`/profile/${props.data.address}`);
+                };
+                redirectToProfile().catch(console.error);
+              }}
+            >
               <Heading2>
                 {props.data.username?.toUpperCase() ?? 'PROFILE'}
               </Heading2>
