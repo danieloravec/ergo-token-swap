@@ -1,6 +1,5 @@
-import { Heading1, Input } from '@components/Common/Text';
+import { Heading1, LargeInput } from '@components/Common/Text';
 import { FlexDiv, FlexDivRow } from '@components/Common/Alignment';
-import { spacing } from '@themes/spacing';
 import React, { useEffect } from 'react';
 import { Alert } from '@components/Common/Alert';
 import styled from 'styled-components';
@@ -16,14 +15,6 @@ const EditProfileFormContainer = styled.div`
   @media (min-width: 1000px) {
     width: 50%;
   }
-`;
-
-const LargeInput = styled(Input)`
-  font-size: 24px;
-  width: 100%;
-  margin-bottom: ${() => `${spacing.spacing_xs}px`};
-  height: 50px;
-  border-radius: 5px;
 `;
 
 const FormAlert = styled(Alert)`
