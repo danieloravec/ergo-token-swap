@@ -43,7 +43,6 @@ export const EditProfileForm = (): JSX.Element => {
   >(undefined);
 
   useEffect(() => {
-    console.log(`address: ${address}`);
     setIsMounted(true);
   });
 
@@ -57,7 +56,6 @@ export const EditProfileForm = (): JSX.Element => {
         'GET'
       );
       if (profileInfo?.status === 200) {
-        console.log(JSON.stringify(profileInfo));
         setDiscord(profileInfo.body?.discord);
         setUsername(profileInfo.body?.username);
         setTwitter(profileInfo.body?.twitter);

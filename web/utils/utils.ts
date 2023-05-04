@@ -1,5 +1,6 @@
 import { config } from '@config';
 import { type Wallet } from '@ergo/wallet';
+import { type ProfileInfo } from '@data-types/profile';
 
 export const backendRequest = async (
   endpoint: string,
@@ -89,7 +90,9 @@ export const authenticate = async (
   return true;
 };
 
-export const createUserIfNotExists = async (address: string): Promise<void> => {
+export const createUserIfNotExists = async (
+  address: string
+): Promise<ProfileInfo | undefined> => {
   const profileInfoResponse = await backendRequest(`/user?address=${address}`);
   if (profileInfoResponse.status !== 200) {
     if (profileInfoResponse.body.message === 'User not found') {
@@ -98,11 +101,14 @@ export const createUserIfNotExists = async (address: string): Promise<void> => {
       });
       if (userCreateResponse.status !== 200) {
         console.error(JSON.stringify(userCreateResponse));
+        return undefined;
       }
-    } else {
-      console.error(profileInfoResponse);
+      return userCreateResponse.body;
     }
+    console.error(profileInfoResponse);
+    return undefined;
   }
+  return profileInfoResponse.body;
 };
 
 export const getCookie = (name: string): string | undefined => {

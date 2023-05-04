@@ -30,17 +30,22 @@ const HoldersSearchForm = (props: {
 
   const handleSubmit = (): void => {
     const getHolders = async (): Promise<void> => {
-      setIsSearching(true);
-      const holdersResponse = await backendRequest(
-        `/holder?tokenId=${tokenId}`
-      );
-      if (holdersResponse.status !== 200) {
-        props.setError('Error getting holders. Is the Token ID valid?');
+      try {
+        setIsSearching(true);
+        const holdersResponse = await backendRequest(
+          `/holder?tokenId=${tokenId}`
+        );
+        if (holdersResponse.status !== 200) {
+          props.setError('Error getting holders. Is the Token ID valid?');
+          setIsSearching(false);
+          return;
+        }
         setIsSearching(false);
-        return;
+        props.onResultsFound(holdersResponse.body);
+      } catch (err) {
+        setIsSearching(false);
+        props.setError('Error getting holders. Is the Token ID valid?');
       }
-      setIsSearching(false);
-      props.onResultsFound(holdersResponse.body);
     };
     getHolders().catch(console.error);
   };
