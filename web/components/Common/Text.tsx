@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { spacing } from '@themes/spacing';
 
 export const Heading1 = styled.h1`
   color: ${(props) => props.theme.properties.colorBgText};
@@ -58,6 +59,14 @@ export const A = styled.a`
 export const Input = styled.input`
   background: ${(props) => props.theme.properties.colorBg};
   color: ${(props) => props.theme.properties.colorBgText};
+`;
+
+export const LargeInput = styled(Input)`
+  font-size: 24px;
+  width: 100%;
+  margin-bottom: ${() => `${spacing.spacing_xs}px`};
+  height: 50px;
+  border-radius: 5px;
 `;
 
 export const Textarea = styled.textarea`

@@ -71,7 +71,6 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log('use effect');
     const fetchAssets = async (): Promise<void> => {
       const assetsResponse = await backendRequest(
         `/user/assets?address=${props.profileAddress}`,
