@@ -97,7 +97,6 @@ export function TokenSelection(props: {
   };
   const handleNanoErgChange = (newAmount: bigint): void => {
     setSelectedNanoErg(newAmount);
-    console.log(`NanoErg changed to: ${newAmount}`);
     props.onChange(
       recordFromNftTokenIds(selectedNftIds),
       newAmount,

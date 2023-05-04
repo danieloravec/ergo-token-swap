@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { FlexDiv } from '@components/Common/Alignment';
-import { backendRequest } from '@utils/utils';
+import { backendRequest, createUserIfNotExists } from '@utils/utils';
 import { ProfileHeader } from '@components/Profile/ProfileHeader';
 import { type ProfileInfo } from '@data-types//profile';
 import { NotFoundPage } from '@components/Common/NotFoundPage';
@@ -19,10 +19,6 @@ export default function Profile(): JSX.Element {
   );
 
   useEffect(() => {
-    setIsReady(true);
-  });
-
-  useEffect(() => {
     const fetchProfileInfoMaybeCreate = async (): Promise<void> => {
       if (profileAddress === undefined) {
         return;
@@ -31,21 +27,15 @@ export default function Profile(): JSX.Element {
         `/user?address=${profileAddress}`
       );
       if (profileInfoResponse.status !== 200) {
-        if (profileInfoResponse.body === 'User not found') {
-          const userCreateBody = {
-            address: profileAddress,
-          };
-          const userCreateResponse = await backendRequest(
-            '/user',
-            'POST',
-            userCreateBody
+        if (profileInfoResponse.body.message === 'User not found') {
+          const userInfo = await createUserIfNotExists(
+            profileAddress as string
           );
-          if (userCreateResponse.status !== 200) {
-            console.error(JSON.stringify(userCreateResponse));
+          if (userInfo === undefined) {
             setIsValid(false);
             return;
           }
-          setProfileInfo(userCreateResponse.body as ProfileInfo);
+          setProfileInfo(userInfo);
         } else {
           console.error(profileInfoResponse);
           setIsValid(false);

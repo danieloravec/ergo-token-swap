@@ -4,7 +4,6 @@ import { CenteredDiv, FlexDiv } from '@components/Common/Alignment';
 import { ProfileHeader } from '@components/Profile/ProfileHeader';
 import styled from 'styled-components';
 import { spacing } from '@themes/spacing';
-import { useRouter } from 'next/router';
 
 const FolloweeEntryContainer = styled(FlexDiv)`
   width: 100%;
@@ -13,8 +12,6 @@ const FolloweeEntryContainer = styled(FlexDiv)`
 `;
 
 export const Follows = (props: { follows?: ProfileInfo[] }): JSX.Element => {
-  const router = useRouter();
-
   if (props.follows === undefined) {
     return (
       <CenteredDiv>
@@ -36,16 +33,7 @@ export const Follows = (props: { follows?: ProfileInfo[] }): JSX.Element => {
       {props.follows.map((follow: ProfileInfo) => {
         return (
           <FolloweeEntryContainer>
-            <ProfileHeader
-              data={follow}
-              disableFavourite
-              onNameClick={() => {
-                const redirectToProfile = async (): Promise<void> => {
-                  await router.push(`/profile/${follow.address}`);
-                };
-                redirectToProfile().catch(console.error);
-              }}
-            />
+            <ProfileHeader data={follow} disableFavourite />
           </FolloweeEntryContainer>
         );
       })}
