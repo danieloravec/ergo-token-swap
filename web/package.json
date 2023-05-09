@@ -21,6 +21,8 @@
   "dependencies": {
     "@fleet-sdk/core": "^0.1.0-alpha.19",
     "@next/font": "^13.1.6",
+    "@react-spring/types": "^9.7.2",
+    "@react-spring/web": "^9.7.2",
     "@types/styled-components": "^5.1.26",
     "ergo-lib-wasm-browser": "^0.23.0",
     "eslint-plugin-unused-imports": "^2.0.0",

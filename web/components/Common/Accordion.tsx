@@ -1,7 +1,8 @@
 import { CenteredDivVertical, FlexDiv } from '@components/Common/Alignment';
 import { Heading1, Heading3 } from '@components/Common/Text';
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import styled from 'styled-components';
+import { useSpring, animated } from '@react-spring/web';
 
 interface AccordionProps {
   width?: string;
@@ -56,6 +57,24 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
     <AccordionContainer width={props.width}>
       <Heading1>{props.title}</Heading1>
       {props.entries.map((entry, idx) => {
+        const [height, setHeight] = useState(0);
+        const contentRef = useRef<HTMLDivElement>(null);
+
+        useLayoutEffect(() => {
+          setHeight(contentRef.current?.offsetHeight ?? 0);
+        });
+
+        const isOpen = idx === openIndex;
+
+        const openAnimation = useSpring({
+          from: {
+            opacity: isOpen ? 0 : 1,
+            height: isOpen ? '0px' : `${height}px`,
+          },
+          to: { opacity: isOpen ? 1 : 0, height: isOpen ? `${height}px` : '0' },
+          config: { duration: 150 },
+        });
+
         return (
           <AccordionItemWrapper
             key={idx}
@@ -71,9 +90,9 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
               <Heading3>{entry.question}</Heading3>
               <Arrow rotated={idx === openIndex} />
             </HeadingArrowWrapper>
-            {idx === openIndex && (
-              <p style={{ width: '100%' }}>{entry.answer}</p>
-            )}
+            <animated.div style={openAnimation}>
+              <div ref={contentRef}>{entry.answer}</div>
+            </animated.div>
           </AccordionItemWrapper>
         );
       })}
