@@ -38,10 +38,14 @@ const CollectionTableEntry = (props: {
         </Heading3>
       </FlexDiv>
       <FlexDiv style={{ width: '100%' }}>
-        <StrongBg>Description: </StrongBg>
-        <Spacer size={spacing.spacing_xxxs} vertical={false} />
-        <Text>{props.collection.description}</Text>
+        <FlexDiv style={{ width: '100%' }}>
+          <StrongBg>Description: </StrongBg>
+        </FlexDiv>
+        <FlexDiv style={{ width: '100%' }}>
+          <Text>{props.collection.description}</Text>
+        </FlexDiv>
       </FlexDiv>
+      <Spacer size={spacing.spacing_s} vertical />
       <FlexDiv>
         <FlexDiv style={{ width: '100%' }}>
           <StrongBg>Minting addresses: </StrongBg>
