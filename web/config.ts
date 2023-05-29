@@ -20,6 +20,6 @@ export const config: ConfigType = {
   serviceFeeNanoErg: BigInt(
     process.env.NEXT_PUBLIC_SERVICE_FEE_NANO_ERG as string
   ),
-  defaultThemeName: 'light' as SupportedThemeName,
+  defaultThemeName: 'dark' as SupportedThemeName,
   minNanoErgValue: BigInt(process.env.NEXT_PUBLIC_MIN_NANO_ERG_VALUE as string),
 };
