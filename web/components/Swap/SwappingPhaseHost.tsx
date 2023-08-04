@@ -4,7 +4,7 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import React, { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
-import { type ParticipantInfo } from '@components/Swap/types';
+import { type Nft, type ParticipantInfo } from '@components/Swap/types';
 import { SwapButton } from '@components/Swap/SwapButton';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { Alert } from '@components/Common/Alert';
@@ -20,6 +20,7 @@ export function SwappingPhaseHost(props: {
   const [selectedNftsA, setSelectedNftsA] = useState<Record<string, bigint>>(
     {}
   );
+  const [selectedNftsADetails, setSelectedNftsADetails] = useState<Nft[]>([]);
   const [selectedFungibleTokensA, setSelectedFungibleTokensA] = useState<
     Record<string, bigint>
   >({});
@@ -27,6 +28,7 @@ export function SwappingPhaseHost(props: {
   const [selectedNftsB, setSelectedNftsB] = useState<Record<string, bigint>>(
     {}
   );
+  const [selectedNftsBDetails, setSelectedNftsBDetails] = useState<Nft[]>([]);
   const [selectedFungibleTokensB, setSelectedFungibleTokensB] = useState<
     Record<string, bigint>
   >({});
@@ -72,10 +74,12 @@ export function SwappingPhaseHost(props: {
           nanoErg={props.hostInfo.nanoErg}
           onChange={(
             newSelectedNfts: Record<string, bigint>,
+            newSelectedNftsDetails: Nft[],
             newSelectedNanoErg: bigint,
             newSelectedFungibleTokens: Record<string, bigint>
           ) => {
             setSelectedNftsA(newSelectedNfts);
+            setSelectedNftsADetails(newSelectedNftsDetails);
             setSelectedNanoErgA(newSelectedNanoErg);
             setSelectedFungibleTokensA(newSelectedFungibleTokens);
           }}
@@ -89,9 +93,11 @@ export function SwappingPhaseHost(props: {
               hostInfo={props.hostInfo}
               guestInfo={props.guestInfo}
               selectedNftsA={selectedNftsA}
+              selectedNftsADetails={selectedNftsADetails}
               selectedFungibleTokensA={selectedFungibleTokensA}
               selectedNanoErgA={selectedNanoErgA}
               selectedNftsB={selectedNftsB}
+              selectedNftsBDetails={selectedNftsBDetails}
               selectedFungibleTokensB={selectedFungibleTokensB}
               selectedNanoErgB={selectedNanoErgB}
               notifyAwaitingGuestSignature={(isAwaiting: boolean) => {
@@ -120,10 +126,12 @@ export function SwappingPhaseHost(props: {
           nanoErg={props.guestInfo.nanoErg}
           onChange={(
             newSelectedNfts: Record<string, bigint>,
+            newSelectedNftsDetails: Nft[],
             newSelectedNanoErg: bigint,
             newSelectedFungibleTokens: Record<string, bigint>
           ) => {
             setSelectedNftsB(newSelectedNfts);
+            setSelectedNftsBDetails(newSelectedNftsDetails);
             setSelectedNanoErgB(newSelectedNanoErg);
             setSelectedFungibleTokensB(newSelectedFungibleTokens);
           }}

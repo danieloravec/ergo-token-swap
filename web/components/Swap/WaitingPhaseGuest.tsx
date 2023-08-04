@@ -21,6 +21,8 @@ import { type Wallet } from '@ergo/wallet';
 import { type Amount, type Box } from '@fleet-sdk/core';
 import { combineSignedInputs, fetchFinishedTxId } from '@components/Swap/utils';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
+import { type FungibleToken, type Nft } from '@components/Swap/types';
+import { ConfirmTxModal } from '@components/Swap/ConfirmTxModal';
 
 const WaitingPhaseHostContainer = styled.div`
   display: flex;
@@ -65,6 +67,26 @@ export function WaitingPhaseGuest(props: {
     undefined
   );
   const [isLoaded, setIsLoaded] = useState(false);
+  const [nftsForA, setnftsForA] = useState<Nft[] | undefined>(undefined);
+  const [nftsForB, setnftsForB] = useState<Nft[] | undefined>(undefined);
+  const [fungibleTokensForA, setfungibleTokensForA] = useState<
+    FungibleToken[] | undefined
+  >(undefined);
+  const [fungibleTokensForB, setfungibleTokensForB] = useState<
+    FungibleToken[] | undefined
+  >(undefined);
+  const [nanoErgForA, setnanoErgForA] = useState<bigint | undefined>(undefined);
+  const [nanoErgForB, setnanoErgForB] = useState<bigint | undefined>(undefined);
+  const [modalAgreed, setModalAgreed] = useState(false);
+  const [ownAddress, setOwnAddress] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fillOwnAddress = async (): Promise<void> => {
+      const address = await props.wallet.getAddress();
+      setOwnAddress(address);
+    };
+    fillOwnAddress().catch(console.error);
+  });
 
   useEffect(() => {
     const fetchIsFinished = async (): Promise<void> => {
@@ -86,17 +108,16 @@ export function WaitingPhaseGuest(props: {
       if (partialTxResponse.status !== 200) {
         console.error('Failed to get partial tx info');
       }
-      if (
-        partialTxResponse?.body?.unsignedTx !== undefined &&
-        partialTxResponse?.body?.inputIndicesHost !== undefined &&
-        partialTxResponse?.body?.inputIndicesGuest !== undefined &&
-        partialTxResponse?.body?.signedInputsHost !== undefined
-      ) {
-        setUnsignedTx(partialTxResponse.body.unsignedTx);
-        setInputIndicesHost(partialTxResponse.body.inputIndicesHost);
-        setInputIndicesGuest(partialTxResponse.body.inputIndicesGuest);
-        setSignedInputsHost(partialTxResponse.body.signedInputsHost);
-      }
+      setUnsignedTx(partialTxResponse?.body?.unsignedTx);
+      setInputIndicesHost(partialTxResponse?.body?.inputIndicesHost);
+      setInputIndicesGuest(partialTxResponse?.body?.inputIndicesGuest);
+      setSignedInputsHost(partialTxResponse?.body?.signedInputsHost);
+      setnftsForA(partialTxResponse?.body?.nftsForA);
+      setnftsForB(partialTxResponse?.body?.nftsForB);
+      setfungibleTokensForA(partialTxResponse?.body?.fungibleTokensForA);
+      setfungibleTokensForB(partialTxResponse?.body?.fungibleTokensForB);
+      setnanoErgForA(BigInt(partialTxResponse?.body?.nanoErgForA ?? 0));
+      setnanoErgForB(BigInt(partialTxResponse?.body?.nanoErgForB ?? 0));
     };
     fetchPartialTxInfo().catch(console.error);
     const interval = setInterval(() => {
@@ -112,7 +133,8 @@ export function WaitingPhaseGuest(props: {
       unsignedTx === undefined ||
       signedInputsHost === undefined ||
       inputIndicesHost === undefined ||
-      inputIndicesGuest === undefined
+      inputIndicesGuest === undefined ||
+      !modalAgreed
     ) {
       return;
     }
@@ -165,7 +187,7 @@ export function WaitingPhaseGuest(props: {
       }
     };
     finalizeGuestSigningAndSubmit().catch(console.error);
-  }, [unsignedTx]);
+  }, [unsignedTx, modalAgreed]);
 
   if (submittedTxId !== undefined) {
     return <TradingSessionFinished txId={submittedTxId} />;
@@ -186,6 +208,27 @@ export function WaitingPhaseGuest(props: {
         <CenteredDivHorizontal>
           <Hourglass width={128} height={128} fill={theme.properties.colorBg} />
         </CenteredDivHorizontal>
+        {unsignedTx?.id !== undefined &&
+          ownAddress !== undefined &&
+          nftsForA !== undefined &&
+          nftsForB !== undefined &&
+          fungibleTokensForA !== undefined &&
+          fungibleTokensForB !== undefined &&
+          nanoErgForA !== undefined &&
+          nanoErgForB !== undefined &&
+          !modalAgreed && (
+            <ConfirmTxModal
+              nftsForA={nftsForA}
+              nftsForB={nftsForB}
+              fungibleTokensForA={fungibleTokensForA}
+              fungibleTokensForB={fungibleTokensForB}
+              nanoErgForA={nanoErgForA}
+              nanoErgForB={nanoErgForB}
+              onAgree={() => {
+                setModalAgreed(true);
+              }}
+            />
+          )}
       </CenteredDivVertical>
     </WaitingPhaseHostContainer>
   );

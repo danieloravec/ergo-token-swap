@@ -55,29 +55,40 @@ export function TokenSelection(props: {
   nanoErg: bigint;
   onChange: (
     newSelectedNfts: Record<string, bigint>,
+    newSelectedNftsDetails: Nft[],
     newSelectedNanoErg: bigint,
     newSelectedFungibleTokens: Record<string, bigint>
   ) => void;
 }): JSX.Element {
   const [selectedNftIds, setSelectedNftIds] = useState<string[]>([]); // We probably don't need a Set here
+  const [selectedNftDetails, setSelectedNftDetails] = useState<Nft[]>([]);
   const [selectedNanoErg, setSelectedNanoErg] = useState<bigint>(BigInt(0));
   const [selectedFungibleAmounts, setSelectedFungibleAmounts] = useState<
     Record<string, bigint>
   >({});
   const [showNftSelect, setShowNftSelect] = useState(true);
-  const toggleNftSelected = (tokenId: string): void => {
-    if (selectedNftIds.includes(tokenId)) {
-      const newSelectedNftIds = selectedNftIds.filter((id) => id !== tokenId);
+  const toggleNftSelected = (nft: Nft): void => {
+    if (selectedNftIds.includes(nft.tokenId)) {
+      const newSelectedNftIds = selectedNftIds.filter(
+        (id) => id !== nft.tokenId
+      );
+      const newSelectedNftDetails = selectedNftDetails.filter(
+        (selectedNft) => selectedNft.tokenId !== nft.tokenId
+      );
       setSelectedNftIds(newSelectedNftIds);
+      setSelectedNftDetails(newSelectedNftDetails);
       props.onChange(
         recordFromNftTokenIds(newSelectedNftIds),
+        newSelectedNftDetails,
         selectedNanoErg,
         selectedFungibleAmounts
       );
     } else {
-      setSelectedNftIds([...selectedNftIds, tokenId]);
+      setSelectedNftIds([...selectedNftIds, nft.tokenId]);
+      setSelectedNftDetails([...selectedNftDetails, nft]);
       props.onChange(
-        recordFromNftTokenIds([...selectedNftIds, tokenId]),
+        recordFromNftTokenIds([...selectedNftIds, nft.tokenId]),
+        [...selectedNftDetails, nft],
         selectedNanoErg,
         selectedFungibleAmounts
       );
@@ -91,6 +102,7 @@ export function TokenSelection(props: {
     setSelectedFungibleAmounts(updatedFungibleAmounts);
     props.onChange(
       recordFromNftTokenIds(selectedNftIds),
+      selectedNftDetails,
       selectedNanoErg,
       updatedFungibleAmounts
     );
@@ -99,6 +111,7 @@ export function TokenSelection(props: {
     setSelectedNanoErg(newAmount);
     props.onChange(
       recordFromNftTokenIds(selectedNftIds),
+      selectedNftDetails,
       newAmount,
       selectedFungibleAmounts
     );
@@ -134,7 +147,9 @@ export function TokenSelection(props: {
               nft={nft}
               imgSize={180}
               key={nft.tokenId}
-              onClick={toggleNftSelected}
+              onClick={() => {
+                toggleNftSelected(nft);
+              }}
               isSelected={selectedNftIds.includes(nft.tokenId)}
             />
           ))

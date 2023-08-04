@@ -81,6 +81,9 @@ export const NftDisplay = (props: {
   });
 
   useEffect(() => {
+    if (mintAddress !== undefined) {
+      return;
+    }
     const fetchMintAddress = async (): Promise<void> => {
       const mintAddress = await getMintAddressByTokenId(props.nft.tokenId);
       if (mintAddress !== undefined) {
@@ -91,10 +94,11 @@ export const NftDisplay = (props: {
   }, [props.nft]);
 
   useEffect(() => {
+    if (mintAddress === undefined) {
+      return;
+    }
+
     const fetchVerifiedMintAddress = async (): Promise<void> => {
-      if (mintAddress === undefined) {
-        return;
-      }
       const collectionByMintAddressResponse = await backendRequest(
         `/collection/byMintingAddresses?mintingAddresses=${JSON.stringify([
           mintAddress,

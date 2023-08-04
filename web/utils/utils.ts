@@ -117,3 +117,9 @@ export const getCookie = (name: string): string | undefined => {
     .filter((row) => row.startsWith(`${name}=`))
     .map((c) => c.split('=')[1])[0];
 };
+
+export const jsonStringifyBig = (obj: object): string => {
+  return JSON.stringify(obj, (key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  );
+};
