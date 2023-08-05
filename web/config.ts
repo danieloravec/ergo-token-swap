@@ -9,6 +9,7 @@ interface ConfigType {
   serviceFeeNanoErg: bigint;
   defaultThemeName: SupportedThemeName;
   minNanoErgValue: bigint;
+  ergTokenId: string;
 }
 
 export const config: ConfigType = {
@@ -22,4 +23,6 @@ export const config: ConfigType = {
   ),
   defaultThemeName: 'dark' as SupportedThemeName,
   minNanoErgValue: BigInt(process.env.NEXT_PUBLIC_MIN_NANO_ERG_VALUE as string),
+  ergTokenId:
+    '0000000000000000000000000000000000000000000000000000000000000000',
 };

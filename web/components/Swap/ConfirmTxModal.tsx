@@ -5,6 +5,8 @@ import { jsonStringifyBig } from '@utils/utils';
 import { NftList } from '@components/Profile/NftList';
 import { FungibleList } from '@components/Profile/FungibleList';
 
+// TODO add support for ERG and then do a better design of the modal
+
 const NftModalList = (props: { nfts: Nft[] }): JSX.Element => {
   return (
     <FlexDiv>
@@ -19,7 +21,10 @@ const FungibleTokenModalList = (props: {
 }): JSX.Element => {
   return (
     <FlexDiv>
-      <FungibleList rawFungibles={props.fungibleTokens} />
+      <FungibleList
+        rawFungibles={props.fungibleTokens}
+        nanoErg={props.nanoErg}
+      />
     </FlexDiv>
   );
 };

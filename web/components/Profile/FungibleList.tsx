@@ -55,18 +55,29 @@ const FungibleTokenTableEntry = (props: {
   );
 };
 
-// TODO add nanoErgo to FungibleList
 export const FungibleList = (props: {
   rawFungibles: FungibleToken[] | undefined;
+  nanoErg: bigint;
 }): JSX.Element => {
   if (props.rawFungibles === undefined) {
     return <Text>Error while loading fungible tokens...</Text>;
   }
-  if (props.rawFungibles.length === 0) {
+  if (props.rawFungibles.length === 0 && props.nanoErg === BigInt(0)) {
     return <Text>No fungible tokens found</Text>;
   }
   return (
     <FlexDiv>
+      {props.nanoErg > BigInt(0) && (
+        <FungibleTokenTableEntry
+          fungibleToken={{
+            name: 'Ergo',
+            tokenId: config.ergTokenId,
+            amount: props.nanoErg,
+            decimals: 9,
+          }}
+          key="0"
+        />
+      )}
       {props.rawFungibles.map((fungible, index) => {
         return (
           <FungibleTokenTableEntry
