@@ -2,7 +2,11 @@ import { buildUnsignedMultisigSwapTx } from '@ergo/transactions';
 import { backendRequest, jsonStringifyBig } from '@utils/utils';
 import { Button } from '@components/Common/Button';
 import { useEffect, useState } from 'react';
-import { type Nft, type ParticipantInfo } from '@components/Swap/types';
+import {
+  type FungibleToken,
+  type Nft,
+  type ParticipantInfo,
+} from '@components/Swap/types';
 import { type Wallet } from '@ergo/wallet';
 
 export const SwapButton = (props: {
@@ -13,10 +17,12 @@ export const SwapButton = (props: {
   selectedNftsA: Record<string, bigint>;
   selectedNftsADetails: Nft[];
   selectedFungibleTokensA: Record<string, bigint>;
+  selectedFungibleTokensADetails: FungibleToken[];
   selectedNanoErgA: bigint;
   selectedNftsB: Record<string, bigint>;
   selectedNftsBDetails: Nft[];
   selectedFungibleTokensB: Record<string, bigint>;
+  selectedFungibleTokensBDetails: FungibleToken[];
   selectedNanoErgB: bigint;
   notifyAwaitingGuestSignature: (isAwaiting: boolean) => void;
   setTxId: (txId: string) => void;
@@ -113,10 +119,10 @@ export const SwapButton = (props: {
             nftsForA: JSON.parse(jsonStringifyBig(props.selectedNftsADetails)),
             nftsForB: JSON.parse(jsonStringifyBig(props.selectedNftsBDetails)),
             fungibleTokensForA: JSON.parse(
-              jsonStringifyBig(props.selectedFungibleTokensA)
+              jsonStringifyBig(props.selectedFungibleTokensADetails)
             ),
             fungibleTokensForB: JSON.parse(
-              jsonStringifyBig(props.selectedFungibleTokensB)
+              jsonStringifyBig(props.selectedFungibleTokensBDetails)
             ),
             nanoErgForA: props.selectedNanoErgA.toString(),
             nanoErgForB: props.selectedNanoErgB.toString(),

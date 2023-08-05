@@ -9,6 +9,7 @@ const txRouter = Router();
 
 txRouter.post('/partial/register', async (req, res) => {
   try {
+    // TODO add validation
     // const bodyIsValid = await utils.validateObject(req.body, types.TxPartialRegisterBodySchema);
     // if(!bodyIsValid) {
     //   res.status(400);
@@ -29,7 +30,6 @@ txRouter.post('/partial/register', async (req, res) => {
       nanoErgForB: bigint,
     } = req.body;
 
-    console.log(`body: ${JSON.stringify(body)}`);
     const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
       unsignedTx: body.unsignedTx,
       unsignedTxAddedOn: new Date(),

@@ -55,6 +55,7 @@ const FungibleTokenTableEntry = (props: {
   );
 };
 
+// TODO add nanoErgo to FungibleList
 export const FungibleList = (props: {
   rawFungibles: FungibleToken[] | undefined;
 }): JSX.Element => {

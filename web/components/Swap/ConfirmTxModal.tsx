@@ -2,16 +2,26 @@ import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { Button } from '@components/Common/Button';
 import { FlexDiv } from '@components/Common/Alignment';
 import { jsonStringifyBig } from '@utils/utils';
+import { NftList } from '@components/Profile/NftList';
+import { FungibleList } from '@components/Profile/FungibleList';
 
 const NftModalList = (props: { nfts: Nft[] }): JSX.Element => {
-  return <div>NftModalList</div>;
+  return (
+    <FlexDiv>
+      <NftList rawNfts={props.nfts} />
+    </FlexDiv>
+  );
 };
 
 const FungibleTokenModalList = (props: {
   fungibleTokens: FungibleToken[];
   nanoErg: bigint;
 }): JSX.Element => {
-  return <div>FungibleTokenModalList</div>;
+  return (
+    <FlexDiv>
+      <FungibleList rawFungibles={props.fungibleTokens} />
+    </FlexDiv>
+  );
 };
 
 export const ConfirmTxModal = (props: {

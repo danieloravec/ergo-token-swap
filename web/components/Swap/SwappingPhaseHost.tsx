@@ -4,7 +4,11 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import React, { useEffect, useState } from 'react';
 import { type Wallet } from '@ergo/wallet';
-import { type Nft, type ParticipantInfo } from '@components/Swap/types';
+import {
+  type FungibleToken,
+  type Nft,
+  type ParticipantInfo,
+} from '@components/Swap/types';
 import { SwapButton } from '@components/Swap/SwapButton';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { Alert } from '@components/Common/Alert';
@@ -24,6 +28,8 @@ export function SwappingPhaseHost(props: {
   const [selectedFungibleTokensA, setSelectedFungibleTokensA] = useState<
     Record<string, bigint>
   >({});
+  const [selectedFungibleTokensADetails, setSelectedFungibleTokensADetails] =
+    useState<FungibleToken[]>([]);
   const [selectedNanoErgA, setSelectedNanoErgA] = useState(BigInt(0));
   const [selectedNftsB, setSelectedNftsB] = useState<Record<string, bigint>>(
     {}
@@ -32,6 +38,8 @@ export function SwappingPhaseHost(props: {
   const [selectedFungibleTokensB, setSelectedFungibleTokensB] = useState<
     Record<string, bigint>
   >({});
+  const [selectedFungibleTokensBDetails, setSelectedFungibleTokensBDetails] =
+    useState<FungibleToken[]>([]);
   const [selectedNanoErgB, setSelectedNanoErgB] = useState(BigInt(0));
   const [awaitingGuestSignature, setAwaitingGuestSignature] = useState(false);
   const [txId, setTxId] = useState<string | undefined>(undefined);
@@ -76,12 +84,14 @@ export function SwappingPhaseHost(props: {
             newSelectedNfts: Record<string, bigint>,
             newSelectedNftsDetails: Nft[],
             newSelectedNanoErg: bigint,
-            newSelectedFungibleTokens: Record<string, bigint>
+            newSelectedFungibleTokens: Record<string, bigint>,
+            newSelectedFungibleTokensDetails: FungibleToken[]
           ) => {
             setSelectedNftsA(newSelectedNfts);
             setSelectedNftsADetails(newSelectedNftsDetails);
             setSelectedNanoErgA(newSelectedNanoErg);
             setSelectedFungibleTokensA(newSelectedFungibleTokens);
+            setSelectedFungibleTokensADetails(newSelectedFungibleTokensDetails);
           }}
         />
         <Spacer size={spacing.spacing_xxxl} vertical={false} />
@@ -95,10 +105,12 @@ export function SwappingPhaseHost(props: {
               selectedNftsA={selectedNftsA}
               selectedNftsADetails={selectedNftsADetails}
               selectedFungibleTokensA={selectedFungibleTokensA}
+              selectedFungibleTokensADetails={selectedFungibleTokensADetails}
               selectedNanoErgA={selectedNanoErgA}
               selectedNftsB={selectedNftsB}
               selectedNftsBDetails={selectedNftsBDetails}
               selectedFungibleTokensB={selectedFungibleTokensB}
+              selectedFungibleTokensBDetails={selectedFungibleTokensBDetails}
               selectedNanoErgB={selectedNanoErgB}
               notifyAwaitingGuestSignature={(isAwaiting: boolean) => {
                 setAwaitingGuestSignature(isAwaiting);
@@ -128,12 +140,14 @@ export function SwappingPhaseHost(props: {
             newSelectedNfts: Record<string, bigint>,
             newSelectedNftsDetails: Nft[],
             newSelectedNanoErg: bigint,
-            newSelectedFungibleTokens: Record<string, bigint>
+            newSelectedFungibleTokens: Record<string, bigint>,
+            newSelectedFungibleTokensDetails: FungibleToken[]
           ) => {
             setSelectedNftsB(newSelectedNfts);
             setSelectedNftsBDetails(newSelectedNftsDetails);
             setSelectedNanoErgB(newSelectedNanoErg);
             setSelectedFungibleTokensB(newSelectedFungibleTokens);
+            setSelectedFungibleTokensBDetails(newSelectedFungibleTokensDetails);
           }}
         />
       </CenteredDiv>
