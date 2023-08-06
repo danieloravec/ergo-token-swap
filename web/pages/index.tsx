@@ -39,10 +39,7 @@ export default function Home(): JSX.Element {
     <Div>
       <FlexDiv style={{ justifyContent: 'space-evenly' }}>
         <CenteredDiv>
-          <Alert type="info">
-            Please update your Nautilus wallet to the latest version.
-          </Alert>
-          <Alert type="error">
+          <Alert type="warning">
             This is a beta version of single-tx-swap. Please only use tokens
             that don't have value for testing.
           </Alert>

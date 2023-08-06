@@ -5,9 +5,12 @@ import { loadNftImageUrl } from '@utils/imageLoader';
 import { getMintAddressByTokenId } from '@utils/verifyUtils';
 import { backendRequest } from '@utils/utils';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
-import { StrongBg, Text, TextNavs } from '@components/Common/Text';
+import { A, StrongBg, Text, TextNavs } from '@components/Common/Text';
 import Image from 'next/image';
 import { spacing } from '@themes/spacing';
+import { config } from '@config';
+import { ExternalLink } from '@components/Icons/ExternalLink';
+import { Spacer } from '@components/Common/Spacer';
 
 const ImageSelectedOverlay = styled(CenteredDiv)<{ imgSize: number }>`
   backdrop-filter: blur(4px) grayscale(100%) brightness(0.4);
@@ -212,7 +215,16 @@ export const NftDisplay = (props: {
             )}
             ]
           </FlexDiv>
-          <FlexDiv style={{ width: '100%' }}>{props.nft.name ?? '???'}</FlexDiv>
+          <FlexDiv style={{ width: '100%' }}>
+            {props.nft.name ?? '???'}
+            <Spacer size={spacing.spacing_xxxs} vertical={false} />
+            <A
+              href={`${config.explorerFrontendUrl}/en/token/${props.nft.tokenId}`}
+              target="_blank"
+            >
+              <ExternalLink color={theme.properties.colorPrimary} />
+            </A>
+          </FlexDiv>
         </FlexDiv>
       </CenteredDiv>
     </div>

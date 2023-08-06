@@ -21,6 +21,8 @@ const FungibleTokenTableEntry = (props: {
 
   const isVerified = assetIconMap[props.fungibleToken.tokenId] !== undefined;
   const name = `${isVerified ? '✅' : '🚨'} ${props.fungibleToken.name}`;
+  const captionColorStyle =
+    props.captionColor !== undefined ? { color: props.captionColor } : {};
 
   useEffect(() => {
     if (isVerified && props.onIsVerified !== undefined) {
@@ -46,9 +48,7 @@ const FungibleTokenTableEntry = (props: {
         {props.captionColor === undefined ? (
           <StrongBg>{name}</StrongBg>
         ) : (
-          <strong style={{ color: props.captionColor ?? 'inherit' }}>
-            {name}
-          </strong>
+          <strong style={captionColorStyle}>{name}</strong>
         )}
       </CenteredDivHorizontal>
 
@@ -63,14 +63,14 @@ const FungibleTokenTableEntry = (props: {
         </FlexDiv>
         <Spacer size={spacing.spacing_xxs} vertical={false} />
         <FlexDiv>
-          <Text style={{ color: props.captionColor ?? 'inherit' }}>
+          <Text style={captionColorStyle}>
             {shortenString(props.fungibleToken.tokenId, 16)}
           </Text>
         </FlexDiv>
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '20%' }}>
-        <StrongBg style={{ color: props.captionColor ?? 'inherit' }}>
+        <StrongBg style={captionColorStyle}>
           {String(
             decimalize(props.fungibleToken.amount, props.fungibleToken.decimals)
           )}
