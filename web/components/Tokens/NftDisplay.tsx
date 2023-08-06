@@ -24,7 +24,9 @@ const UnverifiedWarning = (): JSX.Element => {
   const theme = useTheme();
 
   return (
-    <span style={{ color: theme.properties.colorSecondary }}>UNVERIFIED</span>
+    <span style={{ color: theme.properties.colorSecondary }}>
+      UNVERIFIED 🚨
+    </span>
   );
 };
 
@@ -187,7 +189,7 @@ export const NftDisplay = (props: {
               collectionName === undefined ? (
                 <UnverifiedWarning />
               ) : (
-                <CollectionName name={collectionName} />
+                <CollectionName name={`${collectionName} ✅`} />
               )
             ) : (
               <VerificationLoading />

@@ -7,6 +7,7 @@ import { Toggle } from '@components/Common/Toggle';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { NftDisplay } from '@components/Tokens/NftDisplay';
 import { FungibleTokenDisplay } from '@components/Tokens/FungibleTokenDisplay';
+import ColouredHeading from '@components/Swap/ColouredHeading';
 
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
@@ -22,17 +23,6 @@ const TokenSelectionBody = styled.div<{ width: number }>`
   }};
   overflow-y: auto;
   padding: ${() => `${spacing.spacing_xs}px`};
-`;
-
-const TokenSelectionHeading = styled.div<{ width: number }>`
-  height: 40px;
-  width: ${(props) => `${props.width}px`};
-  background: ${(props) => props.theme.properties.colorSecondary};
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  position: relative;
-  align-content: center;
 `;
 
 const recordFromNftTokenIds = (
@@ -163,11 +153,11 @@ export function TokenSelection(props: {
           }}
         />
       </FlexDiv>
-      <TokenSelectionHeading width={width}>
+      <ColouredHeading width={width}>
         <TextNavs>
           {showNftSelect ? props.headingNft : props.headingFungible}
         </TextNavs>
-      </TokenSelectionHeading>
+      </ColouredHeading>
       <TokenSelectionBody width={width}>
         {showNftSelect ? (
           props.nfts.map((nft) => (

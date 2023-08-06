@@ -1,16 +1,5 @@
-import styled, { useTheme } from 'styled-components';
-import {
-  Heading1,
-  OrderedList,
-  TextPrimaryWrapper,
-} from '@components/Common/Text';
-import { Hourglass } from '@components/Icons/Hourglass';
+import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
-import {
-  CenteredDivHorizontal,
-  CenteredDivVertical,
-  FlexDiv,
-} from '@components/Common/Alignment';
 import { backendRequest } from '@utils/utils';
 import {
   type EIP12UnsignedTransaction,
@@ -23,34 +12,21 @@ import { combineSignedInputs, fetchFinishedTxId } from '@components/Swap/utils';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { ConfirmTxModal } from '@components/Swap/ConfirmTxModal';
+import WaitingScreen from '@components/Swap/WaitingScreen';
 
 const WaitingPhaseHostContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  height: 80vh;
+  min-height: 80vh;
   flex-direction: column;
   align-content: center;
   background: ${(props) => props.theme.properties.colorBg};
 `;
 
-function WaitingPhaseGuestGuide(): JSX.Element {
-  return (
-    <FlexDiv>
-      <OrderedList>
-        <li>Wait for the other party to select assets to swap.</li>
-        <li>A wallet prompt will show up.</li>
-        <li>Make sure the swap is fair.</li>
-        <li>If it is, sign the transaction.</li>
-      </OrderedList>
-    </FlexDiv>
-  );
-}
-
 export function WaitingPhaseGuest(props: {
   tradingSessionId: string;
   wallet: Wallet;
 }): JSX.Element {
-  const theme = useTheme();
   const [unsignedTx, setUnsignedTx] = useState<
     EIP12UnsignedTransaction | undefined
   >(undefined);
@@ -195,41 +171,30 @@ export function WaitingPhaseGuest(props: {
 
   return (
     <WaitingPhaseHostContainer>
-      <CenteredDivVertical>
-        <CenteredDivHorizontal>
-          <Heading1>
-            Welcome to trading room #
-            <TextPrimaryWrapper>{props.tradingSessionId}</TextPrimaryWrapper>!
-          </Heading1>
-        </CenteredDivHorizontal>
-        <CenteredDivHorizontal>
-          <WaitingPhaseGuestGuide />
-        </CenteredDivHorizontal>
-        <CenteredDivHorizontal>
-          <Hourglass width={128} height={128} fill={theme.properties.colorBg} />
-        </CenteredDivHorizontal>
-        {unsignedTx?.id !== undefined &&
-          ownAddress !== undefined &&
-          nftsForA !== undefined &&
-          nftsForB !== undefined &&
-          fungibleTokensForA !== undefined &&
-          fungibleTokensForB !== undefined &&
-          nanoErgForA !== undefined &&
-          nanoErgForB !== undefined &&
-          !modalAgreed && (
-            <ConfirmTxModal
-              nftsForA={nftsForA}
-              nftsForB={nftsForB}
-              fungibleTokensForA={fungibleTokensForA}
-              fungibleTokensForB={fungibleTokensForB}
-              nanoErgForA={nanoErgForA}
-              nanoErgForB={nanoErgForB}
-              onAgree={() => {
-                setModalAgreed(true);
-              }}
-            />
-          )}
-      </CenteredDivVertical>
+      {unsignedTx?.id !== undefined &&
+      ownAddress !== undefined &&
+      nftsForA !== undefined &&
+      nftsForB !== undefined &&
+      fungibleTokensForA !== undefined &&
+      fungibleTokensForB !== undefined &&
+      nanoErgForA !== undefined &&
+      nanoErgForB !== undefined &&
+      !modalAgreed ? (
+        <ConfirmTxModal
+          nftsForA={nftsForA}
+          nftsForB={nftsForB}
+          fungibleTokensForA={fungibleTokensForA}
+          fungibleTokensForB={fungibleTokensForB}
+          nanoErgForA={nanoErgForA}
+          nanoErgForB={nanoErgForB}
+          onAgree={() => {
+            setModalAgreed(true);
+          }}
+          tradingSessionId={props.tradingSessionId}
+        />
+      ) : (
+        <WaitingScreen tradingSessionId={props.tradingSessionId} />
+      )}
     </WaitingPhaseHostContainer>
   );
 }
