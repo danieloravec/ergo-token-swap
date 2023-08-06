@@ -2,6 +2,7 @@ import {DataTypes, Model, Optional} from 'sequelize'
 import sequelizeConnection from '@db/config'
 import { Asset } from "@types";
 import { EIP12UnsignedTransaction, SignedInput } from "@fleet-sdk/common";
+import * as types from "@types";
 
 interface TradingSessionAttributes {
     id: number;
@@ -18,6 +19,12 @@ interface TradingSessionAttributes {
     signedInputsHost?: SignedInput[];
     txInputIndicesHost?: number[];
     txInputIndicesGuest?: number[];
+    nftsForA?: types.Nft[];
+    nftsForB?: types.Nft[];
+    fungibleTokensForA?: types.FungibleToken[];
+    fungibleTokensForB?: types.FungibleToken[];
+    nanoErgForA?: bigint;
+    nanoErgForB?: bigint;
     txId?: string;
     submittedAt?: Date;
 }
@@ -44,6 +51,12 @@ class TradingSession extends Model<TradingSessionAttributes, TradingSessionInput
     signedInputsHost?: SignedInput[];
     txInputIndicesHost?: number[];
     txInputIndicesGuest?: number[];
+    nftsForA?: types.Nft[];
+    nftsForB?: types.Nft[];
+    fungibleTokensForA?: types.FungibleToken[];
+    fungibleTokensForB?: types.FungibleToken[];
+    nanoErgForA?: bigint;
+    nanoErgForB?: bigint;
     public readonly createdAt!: Date;
 }
 
@@ -102,6 +115,24 @@ TradingSession.init({
     submittedAt: {
         type: DataTypes.DATE,
     },
+    nftsForA: {
+        type: DataTypes.JSONB
+    },
+    nftsForB: {
+        type: DataTypes.JSONB
+    },
+    fungibleTokensForA: {
+        type: DataTypes.JSONB
+    },
+    fungibleTokensForB: {
+        type: DataTypes.JSONB
+    },
+    nanoErgForA: {
+        type: DataTypes.BIGINT
+    },
+    nanoErgForB: {
+        type: DataTypes.BIGINT
+    }
 }, {
     timestamps: true,
     underscored: true,

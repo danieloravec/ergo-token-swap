@@ -15,6 +15,10 @@ export const Button = styled.button`
   cursor: pointer;
 `;
 
+export const ButtonFitting = styled(Button)`
+  width: 100%;
+`;
+
 export const ButtonSecondary = styled(Button)`
   background: ${(props) => props.theme.properties.colorSecondary};
 `;

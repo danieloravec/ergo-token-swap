@@ -31,6 +31,12 @@ export const TxPartialRegisterBodySchema: Schema = {
         signedInputsHost: 'object',
         inputIndicesHost: 'object',
         inputIndicesGuest: 'object',
+        nftsForA: 'object',
+        nftsForB: 'object',
+        fungibleTokensForA: 'object',
+        fungibleTokensForB: 'object',
+        nanoErgForA: 'bigint',
+        nanoErgForB: 'bigint',
     }
 }
 

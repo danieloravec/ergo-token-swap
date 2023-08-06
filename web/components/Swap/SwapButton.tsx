@@ -1,8 +1,12 @@
 import { buildUnsignedMultisigSwapTx } from '@ergo/transactions';
-import { backendRequest } from '@utils/utils';
+import { backendRequest, jsonStringifyBig } from '@utils/utils';
 import { Button } from '@components/Common/Button';
 import { useEffect, useState } from 'react';
-import { type ParticipantInfo } from '@components/Swap/types';
+import {
+  type FungibleToken,
+  type Nft,
+  type ParticipantInfo,
+} from '@components/Swap/types';
 import { type Wallet } from '@ergo/wallet';
 
 export const SwapButton = (props: {
@@ -11,10 +15,14 @@ export const SwapButton = (props: {
   hostInfo: ParticipantInfo;
   guestInfo: ParticipantInfo;
   selectedNftsA: Record<string, bigint>;
+  selectedNftsADetails: Nft[];
   selectedFungibleTokensA: Record<string, bigint>;
+  selectedFungibleTokensADetails: FungibleToken[];
   selectedNanoErgA: bigint;
   selectedNftsB: Record<string, bigint>;
+  selectedNftsBDetails: Nft[];
   selectedFungibleTokensB: Record<string, bigint>;
+  selectedFungibleTokensBDetails: FungibleToken[];
   selectedNanoErgB: bigint;
   notifyAwaitingGuestSignature: (isAwaiting: boolean) => void;
   setTxId: (txId: string) => void;
@@ -102,17 +110,28 @@ export const SwapButton = (props: {
             inputIndicesA
           );
 
+          const body = {
+            secret: props.tradingSessionId,
+            unsignedTx,
+            signedInputsHost: signedInputsA,
+            inputIndicesHost: inputIndicesA,
+            inputIndicesGuest: inputIndicesB,
+            nftsForA: JSON.parse(jsonStringifyBig(props.selectedNftsADetails)),
+            nftsForB: JSON.parse(jsonStringifyBig(props.selectedNftsBDetails)),
+            fungibleTokensForA: JSON.parse(
+              jsonStringifyBig(props.selectedFungibleTokensADetails)
+            ),
+            fungibleTokensForB: JSON.parse(
+              jsonStringifyBig(props.selectedFungibleTokensBDetails)
+            ),
+            nanoErgForA: props.selectedNanoErgA.toString(),
+            nanoErgForB: props.selectedNanoErgB.toString(),
+          };
           // Register the partial tx
           const txPartialRegisterResponse = await backendRequest(
             '/tx/partial/register',
             'POST',
-            {
-              secret: props.tradingSessionId,
-              unsignedTx,
-              signedInputsHost: signedInputsA,
-              inputIndicesHost: inputIndicesA,
-              inputIndicesGuest: inputIndicesB,
-            }
+            body
           );
           if (txPartialRegisterResponse.status !== 200) {
             throw new Error('Failed to register partial tx');

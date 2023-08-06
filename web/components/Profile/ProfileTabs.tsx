@@ -61,6 +61,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
   const [rawFungibles, setRawFungibles] = useState<FungibleToken[] | undefined>(
     undefined
   );
+  const [nanoErg, setNanoErg] = useState<bigint | undefined>(undefined);
   const [history, setHistory] = useState<Swap[] | undefined>(undefined);
   const [nftStats, setNftStats] = useState<NftStats[] | undefined>(undefined);
   const [fungibleStats, setFungibleStats] = useState<
@@ -79,7 +80,7 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
       if (assetsResponse.status === 200) {
         setRawNfts(assetsResponse.body.nfts);
         setRawFungibles(assetsResponse.body.fungibleTokens);
-        // setNanoErg(BigInt(assetsResponse.body.nanoErg));
+        setNanoErg(BigInt(assetsResponse.body.nanoErg));
       } else {
         console.error('Failed to fetch assets for profile');
         throw new Error('FAILED_ASSETS_FETCH');
@@ -220,7 +221,10 @@ export const ProfileTabs = (props: { profileAddress: string }): JSX.Element => {
 
       {selectedTab === 'NFT' && <NftList rawNfts={rawNfts} />}
       {selectedTab === 'Fungible' && (
-        <FungibleList rawFungibles={rawFungibles} />
+        <FungibleList
+          rawFungibles={rawFungibles}
+          nanoErg={nanoErg ?? BigInt(0)}
+        />
       )}
       {selectedTab === 'History' && (
         <SwapHistory userAddr={props.profileAddress} history={history} />

@@ -24,7 +24,9 @@ const UnverifiedWarning = (): JSX.Element => {
   const theme = useTheme();
 
   return (
-    <span style={{ color: theme.properties.colorSecondary }}>UNVERIFIED</span>
+    <span style={{ color: theme.properties.colorSecondary }}>
+      UNVERIFIED 🚨
+    </span>
   );
 };
 
@@ -53,6 +55,8 @@ export const NftDisplay = (props: {
   isSelected: boolean;
   onClick: (tokenId: string) => void;
   imgSize: number;
+  onIsUnverified?: () => void;
+  onIsVerified?: () => void;
   captionColor?: string;
 }): JSX.Element => {
   const theme = useTheme();
@@ -81,6 +85,9 @@ export const NftDisplay = (props: {
   });
 
   useEffect(() => {
+    if (mintAddress !== undefined) {
+      return;
+    }
     const fetchMintAddress = async (): Promise<void> => {
       const mintAddress = await getMintAddressByTokenId(props.nft.tokenId);
       if (mintAddress !== undefined) {
@@ -91,10 +98,11 @@ export const NftDisplay = (props: {
   }, [props.nft]);
 
   useEffect(() => {
+    if (mintAddress === undefined) {
+      return;
+    }
+
     const fetchVerifiedMintAddress = async (): Promise<void> => {
-      if (mintAddress === undefined) {
-        return;
-      }
       const collectionByMintAddressResponse = await backendRequest(
         `/collection/byMintingAddresses?mintingAddresses=${JSON.stringify([
           mintAddress,
@@ -119,6 +127,20 @@ export const NftDisplay = (props: {
     };
     fetchVerifiedMintAddress().catch(console.error);
   }, [props.nft, mintAddress]);
+
+  useEffect(() => {
+    if (!collectionNameLoaded) {
+      return;
+    }
+    if (collectionName === undefined && props.onIsUnverified !== undefined) {
+      props.onIsUnverified();
+    } else if (
+      collectionName !== undefined &&
+      props.onIsVerified !== undefined
+    ) {
+      props.onIsVerified();
+    }
+  }, [collectionNameLoaded]);
 
   const Img =
     imageUrl === undefined ? (
@@ -183,7 +205,7 @@ export const NftDisplay = (props: {
               collectionName === undefined ? (
                 <UnverifiedWarning />
               ) : (
-                <CollectionName name={collectionName} />
+                <CollectionName name={`${collectionName} ✅`} />
               )
             ) : (
               <VerificationLoading />

@@ -9,19 +9,39 @@ const txRouter = Router();
 
 txRouter.post('/partial/register', async (req, res) => {
   try {
-    const bodyIsValid = await utils.validateObject(req.body, types.TxPartialRegisterBodySchema);
-    if(!bodyIsValid) {
-      res.status(400);
-      res.send('Invalid body');
-      return;
-    }
-    const body: {secret: string, unsignedTx: EIP12UnsignedTransaction, signedInputsHost: SignedInput[], inputIndicesHost: number[], inputIndicesGuest: number[]} = req.body;
+    // TODO add validation
+    // const bodyIsValid = await utils.validateObject(req.body, types.TxPartialRegisterBodySchema);
+    // if(!bodyIsValid) {
+    //   res.status(400);
+    //   res.send('Invalid body');
+    //   return;
+    // }
+    const body: {
+      secret: string,
+      unsignedTx: EIP12UnsignedTransaction,
+      signedInputsHost: SignedInput[],
+      inputIndicesHost: number[],
+      inputIndicesGuest: number[],
+      nftsForA: types.Nft[],
+      nftsForB: types.Nft[],
+      fungibleTokensForA: types.FungibleToken[],
+      fungibleTokensForB: types.FungibleToken[],
+      nanoErgForA: bigint,
+      nanoErgForB: bigint,
+    } = req.body;
+
     const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
       unsignedTx: body.unsignedTx,
       unsignedTxAddedOn: new Date(),
       signedInputsHost: body.signedInputsHost,
       txInputIndicesHost: body.inputIndicesHost,
       txInputIndicesGuest: body.inputIndicesGuest,
+      nftsForA: body.nftsForA,
+      nftsForB: body.nftsForB,
+      fungibleTokensForA: body.fungibleTokensForA,
+      fungibleTokensForB: body.fungibleTokensForB,
+      nanoErgForA: body.nanoErgForA,
+      nanoErgForB: body.nanoErgForB,
     });
     if(updateStatus !== 200) {
       res.status(updateStatus);
@@ -58,6 +78,12 @@ txRouter.get('/partial', async (req, res) => {
       inputIndicesGuest: session.txInputIndicesGuest,
       inputIndicesHost: session.txInputIndicesHost,
       signedInputsHost: session.signedInputsHost,
+      nftsForA: session.nftsForA,
+      nftsForB: session.nftsForB,
+      fungibleTokensForA: session.fungibleTokensForA,
+      fungibleTokensForB: session.fungibleTokensForB,
+      nanoErgForA: session.nanoErgForA,
+      nanoErgForB: session.nanoErgForB,
     })
   } catch (err) {
     console.error(err.message);

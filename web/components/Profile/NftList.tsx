@@ -9,7 +9,12 @@ const NftDisplaySlot = styled(FlexDiv)`
   margin-right: ${`${spacing.spacing_s}px`};
 `;
 
-export const NftList = (props: { rawNfts: Nft[] | undefined }): JSX.Element => {
+export const NftList = (props: {
+  rawNfts: Nft[] | undefined;
+  onContainsUnverified?: () => void;
+  onContainsVerified?: () => void;
+  captionColor?: string;
+}): JSX.Element => {
   const theme = useTheme();
 
   if (props.rawNfts === undefined) {
@@ -30,7 +35,13 @@ export const NftList = (props: { rawNfts: Nft[] | undefined }): JSX.Element => {
               imgSize={180}
               isSelected={false}
               onClick={(e) => {}}
-              captionColor={theme.properties.colorBgText}
+              onIsUnverified={props.onContainsUnverified}
+              onIsVerified={props.onContainsVerified}
+              captionColor={
+                props.captionColor !== undefined
+                  ? props.captionColor
+                  : theme.properties.colorBgText
+              }
             />
           </NftDisplaySlot>
         );

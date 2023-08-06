@@ -8,11 +8,28 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { decimalize, shortenString } from '@utils/formatters';
 import { FungibleTokenImage } from '@components/Tokens/FungibleTokenDisplay';
+import { assetIconMap } from '@mappers/assetIconMap';
+import { useEffect } from 'react';
 
 const FungibleTokenTableEntry = (props: {
   fungibleToken: FungibleToken;
+  onIsUnverified?: () => void;
+  onIsVerified?: () => void;
+  captionColor?: string;
 }): JSX.Element => {
   const theme = useTheme();
+
+  const isVerified = assetIconMap[props.fungibleToken.tokenId] !== undefined;
+  const name = `${isVerified ? '✅' : '🚨'} ${props.fungibleToken.name}`;
+
+  useEffect(() => {
+    if (isVerified && props.onIsVerified !== undefined) {
+      props.onIsVerified();
+    }
+    if (!isVerified && props.onIsUnverified !== undefined) {
+      props.onIsUnverified();
+    }
+  }, []);
 
   return (
     <FlexDiv
@@ -26,7 +43,13 @@ const FungibleTokenTableEntry = (props: {
       </FlexDiv>
 
       <CenteredDivHorizontal style={{ width: '20%' }}>
-        <StrongBg>{props.fungibleToken.name}</StrongBg>
+        {props.captionColor === undefined ? (
+          <StrongBg>{name}</StrongBg>
+        ) : (
+          <strong style={{ color: props.captionColor ?? 'inherit' }}>
+            {name}
+          </strong>
+        )}
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '40%' }}>
@@ -40,12 +63,14 @@ const FungibleTokenTableEntry = (props: {
         </FlexDiv>
         <Spacer size={spacing.spacing_xxs} vertical={false} />
         <FlexDiv>
-          <Text>{shortenString(props.fungibleToken.tokenId, 24)}</Text>
+          <Text style={{ color: props.captionColor ?? 'inherit' }}>
+            {shortenString(props.fungibleToken.tokenId, 16)}
+          </Text>
         </FlexDiv>
       </CenteredDivHorizontal>
 
       <CenteredDivHorizontal style={{ width: '20%' }}>
-        <StrongBg>
+        <StrongBg style={{ color: props.captionColor ?? 'inherit' }}>
           {String(
             decimalize(props.fungibleToken.amount, props.fungibleToken.decimals)
           )}
@@ -57,20 +82,41 @@ const FungibleTokenTableEntry = (props: {
 
 export const FungibleList = (props: {
   rawFungibles: FungibleToken[] | undefined;
+  nanoErg: bigint;
+  onContainsUnverified?: () => void;
+  onContainsVerified?: () => void;
+  captionColor?: string;
 }): JSX.Element => {
   if (props.rawFungibles === undefined) {
     return <Text>Error while loading fungible tokens...</Text>;
   }
-  if (props.rawFungibles.length === 0) {
+  if (props.rawFungibles.length === 0 && props.nanoErg === BigInt(0)) {
     return <Text>No fungible tokens found</Text>;
   }
   return (
-    <FlexDiv>
+    <FlexDiv style={{ width: '100%' }}>
+      {props.nanoErg > BigInt(0) && (
+        <FungibleTokenTableEntry
+          fungibleToken={{
+            name: 'Ergo',
+            tokenId: config.ergTokenId,
+            amount: props.nanoErg,
+            decimals: 9,
+          }}
+          key={config.ergTokenId}
+          onIsVerified={props.onContainsVerified}
+          onIsUnverified={props.onContainsUnverified}
+          captionColor={props.captionColor}
+        />
+      )}
       {props.rawFungibles.map((fungible, index) => {
         return (
           <FungibleTokenTableEntry
             fungibleToken={fungible}
             key={fungible.tokenId}
+            captionColor={props.captionColor}
+            onIsVerified={props.onContainsVerified}
+            onIsUnverified={props.onContainsUnverified}
           />
         );
       })}

@@ -13,6 +13,10 @@ export const Heading3 = styled.h3`
   color: ${(props) => props.theme.properties.colorBgText};
 `;
 
+export const Heading4 = styled.h4`
+  color: ${(props) => props.theme.properties.colorBgText};
+`;
+
 export const TextPrimaryWrapper = styled.span`
   color: ${(props) => props.theme.properties.colorPrimary};
 `;

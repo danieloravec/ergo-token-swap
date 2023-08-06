@@ -35,20 +35,22 @@ export const FungibleTokenDisplay = (props: {
   onChange: (newAmount: bigint) => void;
 }): JSX.Element => {
   const [displayAmt, setDisplayAmt] = useState(
-    Number(props.initialValue) / Math.pow(10, props.fungibleToken.decimals)
+    String(
+      Number(props.initialValue) / Math.pow(10, props.fungibleToken.decimals)
+    )
   );
   const handleChange = (event: React.FormEvent<HTMLInputElement>): void => {
-    const newDisplayValue = Number(event.currentTarget.value);
+    const newDisplayValueStr = event.currentTarget.value;
+    const newDisplayValueNum = Number(newDisplayValueStr);
     const newValueScaled = BigInt(
-      Math.floor(newDisplayValue * Math.pow(10, props.fungibleToken.decimals))
+      Math.floor(
+        newDisplayValueNum * Math.pow(10, props.fungibleToken.decimals)
+      )
     );
-    if (
-      newDisplayValue < BigInt(0) ||
-      newValueScaled > props.fungibleToken.amount
-    ) {
+    if (newDisplayValueNum < 0 || newValueScaled > props.fungibleToken.amount) {
       return;
     }
-    setDisplayAmt(newDisplayValue);
+    setDisplayAmt(newDisplayValueStr);
     props.onChange(newValueScaled);
   };
   return (
@@ -83,7 +85,7 @@ export const FungibleTokenDisplay = (props: {
             <Spacer size={spacing.spacing_xxs} vertical={false} />
             <input
               style={{ width: '100px' }}
-              value={String(displayAmt)}
+              value={displayAmt}
               type="number"
               onChange={handleChange}
             />
