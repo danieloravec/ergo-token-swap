@@ -11,7 +11,7 @@ import { type Amount, type Box } from '@fleet-sdk/core';
 import { combineSignedInputs, fetchFinishedTxId } from '@components/Swap/utils';
 import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
-import { ConfirmTxModal } from '@components/Swap/ConfirmTxModal';
+import { ConfirmTxScreen } from '@components/Swap/ConfirmTxScreen';
 import WaitingScreen from '@components/Swap/WaitingScreen';
 
 const WaitingPhaseHostContainer = styled.div`
@@ -105,65 +105,64 @@ export function WaitingPhaseGuest(props: {
   }, [isLoaded, unsignedTx]);
 
   useEffect(() => {
+    finalizeGuestSigningAndSubmit().catch(console.error);
+  }, [unsignedTx, modalAgreed]);
+
+  const finalizeGuestSigningAndSubmit = async (): Promise<void> => {
     if (
       unsignedTx === undefined ||
       signedInputsHost === undefined ||
       inputIndicesHost === undefined ||
       inputIndicesGuest === undefined ||
+      submittedTxId !== undefined ||
       !modalAgreed
     ) {
       return;
     }
-    const finalizeGuestSigningAndSubmit = async (): Promise<void> => {
-      if (submittedTxId !== undefined) {
-        return;
-      }
-      if (unsignedTx.id === undefined) {
-        throw new Error('txId is undefined');
-      }
-      const signedGuestInputs = await props.wallet.signTxInputs(
-        unsignedTx,
-        inputIndicesGuest
-      );
-      const signedInputs = combineSignedInputs(
-        signedInputsHost,
-        signedGuestInputs,
-        inputIndicesHost,
-        inputIndicesGuest
-      );
-      const txId = unsignedTx.id;
-      const signedTx: SignedTransaction = {
-        id: txId,
-        inputs: signedInputs,
-        dataInputs: [],
-        outputs: unsignedTx.outputs.map((output, i) => {
-          if (output.boxId === undefined) {
-            throw new Error('boxId is undefined');
-          }
-          const box: Box<Amount> = {
-            ...output,
-            boxId: output.boxId,
-            transactionId: txId,
-            index: i,
-          };
-          return box;
-        }),
-      };
-
-      await props.wallet.submitTx(signedTx);
-
-      try {
-        await backendRequest(`/tx/register`, 'POST', {
-          secret: props.tradingSessionId,
-          txId: signedTx.id,
-        });
-        setSubmittedTxId(signedTx.id);
-      } catch (err) {
-        console.error(err);
-      }
+    if (unsignedTx.id === undefined) {
+      throw new Error('txId is undefined');
+    }
+    const signedGuestInputs = await props.wallet.signTxInputs(
+      unsignedTx,
+      inputIndicesGuest
+    );
+    const signedInputs = combineSignedInputs(
+      signedInputsHost,
+      signedGuestInputs,
+      inputIndicesHost,
+      inputIndicesGuest
+    );
+    const txId = unsignedTx.id;
+    const signedTx: SignedTransaction = {
+      id: txId,
+      inputs: signedInputs,
+      dataInputs: [],
+      outputs: unsignedTx.outputs.map((output, i) => {
+        if (output.boxId === undefined) {
+          throw new Error('boxId is undefined');
+        }
+        const box: Box<Amount> = {
+          ...output,
+          boxId: output.boxId,
+          transactionId: txId,
+          index: i,
+        };
+        return box;
+      }),
     };
-    finalizeGuestSigningAndSubmit().catch(console.error);
-  }, [unsignedTx, modalAgreed]);
+
+    await props.wallet.submitTx(signedTx);
+
+    try {
+      await backendRequest(`/tx/register`, 'POST', {
+        secret: props.tradingSessionId,
+        txId: signedTx.id,
+      });
+      setSubmittedTxId(signedTx.id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (submittedTxId !== undefined) {
     return <TradingSessionFinished txId={submittedTxId} />;
@@ -178,9 +177,8 @@ export function WaitingPhaseGuest(props: {
       fungibleTokensForA !== undefined &&
       fungibleTokensForB !== undefined &&
       nanoErgForA !== undefined &&
-      nanoErgForB !== undefined &&
-      !modalAgreed ? (
-        <ConfirmTxModal
+      nanoErgForB !== undefined ? (
+        <ConfirmTxScreen
           nftsForA={nftsForA}
           nftsForB={nftsForB}
           fungibleTokensForA={fungibleTokensForA}
@@ -189,6 +187,7 @@ export function WaitingPhaseGuest(props: {
           nanoErgForB={nanoErgForB}
           onAgree={() => {
             setModalAgreed(true);
+            finalizeGuestSigningAndSubmit().catch(console.error);
           }}
           tradingSessionId={props.tradingSessionId}
         />

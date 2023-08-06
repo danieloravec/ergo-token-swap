@@ -14,6 +14,11 @@ import { TradingSessionFinished } from '@components/Swap/TradingSessionFinished'
 import { Alert } from '@components/Common/Alert';
 import { fetchFinishedTxId } from '@components/Swap/utils';
 import { StrongNavs } from '@components/Common/Text';
+import styled from 'styled-components';
+
+const TokenDisplayHeadingSpan = styled.span`
+  padding: ${spacing.spacing_xxs}px;
+`;
 
 export function SwappingPhaseHost(props: {
   wallet: Wallet;
@@ -68,14 +73,14 @@ export function SwappingPhaseHost(props: {
         <TokenSelection
           description="YOUR WALLET"
           headingNft={
-            <span>
+            <TokenDisplayHeadingSpan>
               Select tokens to <StrongNavs>send</StrongNavs> by clicking them.
-            </span>
+            </TokenDisplayHeadingSpan>
           }
           headingFungible={
-            <span>
+            <TokenDisplayHeadingSpan>
               Specify amounts of tokens to <StrongNavs>send</StrongNavs>.
-            </span>
+            </TokenDisplayHeadingSpan>
           }
           nfts={props.hostInfo.nfts}
           fungibleTokens={props.hostInfo.fungibleTokens}
@@ -123,15 +128,15 @@ export function SwappingPhaseHost(props: {
         <TokenSelection
           description="GUEST WALLET"
           headingNft={
-            <span>
+            <TokenDisplayHeadingSpan>
               Select tokens to <StrongNavs>receive</StrongNavs> by clicking
               them.
-            </span>
+            </TokenDisplayHeadingSpan>
           }
           headingFungible={
-            <span>
+            <TokenDisplayHeadingSpan>
               Specify amounts of tokens to <StrongNavs>receive</StrongNavs>.
-            </span>
+            </TokenDisplayHeadingSpan>
           }
           nfts={props.guestInfo.nfts}
           fungibleTokens={props.guestInfo.fungibleTokens}

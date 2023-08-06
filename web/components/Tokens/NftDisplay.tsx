@@ -55,6 +55,8 @@ export const NftDisplay = (props: {
   isSelected: boolean;
   onClick: (tokenId: string) => void;
   imgSize: number;
+  onIsUnverified?: () => void;
+  onIsVerified?: () => void;
   captionColor?: string;
 }): JSX.Element => {
   const theme = useTheme();
@@ -125,6 +127,20 @@ export const NftDisplay = (props: {
     };
     fetchVerifiedMintAddress().catch(console.error);
   }, [props.nft, mintAddress]);
+
+  useEffect(() => {
+    if (!collectionNameLoaded) {
+      return;
+    }
+    if (collectionName === undefined && props.onIsUnverified !== undefined) {
+      props.onIsUnverified();
+    } else if (
+      collectionName !== undefined &&
+      props.onIsVerified !== undefined
+    ) {
+      props.onIsVerified();
+    }
+  }, [collectionNameLoaded]);
 
   const Img =
     imageUrl === undefined ? (

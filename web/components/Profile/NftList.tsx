@@ -11,6 +11,8 @@ const NftDisplaySlot = styled(FlexDiv)`
 
 export const NftList = (props: {
   rawNfts: Nft[] | undefined;
+  onContainsUnverified?: () => void;
+  onContainsVerified?: () => void;
   captionColor?: string;
 }): JSX.Element => {
   const theme = useTheme();
@@ -33,6 +35,8 @@ export const NftList = (props: {
               imgSize={180}
               isSelected={false}
               onClick={(e) => {}}
+              onIsUnverified={props.onContainsUnverified}
+              onIsVerified={props.onContainsVerified}
               captionColor={
                 props.captionColor !== undefined
                   ? props.captionColor

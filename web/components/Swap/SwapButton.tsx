@@ -127,7 +127,6 @@ export const SwapButton = (props: {
             nanoErgForA: props.selectedNanoErgA.toString(),
             nanoErgForB: props.selectedNanoErgB.toString(),
           };
-          console.log(`body: ${JSON.stringify(body)}`);
           // Register the partial tx
           const txPartialRegisterResponse = await backendRequest(
             '/tx/partial/register',

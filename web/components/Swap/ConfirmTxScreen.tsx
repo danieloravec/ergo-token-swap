@@ -16,16 +16,23 @@ import {
 } from '@components/Common/Text';
 import { spacing } from '@themes/spacing';
 import styled, { useTheme } from 'styled-components';
-import { type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import ColouredHeading from '@components/Swap/ColouredHeading';
+import { Alert } from '@components/Common/Alert';
 
-const NftModalList = (props: { nfts: Nft[] }): JSX.Element => {
+const NftModalList = (props: {
+  nfts: Nft[];
+  onContainsUnverified: () => void;
+}): JSX.Element => {
   const theme = useTheme();
 
   return (
     <FlexDiv>
       <NftList
         rawNfts={props.nfts}
+        onContainsUnverified={() => {
+          props.onContainsUnverified();
+        }}
         captionColor={theme.properties.colorNavsText}
       />
     </FlexDiv>
@@ -35,6 +42,7 @@ const NftModalList = (props: { nfts: Nft[] }): JSX.Element => {
 const FungibleTokenModalList = (props: {
   fungibleTokens: FungibleToken[];
   nanoErg: bigint;
+  onContainsUnverified: () => void;
 }): JSX.Element => {
   const theme = useTheme();
 
@@ -43,6 +51,7 @@ const FungibleTokenModalList = (props: {
       <FungibleList
         rawFungibles={props.fungibleTokens}
         nanoErg={props.nanoErg}
+        onContainsUnverified={props.onContainsUnverified}
         captionColor={theme.properties.colorNavsText}
       />
     </FlexDiv>
@@ -53,6 +62,11 @@ const TokenSummaryContainer = styled(FlexDiv)`
   background: ${({ theme }) => theme.properties.colorNavs};
   height: 60vh;
   overflow-y: auto;
+  align-content: flex-start;
+`;
+
+const SectionHeading = styled(Heading2)`
+  color: ${({ theme }) => theme.properties.colorNavsText};
 `;
 
 const TokenSummary = (props: {
@@ -61,23 +75,39 @@ const TokenSummary = (props: {
   nanoErg: bigint;
   heading: ReactNode;
 }): JSX.Element => {
-  const theme = useTheme();
-
-  const SectionHeading = styled(Heading2)`
-    color: ${theme.properties.colorNavsText};
-  `;
+  const [containsUnverified, setContainsUnverified] = useState<boolean>(false);
 
   return (
     <TokenSummaryContainer>
       <ColouredHeading>{props.heading}</ColouredHeading>
+      {containsUnverified ? (
+        <Alert type="error">
+          ⚠️ At least one of the assets is unverified! Please check it manually.
+          ⚠️
+        </Alert>
+      ) : (
+        <Alert type="success">All assets on this side are verified ✅</Alert>
+      )}
       <FlexDiv style={{ padding: `${spacing.spacing_m}px` }}>
         <FlexDiv style={{ width: '100%' }}>
-          <FlexDivRow>
-            <SectionHeading>NFT:</SectionHeading>
-          </FlexDivRow>
-          {props.nfts.length > 0 && <NftModalList nfts={props.nfts} />}
+          {props.nfts.length > 0 && (
+            <FlexDiv>
+              <FlexDivRow>
+                <SectionHeading>NFT:</SectionHeading>
+              </FlexDivRow>
+              <NftModalList
+                nfts={props.nfts}
+                onContainsUnverified={() => {
+                  setContainsUnverified(true);
+                }}
+              />
+            </FlexDiv>
+          )}
         </FlexDiv>
-        <FlexDivRow style={{ height: '0px', border: '1px solid white' }} />
+        {(props.fungibleTokens.length > 0 || props.nanoErg > BigInt(0)) &&
+          props.nfts.length > 0 && (
+            <FlexDivRow style={{ height: '0px', border: '1px solid white' }} />
+          )}
         <FlexDiv style={{ width: '100%' }}>
           {(props.fungibleTokens.length > 0 || props.nanoErg > 0) && (
             <FlexDivRow>
@@ -87,6 +117,9 @@ const TokenSummary = (props: {
               <FungibleTokenModalList
                 fungibleTokens={props.fungibleTokens}
                 nanoErg={props.nanoErg}
+                onContainsUnverified={() => {
+                  setContainsUnverified(true);
+                }}
               />
             </FlexDivRow>
           )}
@@ -136,7 +169,12 @@ const ConfirmTxModalIntro = (props: {
   );
 };
 
-export const ConfirmTxModal = (props: {
+const HeadingTextContainer = styled.span`
+  font-size: 22px;
+  padding: ${spacing.spacing_xxs}px;
+`;
+
+export const ConfirmTxScreen = (props: {
   nftsForA: Nft[];
   nftsForB: Nft[];
   fungibleTokensForA: FungibleToken[];
@@ -146,10 +184,6 @@ export const ConfirmTxModal = (props: {
   onAgree: () => void;
   tradingSessionId: string;
 }): JSX.Element => {
-  const HeadingTextContainer = styled.span`
-    font-size: 22px;
-  `;
-
   return (
     <CenteredDivHorizontal>
       <FlexDivRow>

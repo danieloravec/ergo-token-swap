@@ -9,15 +9,27 @@ import { spacing } from '@themes/spacing';
 import { decimalize, shortenString } from '@utils/formatters';
 import { FungibleTokenImage } from '@components/Tokens/FungibleTokenDisplay';
 import { assetIconMap } from '@mappers/assetIconMap';
+import { useEffect } from 'react';
 
 const FungibleTokenTableEntry = (props: {
   fungibleToken: FungibleToken;
+  onIsUnverified?: () => void;
+  onIsVerified?: () => void;
   captionColor?: string;
 }): JSX.Element => {
   const theme = useTheme();
 
   const isVerified = assetIconMap[props.fungibleToken.tokenId] !== undefined;
   const name = `${isVerified ? '✅' : '🚨'} ${props.fungibleToken.name}`;
+
+  useEffect(() => {
+    if (isVerified && props.onIsVerified !== undefined) {
+      props.onIsVerified();
+    }
+    if (!isVerified && props.onIsUnverified !== undefined) {
+      props.onIsUnverified();
+    }
+  }, []);
 
   return (
     <FlexDiv
@@ -71,6 +83,8 @@ const FungibleTokenTableEntry = (props: {
 export const FungibleList = (props: {
   rawFungibles: FungibleToken[] | undefined;
   nanoErg: bigint;
+  onContainsUnverified?: () => void;
+  onContainsVerified?: () => void;
   captionColor?: string;
 }): JSX.Element => {
   if (props.rawFungibles === undefined) {
@@ -90,6 +104,8 @@ export const FungibleList = (props: {
             decimals: 9,
           }}
           key={config.ergTokenId}
+          onIsVerified={props.onContainsVerified}
+          onIsUnverified={props.onContainsUnverified}
           captionColor={props.captionColor}
         />
       )}
@@ -99,6 +115,8 @@ export const FungibleList = (props: {
             fungibleToken={fungible}
             key={fungible.tokenId}
             captionColor={props.captionColor}
+            onIsVerified={props.onContainsVerified}
+            onIsUnverified={props.onContainsUnverified}
           />
         );
       })}

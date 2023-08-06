@@ -8,6 +8,7 @@ import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { NftDisplay } from '@components/Tokens/NftDisplay';
 import { FungibleTokenDisplay } from '@components/Tokens/FungibleTokenDisplay';
 import ColouredHeading from '@components/Swap/ColouredHeading';
+import { config } from '@config';
 
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
@@ -176,8 +177,7 @@ export function TokenSelection(props: {
             <FungibleTokenDisplay
               fungibleToken={{
                 name: 'Ergo',
-                tokenId:
-                  '0000000000000000000000000000000000000000000000000000000000000000',
+                tokenId: config.ergTokenId,
                 amount: props.nanoErg,
                 decimals: 9,
               }}
