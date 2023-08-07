@@ -71,7 +71,11 @@ const HoldersSearchForm = (props: {
       <Spacer size={spacing.spacing_xs} vertical={false} />
 
       <FlexDiv>
-        <ButtonSecondary disabled={isSearching} onClick={handleSubmit}>
+        <ButtonSecondary
+          disabled={isSearching}
+          onClick={handleSubmit}
+          style={{ marginTop: `${spacing.spacing_xxxs}px` }}
+        >
           {isSearching ? 'Please wait...' : 'Search'}
         </ButtonSecondary>
       </FlexDiv>
@@ -114,7 +118,9 @@ const FindHolders = (): JSX.Element => {
     <CenteredDiv>
       {error !== undefined && <Alert type="error">{error}</Alert>}
 
-      <Heading1>FIND TOKENS OWNER CONTACT INFO</Heading1>
+      <Heading1 style={{ marginLeft: `${spacing.spacing_xxs}px` }}>
+        Find tokens owner contact info
+      </Heading1>
 
       <HoldersSearchForm
         onResultsFound={(results: ProfileInfo[]) => {

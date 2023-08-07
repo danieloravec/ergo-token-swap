@@ -7,7 +7,7 @@ import { spacing } from '@themes/spacing';
 import { useWalletStore } from '@components/Wallet/hooks';
 import NoSsr from '@components/Common/NoSsr';
 import { useWindowDimensions } from '@components/hooks';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   CenteredDivHorizontal,
   FlexDiv,
@@ -46,12 +46,6 @@ export function Nav(props: { mobileIfLessThan: number }): JSX.Element {
   const { address } = useWalletStore();
   const [isOpen, setIsOpen] = useState(false);
   const { width } = useWindowDimensions();
-
-  useEffect(() => {
-    if (width >= props.mobileIfLessThan) {
-      setIsOpen(true);
-    }
-  }, [width]);
 
   const DesktopMenu = (): JSX.Element => {
     return (

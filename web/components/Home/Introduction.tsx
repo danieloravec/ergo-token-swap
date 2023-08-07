@@ -1,5 +1,5 @@
 import { Heading1, OrderedList, StrongBg } from '@components/Common/Text';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Button } from '@components/Common/Button';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
 import { Spacer } from '@components/Common/Spacer';
@@ -9,6 +9,7 @@ import { type Wallet } from '@ergo/wallet';
 import { backendRequest } from '@utils/utils';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useWindowDimensions } from '@components/hooks';
 
 const IntroductionContainer = styled.div`
   width: 550px;
@@ -38,6 +39,8 @@ export function Introduction(): JSX.Element {
   const { wallet } = useWalletStore();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const { width } = useWindowDimensions();
+  const theme = useTheme();
 
   useEffect(() => {
     setIsMounted(true);
@@ -45,11 +48,15 @@ export function Introduction(): JSX.Element {
 
   return (
     <IntroductionContainer>
-      <Heading1>SWAP ERGO ASSETS INSTANTLY</Heading1>
+      <Heading1>
+        Swap Ergo assets{' '}
+        <span style={{ color: theme.properties.colorSecondary }}>securely</span>{' '}
+        with people you just met!
+      </Heading1>
       <FlexDiv>
         <Spacer size={spacing.spacing_xs} vertical />
         <OrderedList style={{ fontSize: '20px' }}>
-          <li>Connect your wallet (button in the upper right corner).</li>
+          <li>Connect your wallet.</li>
           <li>
             Push the <StrongBg>Start Trading Session</StrongBg> button below.
           </li>
@@ -59,23 +66,30 @@ export function Introduction(): JSX.Element {
           <li>Wait for the other party to validate and sign it too.</li>
         </OrderedList>
       </FlexDiv>
-      <CenteredDivHorizontal>
-        {!isMounted || wallet === undefined ? (
-          <DisabledButton disabled>Wallet not connected</DisabledButton>
-        ) : (
-          <Button
-            onClick={() => {
-              const startSession = async (): Promise<void> => {
-                const tradingSessionId = await startTradingSession(wallet);
-                await router.push(`/swap/${tradingSessionId}`);
-              };
-              startSession().catch(console.error);
-            }}
-          >
-            Start Trading Session
-          </Button>
-        )}
-      </CenteredDivHorizontal>
+      {width < 768 && (
+        <CenteredDivHorizontal>
+          <DisabledButton disabled>Only desktop supported</DisabledButton>
+        </CenteredDivHorizontal>
+      )}
+      {width >= 768 && (
+        <CenteredDivHorizontal>
+          {!isMounted || wallet === undefined ? (
+            <DisabledButton disabled>Wallet not connected</DisabledButton>
+          ) : (
+            <Button
+              onClick={() => {
+                const startSession = async (): Promise<void> => {
+                  const tradingSessionId = await startTradingSession(wallet);
+                  await router.push(`/swap/${tradingSessionId}`);
+                };
+                startSession().catch(console.error);
+              }}
+            >
+              Start Trading Session
+            </Button>
+          )}
+        </CenteredDivHorizontal>
+      )}
     </IntroductionContainer>
   );
 }

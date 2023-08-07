@@ -17,7 +17,7 @@ import { config } from '@config';
 import { shortenString } from '@utils/formatters';
 import { Favourite } from '@components/Icons/Favourite';
 import { backendRequest } from '@utils/utils';
-import { useJwtAuth } from '@components/hooks';
+import { useJwtAuth, useWindowDimensions } from '@components/hooks';
 
 const ProfileHeaderContainer = styled(FlexDiv)`
   width: 80%;
@@ -59,10 +59,11 @@ export const ProfileHeader = (props: {
   const { address } = useWalletStore();
   const router = useRouter();
   const { jwt } = useJwtAuth();
+  const { width } = useWindowDimensions();
 
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
 
-  const profilePhotoHeight = 100;
+  const profilePhotoHeight = width >= 768 ? 100 : 50;
   const totalPhotoSectionWidth = profilePhotoHeight + spacing.spacing_m;
 
   const handleFavouriteClick = (): void => {
@@ -121,33 +122,37 @@ export const ProfileHeader = (props: {
     <ProfileHeaderContainer>
       <FlexDiv style={{ width: `${totalPhotoSectionWidth}px` }}>
         <FlexDiv style={{ width: '100%' }}>
-          <ProfileImage height={profilePhotoHeight} />
+          <FlexDiv style={{ alignContent: 'center' }}>
+            <ProfileImage height={profilePhotoHeight} />
+          </FlexDiv>
         </FlexDiv>
-        <FlexDiv style={{ width: '100%' }}>
-          {address === props.data.address ? (
-            <ButtonTertiary
-              onClick={() => {
-                void (async (): Promise<void> => {
-                  await router.push('/profile/edit');
-                })();
-              }}
-            >
-              Edit
-            </ButtonTertiary>
-          ) : (
-            <ButtonTertiary
-              onClick={() => {
-                router
-                  .push(`/messages/send?recipient=${props.data.address}`)
-                  .catch(console.error);
-                console.error('NOT IMPLEMENTED');
-              }}
-              disabled={props.data.allowMessages === false}
-            >
-              Message
-            </ButtonTertiary>
-          )}
-        </FlexDiv>
+        {width >= 768 && (
+          <FlexDiv style={{ width: '100%' }}>
+            {address === props.data.address ? (
+              <ButtonTertiary
+                onClick={() => {
+                  void (async (): Promise<void> => {
+                    await router.push('/profile/edit');
+                  })();
+                }}
+              >
+                Edit
+              </ButtonTertiary>
+            ) : (
+              <ButtonTertiary
+                onClick={() => {
+                  router
+                    .push(`/messages/send?recipient=${props.data.address}`)
+                    .catch(console.error);
+                  console.error('NOT IMPLEMENTED');
+                }}
+                disabled={props.data.allowMessages === false}
+              >
+                Message
+              </ButtonTertiary>
+            )}
+          </FlexDiv>
+        )}
       </FlexDiv>
       <AddressSectionWrapper leftContentWidthPx={totalPhotoSectionWidth}>
         <FlexDiv style={{ height: `${profilePhotoHeight}px` }}>
@@ -184,7 +189,7 @@ export const ProfileHeader = (props: {
           </FlexDiv>
           <FlexDiv style={{ width: '100%' }}>
             <AddressTextWrapper>
-              {shortenString(props.data.address, 32)}
+              {shortenString(props.data.address, width < 768 ? 12 : 28)}
             </AddressTextWrapper>
             <Spacer size={spacing.spacing_xxxs} vertical={false} />
             <CenteredDivVertical>
