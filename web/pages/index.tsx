@@ -9,7 +9,6 @@ import {
 import { Introduction } from '@components/Home/Introduction';
 import Image from 'next/image';
 import beastImage from '@public/token-swap-beast.png';
-import { Alert } from '@components/Common/Alert';
 import styled from 'styled-components';
 import NoSsr from '@components/Common/NoSsr';
 import { Spacer } from '@components/Common/Spacer';
@@ -39,10 +38,6 @@ export default function Home(): JSX.Element {
     <Div>
       <FlexDiv style={{ justifyContent: 'space-evenly' }}>
         <CenteredDiv>
-          <Alert type="warning">
-            This is a beta version of single-tx-swap. Please only use tokens
-            that don't have value for testing.
-          </Alert>
           <ColumnContainer>
             <Introduction />
             <NoSsr>
