@@ -37,7 +37,7 @@ export default function App({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <main className={chakraPetch.className}>
       <ThemeProvider theme={themes[selectedThemeName]}>
-        <Nav />
+        <Nav mobileIfLessThan={900} />
         <MainSectionDiv>
           <Component {...pageProps} />
         </MainSectionDiv>
