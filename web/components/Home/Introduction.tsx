@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 
 const IntroductionContainer = styled.div`
   width: 550px;
+  margin-top: ${`${spacing.spacing_xl}px`};
 `;
 
 const startTradingSession = async (wallet: Wallet): Promise<string> => {
