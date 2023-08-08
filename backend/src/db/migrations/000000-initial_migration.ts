@@ -1,4 +1,4 @@
-import { QueryInterface, DataTypes, QueryTypes } from 'sequelize';
+import { QueryInterface } from 'sequelize';
 
 module.exports = {
   up: (queryInterface: QueryInterface): Promise<void> => queryInterface.sequelize.transaction(
