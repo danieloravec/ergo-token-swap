@@ -8,4 +8,15 @@ const sequelizeConnection = new Sequelize(config.dbName, config.dbUser, config.d
     logging: false,
 });
 
+// This is needed for Sequelize migrations. Each environment needs to be exported. The `development` one is default.
+export const development = {
+    username: config.dbUser,
+    password: config.dbPassword,
+    database: config.dbName,
+    host: config.dbHost,
+    port: Number(config.dbPort), // We can trust the environment
+    dialect: 'postgres' as Dialect,
+    logging: false,
+}
+
 export default sequelizeConnection;
