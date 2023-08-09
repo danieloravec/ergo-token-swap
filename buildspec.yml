@@ -8,10 +8,11 @@ phases:
       - npm install -g typescript
       - npm install -g ts-node
       - npm install -g tsconfig-paths
+      - npm install -g sequelize-cli
       - cd backend && npm install && cd ..
   build:
     commands:
-      - cd backend && npm run build && cd ..
+      - cd backend && npm run build && npx sequelize-cli db:migrate && cd ..
 artifacts:
   files:
     - package.json
