@@ -43,10 +43,18 @@ export const assetIconMap: Record<string, string> = {
   '59ee24951ce668f0ed32bdb2e2e5731b6c36128748a3b23c28407c5f8ccbf0f6':
     'walrus.png',
   '3405d8f709a19479839597f9a22a7553bdfc1a590a427572787d7c44a88b6386':
-    'love.svg',
+    'love.png',
   '4c8ac00a28b198219042af9c03937eecb422b34490d55537366dc9245e85d4e1':
     'woodennickels.svg',
   fcfca7654fb0da57ecf9a3f489bcbeb1d43b56dce7e73b352f7bc6f2561d2a1b:
     'ergone.svg',
   '9a06d9e545a41fd51eeffc5e20d818073bf820c635e2a9d922269913e0de369d': 'spf.svg',
+  '01dce8a5632d19799950ff90bca3b5d0ca3ebfa8aaafd06f0cc6dd1e97150e7f':
+    'cypx.png',
+  '01ddcc3d0205c2da8a067ffe047a2ccfc3e8241bc3fcc6f6ebc96b7f7363bb36':
+    'proxie.png',
+  '089990451bb430f05a85f4ef3bcb6ebf852b3d6ee68d86d78658b9ccef20074f':
+    'quacks.svg',
+  '2a51396e09ad9eca60b1bdafd365416beae155efce64fc3deb0d1b3580127b8f':
+    'obsidian.png',
 };
