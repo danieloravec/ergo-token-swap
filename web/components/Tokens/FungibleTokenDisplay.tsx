@@ -34,6 +34,11 @@ export const FungibleTokenDisplay = (props: {
   initialValue: bigint;
   onChange: (newAmount: bigint) => void;
 }): JSX.Element => {
+  const isVerified = assetIconMap[props.fungibleToken.tokenId] !== undefined;
+  const name = `${isVerified ? '✅' : '🚨'} ${
+    props.fungibleToken.name ?? '???'
+  }`;
+
   const [displayAmt, setDisplayAmt] = useState(
     String(
       Number(props.initialValue) / Math.pow(10, props.fungibleToken.decimals)
@@ -59,9 +64,7 @@ export const FungibleTokenDisplay = (props: {
         <Div>
           <FungibleTokenImage fungibleToken={props.fungibleToken} />
         </Div>
-        <Text style={{ maxWidth: 80, overflowWrap: 'break-word' }}>
-          {props.fungibleToken.name ?? '???'}
-        </Text>
+        <Text style={{ maxWidth: 80, overflowWrap: 'break-word' }}>{name}</Text>
       </FungibleImageAndNameContainer>
       <Div>
         <TextNavs>

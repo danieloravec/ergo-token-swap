@@ -53,6 +53,11 @@ const VerificationLoading = (): JSX.Element => {
   );
 };
 
+interface SkyHarborCollection {
+  name: string;
+  mint_addresses: Array<{ address: string }>;
+}
+
 export const NftDisplay = (props: {
   nft: Nft;
   isSelected: boolean;
@@ -105,6 +110,39 @@ export const NftDisplay = (props: {
       return;
     }
 
+    const getCollectionFromSkyHarbor = async (): Promise<boolean> => {
+      const skyHarborResponse = await fetch(
+        `${config.skyHarborApiUrl}/rest/verified/address/${mintAddress}`,
+        {
+          method: 'GET',
+        }
+      );
+      const collections = (await skyHarborResponse.json())?.collections;
+      if (collections === undefined || collections.length === 0) {
+        return false;
+      }
+      const collectionNamesWithScore: Array<{ name: string; score: number }> =
+        collections.map((c: SkyHarborCollection) => {
+          let score = 0;
+          for (let prefixLen = 0; prefixLen < c.name.length; prefixLen++) {
+            if (props.nft.name.includes(c.name.slice(0, prefixLen))) {
+              score++;
+            }
+          }
+          return { name: c.name, score };
+        });
+      const bestMatchCollectionName = collectionNamesWithScore.sort(
+        (
+          a: { name: string; score: number },
+          b: { name: string; score: number }
+        ) => b.score - a.score
+      )[0].name;
+      setCollectionName(bestMatchCollectionName);
+      setCollectionNameLoaded(true);
+      return true;
+    };
+
+    // Fallback in case SkyHarbor does not return anything valid
     const fetchVerifiedMintAddress = async (): Promise<void> => {
       const collectionByMintAddressResponse = await backendRequest(
         `/collection/byMintingAddresses?mintingAddresses=${JSON.stringify([
@@ -128,7 +166,14 @@ export const NftDisplay = (props: {
       }
       setCollectionNameLoaded(true);
     };
-    fetchVerifiedMintAddress().catch(console.error);
+
+    getCollectionFromSkyHarbor()
+      .then((isVerified: boolean) => {
+        if (!isVerified) {
+          fetchVerifiedMintAddress().catch(console.error);
+        }
+      })
+      .catch(console.error);
   }, [props.nft, mintAddress]);
 
   useEffect(() => {
