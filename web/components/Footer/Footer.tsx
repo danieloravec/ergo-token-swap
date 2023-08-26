@@ -83,7 +83,7 @@ export const Footer = (): JSX.Element => {
 
           <FlexDiv style={{ width: '30%' }}>
             <FooterText>
-              <FooterHeading>Partners</FooterHeading>
+              <FooterHeading>Credits</FooterHeading>
             </FooterText>
             <FooterText>
               <SkyHarbor />

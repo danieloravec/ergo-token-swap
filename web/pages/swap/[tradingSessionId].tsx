@@ -7,7 +7,7 @@ import { backendRequest } from '@utils/utils';
 import { WaitingPhaseGuest } from '@components/Swap/WaitingPhaseGuest';
 import { SwappingPhaseHost } from '@components/Swap/SwappingPhaseHost';
 import { type ParticipantInfo } from '@components/Swap/types';
-import { Div } from '@components/Common/Alignment';
+import { Div, FlexDiv } from '@components/Common/Alignment';
 import { LoadingPage } from '@components/Common/LoadingPage';
 
 export default function Swap(): JSX.Element {
@@ -116,7 +116,7 @@ export default function Swap(): JSX.Element {
   }
 
   return (
-    <Div>
+    <FlexDiv>
       {address === hostInfo?.address && (
         <WaitingPhaseHost guestIsReady={guestInfo !== undefined} />
       )}
@@ -126,6 +126,6 @@ export default function Swap(): JSX.Element {
           tradingSessionId={tradingSessionId}
         />
       )}
-    </Div>
+    </FlexDiv>
   );
 }
