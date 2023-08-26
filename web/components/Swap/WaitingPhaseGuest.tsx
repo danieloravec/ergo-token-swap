@@ -14,7 +14,7 @@ import { type FungibleToken, type Nft } from '@components/Swap/types';
 import { ConfirmTxScreen } from '@components/Swap/ConfirmTxScreen';
 import WaitingScreen from '@components/Swap/WaitingScreen';
 
-const WaitingPhaseHostContainer = styled.div`
+const WaitingPhaseGuestContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   min-height: 80vh;
@@ -169,7 +169,7 @@ export function WaitingPhaseGuest(props: {
   }
 
   return (
-    <WaitingPhaseHostContainer>
+    <WaitingPhaseGuestContainer>
       {unsignedTx?.id !== undefined &&
       ownAddress !== undefined &&
       nftsForA !== undefined &&
@@ -194,6 +194,6 @@ export function WaitingPhaseGuest(props: {
       ) : (
         <WaitingScreen tradingSessionId={props.tradingSessionId} />
       )}
-    </WaitingPhaseHostContainer>
+    </WaitingPhaseGuestContainer>
   );
 }

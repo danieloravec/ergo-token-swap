@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { spacing } from '@themes/spacing';
 
 export const CenteredDivHorizontal = styled.div`
   display: flex;
@@ -46,6 +47,7 @@ export const MainSectionDiv = styled.div`
   flex-direction: column;
   align-content: center;
   background: ${(props) => props.theme.properties.colorBg};
+  padding-bottom: ${() => `${spacing.spacing_xxxl}px`};
 `;
 
 export const Div = styled.div``;

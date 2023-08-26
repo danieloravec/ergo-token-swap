@@ -33,11 +33,17 @@ const UnverifiedWarning = (): JSX.Element => {
   );
 };
 
-const CollectionName = (props: { name: string }): JSX.Element => {
+const CollectionName = (props: {
+  name: string;
+  verifiedBy: string;
+}): JSX.Element => {
   const theme = useTheme();
 
   return (
-    <StrongBg style={{ color: theme.properties.colorPrimary }}>
+    <StrongBg
+      title={`Verified by ${props.verifiedBy}`}
+      style={{ color: theme.properties.colorPrimary }}
+    >
       {props.name}
     </StrongBg>
   );
@@ -77,6 +83,9 @@ export const NftDisplay = (props: {
     undefined
   );
   const [collectionNameLoaded, setCollectionNameLoaded] = useState(false);
+  const [verificationType, setVerificationType] = useState<
+    'SkyHarbor.io' | 'single-tx-swap.com' | 'nobody'
+  >('nobody');
 
   useEffect(() => {
     if (imageUrl === undefined) {
@@ -138,6 +147,7 @@ export const NftDisplay = (props: {
         ) => b.score - a.score
       )[0].name;
       setCollectionName(bestMatchCollectionName);
+      setVerificationType('SkyHarbor.io');
       setCollectionNameLoaded(true);
       return true;
     };
@@ -163,6 +173,7 @@ export const NftDisplay = (props: {
         ]?.name;
       if (collectionName !== undefined) {
         setCollectionName(collectionName);
+        setVerificationType('single-tx-swap.com');
       }
       setCollectionNameLoaded(true);
     };
@@ -253,7 +264,10 @@ export const NftDisplay = (props: {
               collectionName === undefined ? (
                 <UnverifiedWarning />
               ) : (
-                <CollectionName name={`${collectionName} ✅`} />
+                <CollectionName
+                  name={`${collectionName} ✅`}
+                  verifiedBy={verificationType}
+                />
               )
             ) : (
               <VerificationLoading />

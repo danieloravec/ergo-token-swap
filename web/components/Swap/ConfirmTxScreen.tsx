@@ -184,6 +184,13 @@ export const ConfirmTxScreen = (props: {
   onAgree: () => void;
   tradingSessionId: string;
 }): JSX.Element => {
+  const [isWaiting, setIsWaiting] = useState(false);
+
+  const handleSwap = (): void => {
+    setIsWaiting(true);
+    props.onAgree();
+  };
+
   return (
     <CenteredDivHorizontal>
       <FlexDivRow>
@@ -206,7 +213,9 @@ export const ConfirmTxScreen = (props: {
         <CenteredDivVertical
           style={{ width: '10%', padding: `${spacing.spacing_xs}px` }}
         >
-          <ButtonFitting onClick={props.onAgree}>Swap</ButtonFitting>
+          <ButtonFitting disabled={isWaiting} onClick={handleSwap}>
+            {isWaiting ? 'Waiting...' : 'Swap'}
+          </ButtonFitting>
         </CenteredDivVertical>
 
         <CenteredDivVertical style={{ width: '40%' }}>
