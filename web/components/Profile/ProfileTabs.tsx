@@ -25,7 +25,7 @@ type Tabs = 'NFT' | 'Fungible' | 'History' | 'Statistics' | 'Follows';
 const ProfileTabsWrapper = styled(FlexDiv)`
   width: 100%;
   border-bottom: ${(props) => {
-    return `1px solid ${props.theme.properties.colorExtras}`;
+    return `1px solid ${props.theme.properties.colorBgText}`;
   }};
 `;
 

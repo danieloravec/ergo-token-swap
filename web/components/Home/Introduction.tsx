@@ -51,7 +51,9 @@ export function Introduction(): JSX.Element {
       <Heading1>
         Swap Ergo assets{' '}
         <span style={{ color: theme.properties.colorSecondary }}>securely</span>{' '}
-        with people you just met!
+        with people you{' '}
+        <span style={{ color: theme.properties.colorSecondary }}>just</span>{' '}
+        met!
       </Heading1>
       <FlexDiv>
         <Spacer size={spacing.spacing_xs} vertical />

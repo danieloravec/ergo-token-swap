@@ -50,7 +50,7 @@ const FooterText = (props: { children: ReactNode }): JSX.Element => {
 };
 
 const FooterHeading = styled(Heading2)`
-  color: ${(props) => props.theme.properties.colorNavsText};
+  color: ${(props) => props.theme.properties.colorPrimary};
 `;
 
 export const Footer = (): JSX.Element => {

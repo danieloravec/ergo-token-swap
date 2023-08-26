@@ -8,8 +8,8 @@ export function ErgoLogo(props: { color?: string }): JSX.Element {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M49.3144 66.1913H69.6992V75.6648H35.6177V67.0555L49.0289 52.209L35.6828 38.2994V29.665H69.6992V39.136H49.7478L62.1194 52.0913L49.3144 66.1913Z"
         fill="white"
       />
