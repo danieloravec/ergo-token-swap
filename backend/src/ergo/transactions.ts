@@ -1,35 +1,44 @@
 import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
-import { type Wallet } from '@ergo/wallet';
 import { config } from '@config';
-import { type EIP12UnsignedTransaction } from '@fleet-sdk/common';
+import {type EIP12UnsignedTransaction, SignedInput} from '@fleet-sdk/common';
 import * as utils from '@ergo/utils';
 import { Loader } from '@ergo/loader';
+import {explorerRequest} from "@utils";
+import JSONBig from "json-bigint";
 
 interface BuildMultisigSwapTxParams {
-  wallet: Wallet;
   addressA: string;
   assetsToReceiveByAFromB: Record<string, bigint>;
   nanoErgToReceiveByAFromB: bigint;
   addressB: string;
   assetsToReceiveByBFromA: Record<string, bigint>;
   nanoErgToReceiveByBFromA: bigint;
+  addRewards: boolean;
 }
 
 export async function buildUnsignedMultisigSwapTx({
-  wallet,
   addressA,
   assetsToReceiveByAFromB,
   nanoErgToReceiveByAFromB,
   addressB,
   assetsToReceiveByBFromA,
   nanoErgToReceiveByBFromA,
+  addRewards = false
 }: BuildMultisigSwapTxParams): Promise<{
   unsignedTx: EIP12UnsignedTransaction;
   inputIndicesA: number[];
   inputIndicesB: number[];
+  inputIndicesRewards: number[];
+  signedRewardsInputs: SignedInput[];
 }> {
   await Loader.load();
-  const creationHeight = await wallet.getCurrentHeight();
+  const creationHeight = (await explorerRequest('/info', 1))?.height;
+  if (!creationHeight) {
+    throw new Error('Could not get current height');
+  }
+
+  const rewardInputs = addRewards ? await utils.getRewardBoxes(2) : [];
+
   const inputsA = await utils.getInputs(addressA);
   const inputsB = await utils.getInputs(addressB);
 
@@ -52,19 +61,21 @@ export async function buildUnsignedMultisigSwapTx({
   const totalAssetsToReceiveByA = utils.mergeAssets([
     assetsToReceiveByAFromB,
     changeAssetsToA,
+    addRewards ? utils.getAssetsFromBox(rewardInputs[0]) : {}
   ]);
   const totalAssetsToReceiveByB = utils.mergeAssets([
     assetsToReceiveByBFromA,
     changeAssetsToB,
+    addRewards ? utils.getAssetsFromBox(rewardInputs[1]) : {}
   ]);
 
   const outputs = [
     new OutputBuilder(
       allNanoErgA +
-        nanoErgToReceiveByAFromB -
-        nanoErgToReceiveByBFromA -
-        config.serviceFeeNanoErg +
-        config.minNanoErgValue,
+      nanoErgToReceiveByAFromB -
+      nanoErgToReceiveByBFromA -
+      config.serviceFeeNanoErg +
+      config.minNanoErgValue,
       addressA
     ).addTokens([
       ...Object.keys(totalAssetsToReceiveByA).map((tokenId) => ({
@@ -74,10 +85,10 @@ export async function buildUnsignedMultisigSwapTx({
     ]),
     new OutputBuilder(
       allNanoErgB +
-        nanoErgToReceiveByBFromA -
-        nanoErgToReceiveByAFromB -
-        config.serviceFeeNanoErg +
-        config.minNanoErgValue,
+      nanoErgToReceiveByBFromA -
+      nanoErgToReceiveByAFromB -
+      config.serviceFeeNanoErg +
+      config.minNanoErgValue,
       addressB
     ).addTokens([
       ...Object.keys(totalAssetsToReceiveByB).map((tokenId) => ({
@@ -87,12 +98,36 @@ export async function buildUnsignedMultisigSwapTx({
     ]),
   ];
 
-  const unsignedTx = new TransactionBuilder(creationHeight)
-    .from([...inputsA, ...inputsB])
+  const unsignedTxBuilt = new TransactionBuilder(creationHeight)
+    .from([...inputsA, ...inputsB, ...rewardInputs])
     .to(outputs)
     .sendChangeTo(config.serviceFeeAddress) // Only 2 * config.serviceFeeNanoErg will be in change
     .payMinFee()
-    .build('EIP-12');
+    .build();
+  const unsignedTx = unsignedTxBuilt.toEIP12Object();
+
+  let inputIndicesRewards = [] as number[];
+  let signedRewardsInputs = [] as SignedInput[];
+  if (addRewards) {
+    const rewardsWallet = Loader.Ergo.Wallet.from_mnemonic(config.rewardsWalletMnemonic, config.rewardsWalletPassword);
+    inputIndicesRewards = unsignedTx.inputs.map((input, idx) => {
+      return input.ergoTree === rewardInputs[0].ergoTree ? idx : -1;
+    }).filter((idx) => idx !== -1);
+    const headers = (await explorerRequest(`/api/v1/blocks/headers?limit=10`, 1))?.items;
+    const blockHeaders = Loader.Ergo.BlockHeaders.from_json(headers);
+    const preHeader = Loader.Ergo.PreHeader.from_block_header(blockHeaders.get(0));
+    const signContext = new Loader.Ergo.ErgoStateContext(preHeader, blockHeaders);
+    const unspentBoxes = Loader.Ergo.ErgoBoxes.from_boxes_json(unsignedTx.inputs);
+    const dataInputBoxes = Loader.Ergo.ErgoBoxes.from_boxes_json(unsignedTx.dataInputs);
+    const unsignedTxWasm = Loader.Ergo.UnsignedTransaction.from_json(JSONBig.stringify(unsignedTx));
+    signedRewardsInputs = await Promise.all(inputIndicesRewards.map(async (rewardInputIdx) => {
+      const signedInputWasm = await rewardsWallet.sign_tx_input(rewardInputIdx, signContext, unsignedTxWasm, unspentBoxes, dataInputBoxes);
+      return {
+        boxId: signedInputWasm.box_id().to_str(),
+        spendingProof: JSON.parse(signedInputWasm.spending_proof().to_json())
+      } as SignedInput;
+    }));
+  }
 
   // Calculate txId from unsignedTx
   const txId = Loader.Ergo.UnsignedTransaction.from_json(
@@ -121,8 +156,6 @@ export async function buildUnsignedMultisigSwapTx({
       inputIndicesA.push(index);
     } else if (input.ergoTree === inputsB[0].ergoTree) {
       inputIndicesB.push(index);
-    } else {
-      throw new Error('Unexpected input');
     }
   });
 
@@ -133,5 +166,7 @@ export async function buildUnsignedMultisigSwapTx({
     },
     inputIndicesA,
     inputIndicesB,
+    inputIndicesRewards,
+    signedRewardsInputs
   };
 }

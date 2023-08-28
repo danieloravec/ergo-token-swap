@@ -1,6 +1,9 @@
 import { type NonMandatoryRegisters } from '@fleet-sdk/common';
 import { config } from '@config';
-import { type Amount, type Box } from '@fleet-sdk/core';
+import {type Amount, type Box, TokenAmount} from '@fleet-sdk/core';
+import sequelizeConnection from "@db/config";
+import {QueryTypes} from "sequelize";
+import Reward from "@db/models/rewards";
 
 export interface AdditionalRegisterObjectRepr {
   serializedValue: string;
@@ -34,7 +37,7 @@ export async function explorerRequest(
   if (!endpoint.startsWith('/')) {
     endpoint = `/${endpoint}`;
   }
-  const res = await fetch(`${config.explorerApiUrl}/v${apiVersion}${endpoint}`);
+  const res = await fetch(`${config.blockchainApiUrl}/v${apiVersion}${endpoint}`);
   return await res.json();
 }
 
@@ -62,6 +65,31 @@ export const getInputs = async (
     };
   });
 };
+
+export const getRewardBoxes = async (amount: number): Promise<Array<Box<Amount>>> => {
+  // TODO get random available token IDs from DB and get boxes for them (each reward NFT will be in a separate box)
+  const rewards = await Reward.findAll({
+    where: {
+      available: true,
+    },
+    order: [['tokenId', 'DESC']],
+    limit: amount,
+    raw: true
+  });
+  console.log(`\n\nrewards: ${JSON.stringify(rewards)}\n\n`);
+  const tokenIds = rewards.map((reward) => reward.tokenId);
+  return await Promise.all(tokenIds.map(async (tokenId) => {
+    return (await explorerRequest(`/boxes/unspent/byTokenId/${tokenId}`, 1)) as Box<Amount>;
+  }));
+};
+
+export const getAssetsFromBox = (box: Box<Amount>): Record<string, bigint> => {
+  const result: Record<string, bigint> = {};
+  box.assets.forEach((asset: TokenAmount<Amount>) => {
+    result[asset.tokenId] = BigInt(asset.amount);
+  });
+  return result;
+}
 
 export const aggregateTokensInfo = (
   inputs: Array<Box<Amount>>
@@ -118,9 +146,7 @@ export const mergeAssetsSimple = (
   return result;
 };
 
-export const mergeAssets = (
-  assetsToMerge: Array<Record<string, bigint>>
-): Record<string, bigint> => {
+export const mergeAssets = (assetsToMerge: Array<Record<string, bigint>>): Record<string, bigint> => {
   if (assetsToMerge.length === 0) {
     return {};
   }
@@ -129,4 +155,4 @@ export const mergeAssets = (
     result = mergeAssetsSimple(result, assetsToMerge[i]);
   }
   return result;
-};
+}

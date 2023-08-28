@@ -25,14 +25,12 @@ interface TradingSessionAttributes {
     fungibleTokensForB?: types.FungibleToken[];
     nanoErgForA?: bigint;
     nanoErgForB?: bigint;
+    signedRewardsInputs?: SignedInput[];
     txId?: string;
     submittedAt?: Date;
 }
 
 export interface TradingSessionInput extends Optional<TradingSessionAttributes, 'id'> {
-}
-
-export interface TradingSessionOuput extends Required<TradingSessionAttributes> {
 }
 
 class TradingSession extends Model<TradingSessionAttributes, TradingSessionInput> implements TradingSessionAttributes {
@@ -57,6 +55,7 @@ class TradingSession extends Model<TradingSessionAttributes, TradingSessionInput
     fungibleTokensForB?: types.FungibleToken[];
     nanoErgForA?: bigint;
     nanoErgForB?: bigint;
+    signedRewardsInputs?: SignedInput[];
     public readonly createdAt!: Date;
 }
 
@@ -132,7 +131,10 @@ TradingSession.init({
     },
     nanoErgForB: {
         type: DataTypes.BIGINT
-    }
+    },
+    signedRewardsInputs: {
+        type: DataTypes.JSONB,
+    },
 }, {
     timestamps: true,
     underscored: true,

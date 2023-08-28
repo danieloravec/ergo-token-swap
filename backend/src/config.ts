@@ -17,6 +17,11 @@ interface ConfigType {
     jwtLifespanMs: number;
     network: Network;
     adminSecret: string;
+    serviceFeeAddress: string;
+    serviceFeeNanoErg: bigint;
+    minNanoErgValue: bigint;
+    rewardsWalletMnemonic: string;
+    rewardsWalletPassword: string;
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
@@ -31,4 +36,9 @@ export const config: ConfigType = {
     jwtLifespanMs: Number(process.env.JWT_LIFESPAN_MS as string),
     network: process.env.NETWORK === "MAINNET" ? Network.Mainnet : Network.Testnet,
     adminSecret: process.env.ADMIN_SECRET as string,
+    serviceFeeAddress: process.env.SERVICE_FEE_ADDRESS as string,
+    serviceFeeNanoErg: BigInt(process.env.SERVICE_FEE_NANO_ERG as string),
+    minNanoErgValue: BigInt(process.env.MIN_NANO_ERG_VALUE as string),
+    rewardsWalletMnemonic: process.env.REWARDS_WALLET_MNEMONIC as string,
+    rewardsWalletPassword: process.env.REWARDS_WALLET_PASSWORD as string,
 };
