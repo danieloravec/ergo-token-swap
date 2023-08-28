@@ -25,6 +25,7 @@ interface TradingSessionAttributes {
     fungibleTokensForB?: types.FungibleToken[];
     nanoErgForA?: bigint;
     nanoErgForB?: bigint;
+    inputIndicesRewards?: number[];
     signedRewardsInputs?: SignedInput[];
     txId?: string;
     submittedAt?: Date;
@@ -55,6 +56,7 @@ class TradingSession extends Model<TradingSessionAttributes, TradingSessionInput
     fungibleTokensForB?: types.FungibleToken[];
     nanoErgForA?: bigint;
     nanoErgForB?: bigint;
+    inputIndicesRewards?: number[];
     signedRewardsInputs?: SignedInput[];
     public readonly createdAt!: Date;
 }
@@ -131,6 +133,9 @@ TradingSession.init({
     },
     nanoErgForB: {
         type: DataTypes.BIGINT
+    },
+    inputIndicesRewards: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
     signedRewardsInputs: {
         type: DataTypes.JSONB,

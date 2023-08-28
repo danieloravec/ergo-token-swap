@@ -22,6 +22,7 @@ interface ConfigType {
     minNanoErgValue: bigint;
     rewardsWalletMnemonic: string;
     rewardsWalletPassword: string;
+    rewardsCampaignEnabled: boolean;
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
@@ -41,4 +42,5 @@ export const config: ConfigType = {
     minNanoErgValue: BigInt(process.env.MIN_NANO_ERG_VALUE as string),
     rewardsWalletMnemonic: process.env.REWARDS_WALLET_MNEMONIC as string,
     rewardsWalletPassword: process.env.REWARDS_WALLET_PASSWORD as string,
+    rewardsCampaignEnabled: (process.env.REWARDS_CAMPAIGN_ENABLED as string) === 'true',
 };

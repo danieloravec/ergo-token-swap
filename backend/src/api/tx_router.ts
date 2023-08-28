@@ -1,11 +1,69 @@
 import Router from 'express';
 import * as utils from "@utils";
 import * as types from "@types";
-import {EIP12UnsignedTransaction, SignedInput} from "@fleet-sdk/common";
+import {SignedInput} from "@fleet-sdk/common";
 import TradingSession from "@db/models/trading_session";
+import {buildUnsignedMultisigSwapTx} from "@ergo/transactions";
+import {config} from "@config";
 
 const txRouter = Router();
 
+
+// Build an unsigned transaction with possibly signed reward inputs
+txRouter.post('/', async (req, res) => {
+  const body: {
+    secret: string;
+    assetsToReceiveByAFromB: Record<string, bigint>;
+    assetsToReceiveByBFromA: Record<string, bigint>;
+    nanoErgToReceiveByAFromB: bigint;
+    nanoErgToReceiveByBFromA: bigint;
+  } = req.body;
+
+  const {status, result} = await utils.getSessionByQuery(req);
+  const tradingSession = status === 200 ? result as TradingSession : undefined;
+  if (tradingSession === undefined) {
+    res.status(status);
+    res.send({message: result as string});
+    return;
+  }
+
+  const {
+    unsignedTx,
+    inputIndicesA,
+    inputIndicesB,
+    inputIndicesRewards,
+    signedRewardsInputs
+  } = await buildUnsignedMultisigSwapTx({
+    addressA: tradingSession.hostAddr,
+    assetsToReceiveByAFromB: body.assetsToReceiveByAFromB,
+    nanoErgToReceiveByAFromB: body.nanoErgToReceiveByAFromB,
+    addressB: tradingSession.guestAddr,
+    assetsToReceiveByBFromA: body.assetsToReceiveByBFromA,
+    nanoErgToReceiveByBFromA: body.nanoErgToReceiveByBFromA,
+    addRewards: config.rewardsCampaignEnabled
+  });
+
+  const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
+    ...tradingSession,
+    unsignedTx,
+    unsignedTxAddedOn: new Date(),
+    txInputIndicesHost: inputIndicesA,
+    txInputIndicesGuest: inputIndicesB,
+    inputIndicesRewards,
+    signedRewardsInputs,
+  });
+  if (updateStatus !== 200) {
+    res.status(updateStatus);
+    res.send({message: updateMessage});
+    return;
+  }
+
+  res.status(200);
+  res.send({
+    unsignedTx,
+    inputIndicesA
+  });
+});
 
 txRouter.post('/partial/register', async (req, res) => {
   try {
@@ -18,10 +76,7 @@ txRouter.post('/partial/register', async (req, res) => {
     // }
     const body: {
       secret: string,
-      unsignedTx: EIP12UnsignedTransaction,
       signedInputsHost: SignedInput[],
-      inputIndicesHost: number[],
-      inputIndicesGuest: number[],
       nftsForA: types.Nft[],
       nftsForB: types.Nft[],
       fungibleTokensForA: types.FungibleToken[],
@@ -31,11 +86,7 @@ txRouter.post('/partial/register', async (req, res) => {
     } = req.body;
 
     const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
-      unsignedTx: body.unsignedTx,
-      unsignedTxAddedOn: new Date(),
       signedInputsHost: body.signedInputsHost,
-      txInputIndicesHost: body.inputIndicesHost,
-      txInputIndicesGuest: body.inputIndicesGuest,
       nftsForA: body.nftsForA,
       nftsForB: body.nftsForB,
       fungibleTokensForA: body.fungibleTokensForA,
@@ -45,15 +96,15 @@ txRouter.post('/partial/register', async (req, res) => {
     });
     if(updateStatus !== 200) {
       res.status(updateStatus);
-      res.send(updateMessage);
+      res.send({message: updateMessage});
       return;
     }
     res.status(200);
-    res.send({});
+    res.send({message: "OK"});
   } catch(err) {
     console.error(err.message);
     res.status(500);
-    res.send("Server-side error while registering the transaction");
+    res.send({message: "Server-side error while registering the transaction"});
   }
 });
 
@@ -64,7 +115,7 @@ txRouter.get('/partial', async (req, res) => {
     const {status, result} = await utils.getSessionByQuery(req);
     if(status !== 200) {
       res.status(status);
-      res.send(result);
+      res.send({message: result as string});
       return;
     }
     const session = result as TradingSession;
@@ -78,6 +129,7 @@ txRouter.get('/partial', async (req, res) => {
       inputIndicesGuest: session.txInputIndicesGuest,
       inputIndicesHost: session.txInputIndicesHost,
       signedInputsHost: session.signedInputsHost,
+      signedRewardsInputs: session.signedRewardsInputs, // TODO reflect this line on frontend
       nftsForA: session.nftsForA,
       nftsForB: session.nftsForB,
       fungibleTokensForA: session.fungibleTokensForA,
@@ -88,7 +140,7 @@ txRouter.get('/partial', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500);
-    res.send("Server-side error while getting info about the partial transaction");
+    res.send({message: "Server-side error while getting info about the partial transaction"});
   }
 });
 
@@ -98,7 +150,7 @@ txRouter.get('/', async (req, res) => {
     const {status, result} = await utils.getSessionByQuery(req);
     if(status !== 200) {
       res.status(status);
-      res.send(result);
+      res.send({message: result as string});
       return;
     }
     const session = result as TradingSession;
@@ -110,7 +162,7 @@ txRouter.get('/', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500);
-    res.send("Server-side error while getting info about the partial transaction");
+    res.send({message: "Server-side error while getting info about the partial transaction"});
   }
 });
 
@@ -119,7 +171,7 @@ txRouter.post('/register', async (req, res) => {
     const bodyIsValid = await utils.validateObject(req.body, types.TxRegisterBodySchema);
     if(!bodyIsValid) {
       res.status(400);
-      res.send('Invalid body');
+      res.send({message: 'Invalid body'});
       return;
     }
     const body: {secret: string, txId: string} = req.body;
@@ -142,7 +194,7 @@ txRouter.post('/register', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500);
-    res.send("Server-side error while registering the transaction");
+    res.send({message: "Server-side error while registering the transaction"});
   }
 });
 
