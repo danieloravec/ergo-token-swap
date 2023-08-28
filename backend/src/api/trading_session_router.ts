@@ -26,9 +26,9 @@ tradingSessionRouter.post('/create', async (req, res) => {
     try {
       await TradingSession.create({
         secret,
-        hostAddr: body!.hostAddr,
-        hostAssetsJson: assets,
-        hostNanoErg: nanoErg,
+        host_addr: body!.hostAddr,
+        host_assets_json: assets,
+        host_nano_erg: nanoErg,
       });
     } catch (e) {
       console.error(e.message);
@@ -88,21 +88,21 @@ tradingSessionRouter.get('/info', async (req, res) => {
       return;
     }
     const session = result as TradingSession;
-    const {nfts: hostNfts, fungibleTokens: hostFungibleTokens} = utils.splitAssets(session.hostAssetsJson);
-    const {nfts: guestNfts, fungibleTokens: guestFungibleTokens} = utils.splitAssets(session.guestAssetsJson);
+    const {nfts: hostNfts, fungibleTokens: hostFungibleTokens} = utils.splitAssets(session.host_assets_json);
+    const {nfts: guestNfts, fungibleTokens: guestFungibleTokens} = utils.splitAssets(session.guest_assets_json);
     res.status(200);
     res.send({
       host: {
-        address: session.hostAddr,
+        address: session.host_addr,
         nfts: hostNfts,
         fungibleTokens: hostFungibleTokens,
-        nanoErg: session.hostNanoErg,
+        nanoErg: session.host_nano_erg,
       },
-      guest: session.guestAddr === null ? undefined : {
-        address: session.guestAddr,
+      guest: session.guest_addr === null ? undefined : {
+        address: session.guest_addr,
         nfts: guestNfts,
         fungibleTokens: guestFungibleTokens,
-        nanoErg: session.guestNanoErg ?? undefined,
+        nanoErg: session.guest_nano_erg ?? undefined,
       },
     });
   } catch (err) {

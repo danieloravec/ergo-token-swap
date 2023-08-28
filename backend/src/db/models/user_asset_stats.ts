@@ -2,34 +2,34 @@ import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
 interface UserAssetStatsAttributes {
-  userAddress: string;
-  tokenId: string;
-  amountBought: bigint;
-  amountSold: bigint;
+  user_address: string;
+  token_id: string;
+  amount_bought: bigint;
+  amount_sold: bigint;
 }
 
 class UserAssetStats extends Model<UserAssetStatsAttributes> implements UserAssetStatsAttributes {
-  userAddress: string;
-  tokenId: string;
-  amountBought: bigint;
-  amountSold: bigint;
+  user_address: string;
+  token_id: string;
+  amount_bought: bigint;
+  amount_sold: bigint;
 }
 
 UserAssetStats.init({
-  userAddress: {
+  user_address: {
     type: DataTypes.STRING(51),
     allowNull: false,
   },
-  tokenId: {
+  token_id: {
     type: DataTypes.STRING(64),
     allowNull: false,
   },
-  amountBought: {
+  amount_bought: {
     type: DataTypes.BIGINT,
     allowNull: false,
     defaultValue: BigInt(0),
   },
-  amountSold: {
+  amount_sold: {
     type: DataTypes.BIGINT,
     allowNull: false,
     defaultValue: BigInt(0),

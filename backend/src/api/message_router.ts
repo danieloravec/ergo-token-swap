@@ -29,16 +29,16 @@ messageRouter.get('/', async (req, res) => {
     }
     const receivedMessages = await Message.findAll({
       where: {
-        toAddress: req.query.address,
-        receiverArchived: false
+        to_address: req.query.address,
+        receiver_archived: false
       },
       order: [['createdAt', 'DESC']],
       raw: true
     });
     const sentMessages = await Message.findAll({
       where: {
-        fromAddress: req.query.address,
-        senderArchived: false,
+        from_address: req.query.address,
+        sender_archived: false,
       },
       order: [['createdAt', 'DESC']],
       raw: true
@@ -87,8 +87,8 @@ messageRouter.post('/', async (req, res) => {
     }
     try {
       await Message.create({
-        fromAddress: body.fromAddress,
-        toAddress: body.toAddress,
+        from_address: body.fromAddress,
+        to_address: body.toAddress,
         subject: body.subject,
         text: body.text,
       });
@@ -127,7 +127,7 @@ messageRouter.delete('/', async (req, res) => {
     }
 
     const jwt = req.header("Authorization");
-    if(jwt === undefined || !utils.verifyJwt(message.toAddress, jwt)) {
+    if(jwt === undefined || !utils.verifyJwt(message.to_address, jwt)) {
       res.status(401);
       res.send("Unauthorized");
       return;
@@ -161,8 +161,8 @@ messageRouter.put('/archive', async (req, res) => {
     }
 
     const jwt = req.header("Authorization");
-    const senderIsAuthorized = jwt !== undefined && utils.verifyJwt(message.fromAddress, jwt);
-    const receiverIsAuthorized = jwt !== undefined && utils.verifyJwt(message.toAddress, jwt);
+    const senderIsAuthorized = jwt !== undefined && utils.verifyJwt(message.from_address, jwt);
+    const receiverIsAuthorized = jwt !== undefined && utils.verifyJwt(message.to_address, jwt);
     if(!senderIsAuthorized && !receiverIsAuthorized) {
       res.status(401);
       res.send("Unauthorized");
@@ -170,9 +170,9 @@ messageRouter.put('/archive', async (req, res) => {
     }
 
     if (senderIsAuthorized) {
-      await Message.update({senderArchived: true}, {where: {id: messageId}});
+      await Message.update({sender_archived: true}, {where: {id: messageId}});
     } else {
-      await Message.update({receiverArchived: true}, {where: {id: messageId}});
+      await Message.update({receiver_archived: true}, {where: {id: messageId}});
     }
 
     res.status(200);
@@ -202,7 +202,7 @@ messageRouter.put('/seen', async (req, res) => {
     }
 
     const jwt = req.header("Authorization");
-    if(jwt === undefined || !utils.verifyJwt(message.toAddress, jwt)) {
+    if(jwt === undefined || !utils.verifyJwt(message.to_address, jwt)) {
       res.status(401);
       res.send("Unauthorized");
       return;

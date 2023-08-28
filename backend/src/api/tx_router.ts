@@ -34,10 +34,10 @@ txRouter.post('/', async (req, res) => {
     inputIndicesRewards,
     signedRewardsInputs
   } = await buildUnsignedMultisigSwapTx({
-    addressA: tradingSession.hostAddr,
+    addressA: tradingSession.host_addr,
     assetsToReceiveByAFromB: body.assetsToReceiveByAFromB,
     nanoErgToReceiveByAFromB: body.nanoErgToReceiveByAFromB,
-    addressB: tradingSession.guestAddr,
+    addressB: tradingSession.guest_addr,
     assetsToReceiveByBFromA: body.assetsToReceiveByBFromA,
     nanoErgToReceiveByBFromA: body.nanoErgToReceiveByBFromA,
     addRewards: config.rewardsCampaignEnabled
@@ -120,22 +120,22 @@ txRouter.get('/partial', async (req, res) => {
     }
     const session = result as TradingSession;
     res.status(200);
-    if(session.unsignedTx === null) {
+    if(session.unsigned_tx === null) {
       res.send({});
       return;
     }
     res.send({
-      unsignedTx: session.unsignedTx,
-      inputIndicesGuest: session.txInputIndicesGuest,
-      inputIndicesHost: session.txInputIndicesHost,
-      signedInputsHost: session.signedInputsHost,
-      signedRewardsInputs: session.signedRewardsInputs, // TODO reflect this line on frontend
-      nftsForA: session.nftsForA,
-      nftsForB: session.nftsForB,
-      fungibleTokensForA: session.fungibleTokensForA,
-      fungibleTokensForB: session.fungibleTokensForB,
-      nanoErgForA: session.nanoErgForA,
-      nanoErgForB: session.nanoErgForB,
+      unsignedTx: session.unsigned_tx,
+      inputIndicesGuest: session.tx_input_indices_guest,
+      inputIndicesHost: session.tx_input_indices_host,
+      signedInputsHost: session.signed_inputs_host,
+      signedRewardsInputs: session.signed_rewards_inputs, // TODO reflect this line on frontend
+      nftsForA: session.nfts_for_a,
+      nftsForB: session.nfts_for_b,
+      fungibleTokensForA: session.fungible_tokens_for_a,
+      fungibleTokensForB: session.fungible_tokens_for_b,
+      nanoErgForA: session.nano_erg_for_a,
+      nanoErgForB: session.nano_erg_for_b,
     })
   } catch (err) {
     console.error(err.message);
@@ -156,8 +156,8 @@ txRouter.get('/', async (req, res) => {
     const session = result as TradingSession;
     res.status(200);
     res.send({
-      submitted: (session.submittedAt !== null),
-      txId: session.txId ?? undefined,
+      submitted: (session.submitted_at !== null),
+      txId: session.tx_id ?? undefined,
     });
   } catch (err) {
     console.error(err.message);

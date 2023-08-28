@@ -4,13 +4,13 @@ import sequelizeConnection from '@db/config'
 interface CollectionAttributes {
   name: string;
   description: string;
-  mintingAddresses: string[];
+  minting_addresses: string[];
 }
 
 class Collection extends Model<CollectionAttributes> implements CollectionAttributes {
   name: string;
   description: string;
-  mintingAddresses: string[];
+  minting_addresses: string[];
 }
 
 Collection.init({
@@ -22,7 +22,7 @@ Collection.init({
   description: {
     type: DataTypes.STRING,
   },
-  mintingAddresses: {
+  minting_addresses: {
     type: DataTypes.ARRAY(DataTypes.STRING),
   },
 }, {

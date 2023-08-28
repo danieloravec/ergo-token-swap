@@ -81,7 +81,7 @@ export const updateSession = async (secret: string, updatedData: object): Promis
             if(!session) {
                 throw new Error(sessionNotFoundMsg);
             }
-            if(session.submittedAt) {
+            if(session.submitted_at) {
                 throw new Error("Session already settled");
             }
             await TradingSession.update(updatedData, {
@@ -155,27 +155,27 @@ const updateStatsForAddress = async (userAddress: string, deltas: {[tokenId: str
         for (const [tokenId, delta] of Object.entries(deltas)) {
             let stat = await UserAssetStats.findOne({
                 where: {
-                    userAddress,
-                    tokenId,
+                    user_address: userAddress,
+                    token_id: tokenId,
                 },
                 transaction: t,
                 raw: true,
             });
             if (!stat) {
                 stat = await UserAssetStats.create({
-                    tokenId,
-                    userAddress,
-                    amountBought: BigInt(0),
-                    amountSold: BigInt(0),
+                    token_id: tokenId,
+                    user_address: userAddress,
+                    amount_bought: BigInt(0),
+                    amount_sold: BigInt(0),
                 })
             }
             await UserAssetStats.update({
-                amountBought: BigInt(stat.amountBought) + delta.bought,
-                amountSold: BigInt(stat.amountSold) + delta.sold,
+                amount_bought: BigInt(stat.amount_bought) + delta.bought,
+                amount_sold: BigInt(stat.amount_sold) + delta.sold,
             }, {
                 where: {
-                    userAddress,
-                    tokenId,
+                    user_address: userAddress,
+                    token_id: tokenId,
                 },
                 transaction: t,
             });
@@ -198,16 +198,16 @@ export const updateStats = async (secret: string): Promise<boolean> => {
         if (!tradingSession) {
             return false;
         }
-        const unsignedTx = tradingSession.unsignedTx;
+        const unsignedTx = tradingSession.unsigned_tx;
 
-        const hostDelta = calcAddressDelta(unsignedTx, tradingSession.txInputIndicesHost);
-        const guestDelta = calcAddressDelta(unsignedTx, tradingSession.txInputIndicesGuest);
+        const hostDelta = calcAddressDelta(unsignedTx, tradingSession.tx_input_indices_host);
+        const guestDelta = calcAddressDelta(unsignedTx, tradingSession.tx_input_indices_guest);
 
-        const hostSuccess = await updateStatsForAddress(tradingSession.hostAddr, hostDelta);
+        const hostSuccess = await updateStatsForAddress(tradingSession.host_addr, hostDelta);
         if (!hostSuccess) {
             return false;
         }
-        return await updateStatsForAddress(tradingSession.guestAddr, guestDelta);
+        return await updateStatsForAddress(tradingSession.guest_addr, guestDelta);
     } catch (err) {
         console.error(`Error updating stats for secret ${secret}: ${err}`);
         return false;

@@ -8,4 +8,5 @@ database using `sequelize-cli`:
 - Open `/src/db/migrations` and copy `000000-initial_migration.ts` to a new file
   that you name appropriately.
 - Modify that file such that it represents a valid migration.
+- Build the backend using `npm run build`.
 - Run `npx sequelize-cli db:migrate`

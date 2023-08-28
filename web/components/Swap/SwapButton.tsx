@@ -1,4 +1,3 @@
-import { buildUnsignedMultisigSwapTx } from '@ergo/transactions';
 import { backendRequest, jsonStringifyBig } from '@utils/utils';
 import { Button } from '@components/Common/Button';
 import { useEffect, useState } from 'react';
@@ -8,6 +7,7 @@ import {
   type ParticipantInfo,
 } from '@components/Swap/types';
 import { type Wallet } from '@ergo/wallet';
+import { type UnsignedTransaction } from '@fleet-sdk/common';
 
 export const SwapButton = (props: {
   tradingSessionId: string;
@@ -89,22 +89,27 @@ export const SwapButton = (props: {
       onClick={() => {
         (async () => {
           setIsWaitingForHostSignature(true);
-          const { unsignedTx, inputIndicesA, inputIndicesB } =
-            await buildUnsignedMultisigSwapTx({
-              wallet: props.wallet,
-              addressA: props.hostInfo.address,
-              assetsToReceiveByAFromB: {
-                ...props.selectedNftsB,
-                ...props.selectedFungibleTokensB,
-              },
-              nanoErgToReceiveByAFromB: props.selectedNanoErgB,
-              addressB: props.guestInfo.address,
-              assetsToReceiveByBFromA: {
-                ...props.selectedNftsA,
-                ...props.selectedFungibleTokensA,
-              },
-              nanoErgToReceiveByBFromA: props.selectedNanoErgA,
-            });
+          const { status, body: txInfo } = await backendRequest('/tx', 'POST', {
+            secret: props.tradingSessionId,
+            assetsToReceiveByAFromB: {
+              ...props.selectedNftsB,
+              ...props.selectedFungibleTokensB,
+            },
+            assetsToReceiveByBFromA: {
+              ...props.selectedNftsA,
+              ...props.selectedFungibleTokensA,
+            },
+            nanoErgToReceiveByAFromB: props.selectedNanoErgB,
+            nanoErgToReceiveByBFromA: props.selectedNanoErgA,
+          });
+          if (status !== 200) {
+            throw new Error('Failed to create tx');
+          }
+          const { unsignedTx, inputIndicesA } = txInfo as {
+            unsignedTx: UnsignedTransaction;
+            inputIndicesA: number[];
+          };
+
           const signedInputsA = await props.wallet.signTxInputs(
             unsignedTx,
             inputIndicesA
@@ -112,10 +117,7 @@ export const SwapButton = (props: {
 
           const body = {
             secret: props.tradingSessionId,
-            unsignedTx,
             signedInputsHost: signedInputsA,
-            inputIndicesHost: inputIndicesA,
-            inputIndicesGuest: inputIndicesB,
             nftsForA: JSON.parse(jsonStringifyBig(props.selectedNftsADetails)),
             nftsForB: JSON.parse(jsonStringifyBig(props.selectedNftsBDetails)),
             fungibleTokensForA: JSON.parse(

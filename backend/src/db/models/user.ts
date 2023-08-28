@@ -7,20 +7,20 @@ interface UserAttributes {
   email: string;
   discord: string;
   twitter: string;
-  allowMessages: boolean;
-  createdAt: Date;
-  authSecret?: string;
+  allow_messages: boolean;
+  created_at: Date;
+  auth_secret?: string;
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
   public address!: string;
-  allowMessages!: boolean;
+  allow_messages!: boolean;
   discord: string;
   email: string;
   twitter: string;
   username: string;
-  public readonly createdAt!: Date;
-  authSecret?: string;
+  public readonly created_at!: Date;
+  auth_secret?: string;
 }
 
 User.init({
@@ -28,7 +28,7 @@ User.init({
     type: DataTypes.STRING,
     primaryKey: true,
   },
-  allowMessages: {
+  allow_messages: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
@@ -44,10 +44,10 @@ User.init({
   username: {
     type: DataTypes.STRING,
   },
-  createdAt: {
+  created_at: {
     type: DataTypes.DATE,
   },
-  authSecret: {
+  auth_secret: {
     type: DataTypes.STRING,
   }
 }, {
@@ -61,7 +61,7 @@ User.init({
     },
   ],
   defaultScope: {
-    attributes: { exclude: ['authSecret'] },
+    attributes: { exclude: ['auth_secret'] },
   }
 })
 

@@ -77,7 +77,7 @@ export const getRewardBoxes = async (amount: number): Promise<Array<Box<Amount>>
     raw: true
   });
   console.log(`\n\nrewards: ${JSON.stringify(rewards)}\n\n`);
-  const tokenIds = rewards.map((reward) => reward.tokenId);
+  const tokenIds = rewards.map((reward) => reward.token_id);
   return await Promise.all(tokenIds.map(async (tokenId) => {
     return (await explorerRequest(`/boxes/unspent/byTokenId/${tokenId}`, 1)) as Box<Amount>;
   }));

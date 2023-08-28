@@ -2,20 +2,20 @@ import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
 interface FollowAttributes {
-  fromAddress: string;
-  toAddress: string;
+  from_address: string;
+  to_address: string;
 }
 
 class Follow extends Model<FollowAttributes> implements FollowAttributes {
-  fromAddress: string;
-  toAddress: string;
+  from_address: string;
+  to_address: string;
 }
 
 Follow.init({
-  fromAddress: {
+  from_address: {
     type: DataTypes.STRING,
   },
-  toAddress: {
+  to_address: {
     type: DataTypes.STRING,
   }
 }, {

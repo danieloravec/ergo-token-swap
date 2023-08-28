@@ -3,10 +3,10 @@ import sequelizeConnection from '@db/config'
 
 interface MessageAttributes {
   id: number;
-  fromAddress: string;
-  toAddress: string;
-  senderArchived: boolean;
-  receiverArchived: boolean;
+  from_address: string;
+  to_address: string;
+  sender_archived: boolean;
+  receiver_archived: boolean;
   subject: string;
   text: string;
   seen: boolean;
@@ -14,10 +14,10 @@ interface MessageAttributes {
 
 class Message extends Model<MessageAttributes> implements MessageAttributes {
   id: number;
-  fromAddress: string;
-  toAddress: string;
-  senderArchived: boolean;
-  receiverArchived: boolean;
+  from_address: string;
+  to_address: string;
+  sender_archived: boolean;
+  receiver_archived: boolean;
   subject: string;
   text: string;
   seen: boolean;
@@ -29,18 +29,18 @@ Message.init({
     autoIncrement: true,
     primaryKey: true,
   },
-  fromAddress: {
+  from_address: {
     type: DataTypes.STRING(51),
   },
-  toAddress: {
+  to_address: {
     type: DataTypes.STRING(51),
   },
-  senderArchived: {
+  sender_archived: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   },
-  receiverArchived: {
+  receiver_archived: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,

@@ -55,7 +55,7 @@ collectionRouter.post(`/`, async (req, res) => {
     for (const mintingAddress of body.mintingAddresses) {
       const existingCollection = await Collection.findOne({
         where: {
-          mintingAddresses: {
+          minting_addresses: {
             [Op.contains]: [mintingAddress]
           }
         },
@@ -70,7 +70,7 @@ collectionRouter.post(`/`, async (req, res) => {
     const collection = await Collection.create({
       name: body.name,
       description: body.description,
-      mintingAddresses: body.mintingAddresses,
+      minting_addresses: body.mintingAddresses,
     });
 
     res.send(collection);
@@ -106,7 +106,7 @@ collectionRouter.get('/byMintingAddresses', async (req, res) => {
     for (const mintingAddress of mintingAddresses) {
       const collection: Collection | undefined = await Collection.findOne({
         where: {
-          mintingAddresses: {
+          minting_addresses: {
             [Op.contains]: [mintingAddress]
           }
         },

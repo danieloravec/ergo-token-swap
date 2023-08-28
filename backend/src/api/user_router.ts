@@ -80,7 +80,7 @@ userRouter.post('/', async (req, res) => {
           email: req.body.email ?? user.email,
           discord: req.body.discord ?? user.discord,
           twitter: req.body.twitter ?? user.twitter,
-          allowMessages: req.body.allowMessages ?? user.allowMessages,
+          allow_messages: req.body.allowMessages ?? user.allow_messages,
         }
         await User.update(updatedUserData, {where: {address: req.body.address}, transaction: t});
         user = {
@@ -102,7 +102,7 @@ userRouter.post('/', async (req, res) => {
           email: req.body.email,
           discord: req.body.discord,
           twitter: req.body.twitter,
-          allowMessages: true,
+          allow_messages: true,
         }, {transaction: t});
       } catch (e) {
         await t.rollback();
@@ -161,11 +161,11 @@ userRouter.get('/history', async (req, res) => {
         attributes: [['submitted_at', 'timestamp'], 'host_addr', 'guest_addr', 'tx_id'],
         where: {
           [Op.or]: [
-            { guestAddr: address },
-            { hostAddr: address }
+            { guest_addr: address },
+            { host_addr: address }
           ],
           [Op.not]: {
-            txId: null
+            tx_id: null
           }
         },
         order: [['submittedAt', 'DESC']],
@@ -192,7 +192,7 @@ userRouter.get('/auth', async (req, res) => {
     await User.update(
       {
         ...user,
-        authSecret: secret,
+        auth_secret: secret,
       },
       {where: {address: req.query!.address as string}}
     );
@@ -214,7 +214,7 @@ userRouter.post('/auth', async (req, res) => {
     if (!user) {
       return;
     }
-    if (!utils.verifySignature(user.authSecret, req.body.signature)) {
+    if (!utils.verifySignature(user.auth_secret, req.body.signature)) {
       res.status(400);
       res.send("Invalid signature");
       return;
@@ -285,8 +285,8 @@ userRouter.get('/follow/specific', async (req: Request, res: Response) => {
 
     const follow = await Follow.findOne({
       where: {
-        fromAddress,
-        toAddress,
+        from_address: fromAddress,
+        to_address: toAddress,
       },
       raw: true,
     });
@@ -347,8 +347,8 @@ userRouter.post('/follow', async (req: Request, res: Response) => {
     }
 
     await Follow.create({
-      fromAddress: req.body.fromAddress,
-      toAddress: req.body.toAddress
+      from_address: req.body.fromAddress,
+      to_address: req.body.toAddress
     });
 
     res.send({followed: true});
@@ -374,8 +374,8 @@ userRouter.delete('/follow', async (req: Request, res: Response) => {
 
     const affected = await Follow.destroy({
       where: {
-        fromAddress: req.body.fromAddress,
-        toAddress: req.body.toAddress,
+        from_address: req.body.fromAddress,
+        to_address: req.body.toAddress,
       }
     });
 

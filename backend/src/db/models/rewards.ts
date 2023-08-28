@@ -2,17 +2,17 @@ import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
 interface RewardAttributes {
-  tokenId: string;
+  token_id: string;
   available: boolean;
 }
 
 class Reward extends Model<RewardAttributes> implements RewardAttributes {
-  tokenId: string;
+  token_id: string;
   available: boolean;
 }
 
 Reward.init({
-  tokenId: {
+  token_id: {
     type: DataTypes.STRING,
   },
   available: {

@@ -7,28 +7,28 @@ import * as types from "@types";
 interface TradingSessionAttributes {
     id: number;
     secret: string;
-    createdAt: Date;
-    hostAddr: string;
-    hostAssetsJson: Asset[];
-    hostNanoErg: bigint;
-    guestAddr?: string;
-    guestAssetsJson?: Asset[];
-    guestNanoErg?: bigint;
-    unsignedTx?: EIP12UnsignedTransaction;
-    unsignedTxAddedOn?: string;
-    signedInputsHost?: SignedInput[];
-    txInputIndicesHost?: number[];
-    txInputIndicesGuest?: number[];
-    nftsForA?: types.Nft[];
-    nftsForB?: types.Nft[];
-    fungibleTokensForA?: types.FungibleToken[];
-    fungibleTokensForB?: types.FungibleToken[];
-    nanoErgForA?: bigint;
-    nanoErgForB?: bigint;
-    inputIndicesRewards?: number[];
-    signedRewardsInputs?: SignedInput[];
-    txId?: string;
-    submittedAt?: Date;
+    created_at: Date;
+    host_addr: string;
+    host_assets_json: Asset[];
+    host_nano_erg: bigint;
+    guest_addr?: string;
+    guest_assets_json?: Asset[];
+    guest_nano_erg?: bigint;
+    unsigned_tx?: EIP12UnsignedTransaction;
+    unsigned_tx_added_on?: string;
+    signed_inputs_host?: SignedInput[];
+    tx_input_indices_host?: number[];
+    tx_input_indices_guest?: number[];
+    nfts_for_a?: types.Nft[];
+    nfts_for_b?: types.Nft[];
+    fungible_tokens_for_a?: types.FungibleToken[];
+    fungible_tokens_for_b?: types.FungibleToken[];
+    nano_erg_for_a?: bigint;
+    nano_erg_for_b?: bigint;
+    input_indices_rewards?: number[];
+    signed_rewards_inputs?: SignedInput[];
+    tx_id?: string;
+    submitted_at?: Date;
 }
 
 export interface TradingSessionInput extends Optional<TradingSessionAttributes, 'id'> {
@@ -36,29 +36,29 @@ export interface TradingSessionInput extends Optional<TradingSessionAttributes, 
 
 class TradingSession extends Model<TradingSessionAttributes, TradingSessionInput> implements TradingSessionAttributes {
     public id!: number
-    hostAddr!: string;
-    hostAssetsJson!: Asset[];
-    hostNanoErg!: bigint;
-    guestAddr: string;
-    guestAssetsJson: Asset[];
-    guestNanoErg: bigint;
+    host_addr!: string;
+    host_assets_json!: Asset[];
+    host_nano_erg!: bigint;
+    guest_addr: string;
+    guest_assets_json: Asset[];
+    guest_nano_erg: bigint;
     secret!: string;
-    submittedAt: Date;
-    txId?: string;
-    unsignedTx?: EIP12UnsignedTransaction;
-    unsignedTxAddedOn?: string;
-    signedInputsHost?: SignedInput[];
-    txInputIndicesHost?: number[];
-    txInputIndicesGuest?: number[];
-    nftsForA?: types.Nft[];
-    nftsForB?: types.Nft[];
-    fungibleTokensForA?: types.FungibleToken[];
-    fungibleTokensForB?: types.FungibleToken[];
-    nanoErgForA?: bigint;
-    nanoErgForB?: bigint;
-    inputIndicesRewards?: number[];
-    signedRewardsInputs?: SignedInput[];
-    public readonly createdAt!: Date;
+    submitted_at: Date;
+    tx_id?: string;
+    unsigned_tx?: EIP12UnsignedTransaction;
+    unsigned_tx_added_on?: string;
+    signed_inputs_host?: SignedInput[];
+    tx_input_indices_host?: number[];
+    tx_input_indices_guest?: number[];
+    nfts_for_a?: types.Nft[];
+    nfts_for_b?: types.Nft[];
+    fungible_tokens_for_a?: types.FungibleToken[];
+    fungible_tokens_for_b?: types.FungibleToken[];
+    nano_erg_for_a?: bigint;
+    nano_erg_for_b?: bigint;
+    input_indices_rewards?: number[];
+    signed_rewards_inputs?: SignedInput[];
+    public readonly created_at!: Date;
 }
 
 TradingSession.init({
@@ -67,77 +67,77 @@ TradingSession.init({
         autoIncrement: true,
         primaryKey: true,
     },
-    createdAt: {
+    created_at: {
         type: DataTypes.DATE,
     },
     secret: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    hostAddr: {
+    host_addr: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    hostAssetsJson: {
+    host_assets_json: {
         type: DataTypes.JSONB,
         allowNull: false,
     },
-    hostNanoErg: {
+    host_nano_erg: {
         type: DataTypes.BIGINT,
         allowNull: false,
     },
-    unsignedTx: {
+    unsigned_tx: {
         type: DataTypes.JSONB,
     },
-    unsignedTxAddedOn: {
+    unsigned_tx_added_on: {
         type: DataTypes.DATE
     },
-    signedInputsHost: {
+    signed_inputs_host: {
         type: DataTypes.JSONB,
     },
-    txInputIndicesHost: {
+    tx_input_indices_host: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
-    txInputIndicesGuest: {
+    tx_input_indices_guest: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
-    guestAddr: {
+    guest_addr: {
         type: DataTypes.STRING,
     },
-    guestAssetsJson: {
+    guest_assets_json: {
         type: DataTypes.JSONB,
     },
-    guestNanoErg: {
+    guest_nano_erg: {
         type: DataTypes.BIGINT,
     },
-    txId: {
+    tx_id: {
         type: DataTypes.STRING,
     },
-    submittedAt: {
+    submitted_at: {
         type: DataTypes.DATE,
     },
-    nftsForA: {
+    nfts_for_a: {
         type: DataTypes.JSONB
     },
-    nftsForB: {
+    nfts_for_b: {
         type: DataTypes.JSONB
     },
-    fungibleTokensForA: {
+    fungible_tokens_for_a: {
         type: DataTypes.JSONB
     },
-    fungibleTokensForB: {
+    fungible_tokens_for_b: {
         type: DataTypes.JSONB
     },
-    nanoErgForA: {
+    nano_erg_for_a: {
         type: DataTypes.BIGINT
     },
-    nanoErgForB: {
+    nano_erg_for_b: {
         type: DataTypes.BIGINT
     },
-    inputIndicesRewards: {
+    input_indices_rewards: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
-    signedRewardsInputs: {
+    signed_rewards_inputs: {
         type: DataTypes.JSONB,
     },
 }, {

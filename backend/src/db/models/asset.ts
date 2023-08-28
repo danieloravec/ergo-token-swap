@@ -2,19 +2,19 @@ import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
 interface AssetAttributes {
-  tokenId: string;
+  token_id: string;
   decimals: number;
-  isVerified: boolean;
+  is_verified: boolean;
 }
 
 class Asset extends Model<AssetAttributes> implements AssetAttributes {
-  tokenId: string;
+  token_id: string;
   decimals: number;
-  isVerified: boolean;
+  is_verified: boolean;
 }
 
 Asset.init({
-  tokenId: {
+  token_id: {
     primaryKey: true,
     type: DataTypes.STRING(64),
     allowNull: false,
@@ -23,7 +23,7 @@ Asset.init({
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  isVerified: {
+  is_verified: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
