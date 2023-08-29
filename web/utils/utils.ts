@@ -1,6 +1,7 @@
 import { config } from '@config';
 import { type Wallet } from '@ergo/wallet';
 import { type ProfileInfo } from '@data-types/profile';
+import JSONBig from 'json-bigint';
 
 export const backendRequest = async (
   endpoint: string,
@@ -18,7 +19,7 @@ export const backendRequest = async (
       'Content-Type': 'application/json',
       ...additionalHeaders,
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body !== undefined ? JSONBig.stringify(body) : undefined,
   });
   if (response.status !== 200) {
     return {
@@ -31,6 +32,17 @@ export const backendRequest = async (
     body: await response.json(),
   };
 };
+
+export async function explorerRequest(
+  endpoint: string,
+  apiVersion: 0 | 1 = 1
+): Promise<any> {
+  if (!endpoint.startsWith('/')) {
+    endpoint = `/${endpoint}`;
+  }
+  const res = await fetch(`${config.explorerApiUrl}/v${apiVersion}${endpoint}`);
+  return await res.json();
+}
 
 export const authenticate = async (
   address: string,

@@ -61,9 +61,9 @@ tradingSessionRouter.post('/enter', async (req, res) => {
     }
     const {assets, nanoErg} = await utils.getAssetsAndNanoErgByAddress(body!.guestAddr);
     const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
-      guestAddr: body.guestAddr,
-      guestAssetsJson: assets,
-      guestNanoErg: nanoErg
+      guest_addr: body.guestAddr,
+      guest_assets_json: assets,
+      guest_nano_erg: nanoErg
     });
     if (updateStatus !== 200) {
       res.status(updateStatus);
@@ -81,7 +81,7 @@ tradingSessionRouter.post('/enter', async (req, res) => {
 
 tradingSessionRouter.get('/info', async (req, res) => {
   try {
-    const {status, result} = await utils.getSessionByQuery(req);
+    const {status, result} = await utils.getSessionByReq(req);
     if(status !== 200) {
       res.status(status);
       res.send(result);

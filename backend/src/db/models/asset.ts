@@ -1,6 +1,7 @@
 import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
+/* tslint:disable variable-name */
 interface AssetAttributes {
   token_id: string;
   decimals: number;

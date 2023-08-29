@@ -44,7 +44,7 @@ export const SwapButton = (props: {
       );
       if (
         txPartialInfoResponse.status === 200 &&
-        txPartialInfoResponse?.body?.unsignedTx !== undefined
+        Boolean(txPartialInfoResponse?.body?.signedInputsHost)
       ) {
         setIsWaitingForGuestSignature(true);
       }

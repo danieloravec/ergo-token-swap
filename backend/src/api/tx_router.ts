@@ -5,6 +5,7 @@ import {SignedInput} from "@fleet-sdk/common";
 import TradingSession from "@db/models/trading_session";
 import {buildUnsignedMultisigSwapTx} from "@ergo/transactions";
 import {config} from "@config";
+import JSONBig from "json-bigint";
 
 const txRouter = Router();
 
@@ -19,7 +20,7 @@ txRouter.post('/', async (req, res) => {
     nanoErgToReceiveByBFromA: bigint;
   } = req.body;
 
-  const {status, result} = await utils.getSessionByQuery(req);
+  const {status, result} = await utils.getSessionByReq(req);
   const tradingSession = status === 200 ? result as TradingSession : undefined;
   if (tradingSession === undefined) {
     res.status(status);
@@ -45,12 +46,12 @@ txRouter.post('/', async (req, res) => {
 
   const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
     ...tradingSession,
-    unsignedTx,
-    unsignedTxAddedOn: new Date(),
-    txInputIndicesHost: inputIndicesA,
-    txInputIndicesGuest: inputIndicesB,
-    inputIndicesRewards,
-    signedRewardsInputs,
+    unsigned_tx: unsignedTx,
+    unsigned_tx_added_on: new Date(),
+    tx_input_indices_host: inputIndicesA,
+    tx_input_indices_guest: inputIndicesB,
+    input_indices_rewards: inputIndicesRewards,
+    signed_rewards_inputs: signedRewardsInputs,
   });
   if (updateStatus !== 200) {
     res.status(updateStatus);
@@ -86,13 +87,13 @@ txRouter.post('/partial/register', async (req, res) => {
     } = req.body;
 
     const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
-      signedInputsHost: body.signedInputsHost,
-      nftsForA: body.nftsForA,
-      nftsForB: body.nftsForB,
-      fungibleTokensForA: body.fungibleTokensForA,
-      fungibleTokensForB: body.fungibleTokensForB,
-      nanoErgForA: body.nanoErgForA,
-      nanoErgForB: body.nanoErgForB,
+      signed_inputs_host: body.signedInputsHost,
+      nfts_for_a: body.nftsForA,
+      nfts_for_b: body.nftsForB,
+      fungible_tokens_for_a: body.fungibleTokensForA,
+      fungible_tokens_for_b: body.fungibleTokensForB,
+      nano_erg_for_a: body.nanoErgForA,
+      nano_erg_for_b: body.nanoErgForB,
     });
     if(updateStatus !== 200) {
       res.status(updateStatus);
@@ -112,15 +113,16 @@ txRouter.post('/partial/register', async (req, res) => {
 // Returns empty body if the partial transaction is not registered yet
 txRouter.get('/partial', async (req, res) => {
   try {
-    const {status, result} = await utils.getSessionByQuery(req);
+    const {status, result} = await utils.getSessionByReq(req);
     if(status !== 200) {
       res.status(status);
       res.send({message: result as string});
       return;
     }
     const session = result as TradingSession;
+
     res.status(200);
-    if(session.unsigned_tx === null) {
+    if(session.nfts_for_a === null) {
       res.send({});
       return;
     }
@@ -147,7 +149,7 @@ txRouter.get('/partial', async (req, res) => {
 // Checks if the transaction for a specific session was submitted to the network already
 txRouter.get('/', async (req, res) => {
   try {
-    const {status, result} = await utils.getSessionByQuery(req);
+    const {status, result} = await utils.getSessionByReq(req);
     if(status !== 200) {
       res.status(status);
       res.send({message: result as string});
@@ -176,8 +178,8 @@ txRouter.post('/register', async (req, res) => {
     }
     const body: {secret: string, txId: string} = req.body;
     const {status, message} = await utils.updateSession(body.secret, {
-      submittedAt: new Date(),
-      txId: body.txId,
+      submitted_at: new Date(),
+      tx_id: body.txId,
     });
 
     await utils.updateStats(body.secret);

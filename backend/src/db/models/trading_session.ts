@@ -4,6 +4,7 @@ import { Asset } from "@types";
 import { EIP12UnsignedTransaction, SignedInput } from "@fleet-sdk/common";
 import * as types from "@types";
 
+/* tslint:disable variable-name */
 interface TradingSessionAttributes {
     id: number;
     secret: string;

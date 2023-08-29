@@ -12,6 +12,7 @@ import UserAssetStats from "@db/models/user_asset_stats";
 import User from "@db/models/user";
 import {Transaction} from "sequelize";
 import * as types from "@types";
+import JSONBig from "json-bigint";
 
 export async function explorerRequest(endpoint: string, apiVersion: number = 0): Promise<any> {
     const res = await fetch(`${config.blockchainApiUrl}/v${apiVersion}${endpoint}`);
@@ -214,14 +215,14 @@ export const updateStats = async (secret: string): Promise<boolean> => {
     }
 }
 
-export const getSessionByQuery = async (req: Request): Promise<{status: number, result: string | TradingSession}> => {
-    if (req.query.secret === undefined) {
+export const getSessionByReq = async (req: Request): Promise<{status: number, result: string | TradingSession}> => {
+    if (req.query.secret === undefined && req.body?.secret === undefined) {
         return {
             status: 400,
             result: "Missing secret",
         };
     }
-    const secret = req.query.secret as string;
+    const secret = (req.query.secret ?? req.body?.secret) as string;
     const session = await TradingSession.findOne({
         where: {
             secret

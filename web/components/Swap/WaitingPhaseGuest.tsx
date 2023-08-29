@@ -88,10 +88,10 @@ export function WaitingPhaseGuest(props: {
       setInputIndicesHost(partialTxResponse?.body?.inputIndicesHost);
       setInputIndicesGuest(partialTxResponse?.body?.inputIndicesGuest);
       setSignedInputsHost(partialTxResponse?.body?.signedInputsHost);
-      setnftsForA(partialTxResponse?.body?.nftsForA);
-      setnftsForB(partialTxResponse?.body?.nftsForB);
-      setfungibleTokensForA(partialTxResponse?.body?.fungibleTokensForA);
-      setfungibleTokensForB(partialTxResponse?.body?.fungibleTokensForB);
+      setnftsForA(partialTxResponse?.body?.nftsForA ?? []);
+      setnftsForB(partialTxResponse?.body?.nftsForB ?? []);
+      setfungibleTokensForA(partialTxResponse?.body?.fungibleTokensForA ?? []);
+      setfungibleTokensForB(partialTxResponse?.body?.fungibleTokensForB ?? []);
       setnanoErgForA(BigInt(partialTxResponse?.body?.nanoErgForA ?? 0));
       setnanoErgForB(BigInt(partialTxResponse?.body?.nanoErgForB ?? 0));
     };
@@ -122,10 +122,15 @@ export function WaitingPhaseGuest(props: {
     if (unsignedTx.id === undefined) {
       throw new Error('txId is undefined');
     }
-    const signedGuestInputs = await props.wallet.signTxInputs(
-      unsignedTx,
-      inputIndicesGuest
-    );
+    let signedGuestInputs;
+    try {
+      signedGuestInputs = await props.wallet.signTxInputs(
+        unsignedTx,
+        inputIndicesGuest
+      );
+    } catch (err) {
+      return;
+    }
     const signedInputs = combineSignedInputs(
       signedInputsHost,
       signedGuestInputs,
@@ -186,8 +191,8 @@ export function WaitingPhaseGuest(props: {
           nanoErgForA={nanoErgForA}
           nanoErgForB={nanoErgForB}
           onAgree={() => {
-            setModalAgreed(true);
             finalizeGuestSigningAndSubmit().catch(console.error);
+            setModalAgreed(true);
           }}
           tradingSessionId={props.tradingSessionId}
         />

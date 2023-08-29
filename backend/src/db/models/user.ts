@@ -1,6 +1,7 @@
 import {DataTypes, Model, Optional} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
+/* tslint:disable variable-name */
 interface UserAttributes {
   address: string;
   username: string;

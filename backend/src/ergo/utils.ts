@@ -43,7 +43,7 @@ export async function explorerRequest(
 
 export const getInputs = async (
   address: string
-): Promise<Array<Box<Amount>>> => {
+): Promise<Box<Amount>[]> => {
   const inputsResponse = await explorerRequest(
     `/boxes/unspent/byAddress/${address}`
   );
@@ -66,7 +66,7 @@ export const getInputs = async (
   });
 };
 
-export const getRewardBoxes = async (amount: number): Promise<Array<Box<Amount>>> => {
+export const getRewardBoxes = async (amount: number): Promise<Box<Amount>[]> => {
   // TODO get random available token IDs from DB and get boxes for them (each reward NFT will be in a separate box)
   const rewards = await Reward.findAll({
     where: {
@@ -92,7 +92,7 @@ export const getAssetsFromBox = (box: Box<Amount>): Record<string, bigint> => {
 }
 
 export const aggregateTokensInfo = (
-  inputs: Array<Box<Amount>>
+  inputs: Box<Amount>[]
 ): Record<string, bigint> => {
   const totalAssets: Record<string, bigint> = {};
   for (const input of inputs) {
@@ -107,7 +107,7 @@ export const aggregateTokensInfo = (
 };
 
 export const aggregateInputsNanoErgValue = (
-  inputs: Array<Box<Amount>>
+  inputs: Box<Amount>[]
 ): bigint => {
   return inputs.reduce((acc, input) => acc + BigInt(input.value), BigInt(0));
 };
@@ -117,15 +117,14 @@ export const subtractAssets = (
   assetsToSubtract: Record<string, bigint>
 ): Record<string, bigint> => {
   const assetsCopy = { ...assets };
-  for (const tokenId in assetsToSubtract) {
+  for (const tokenId of Object.keys(assetsToSubtract)) {
     if (assetsCopy[tokenId] === undefined) {
       throw new Error('Token not available and can not be subtracted');
     }
-    assetsCopy[tokenId] -= assetsToSubtract[tokenId];
+    assetsCopy[tokenId] -= BigInt(assetsToSubtract[tokenId]);
   }
-  for (const tokenId in assetsCopy) {
+  for (const tokenId of Object.keys(assetsCopy)) {
     if (assetsCopy[tokenId] <= BigInt(0)) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete assetsCopy[tokenId];
     }
   }
@@ -137,22 +136,22 @@ export const mergeAssetsSimple = (
   assetsB: Record<string, bigint>
 ): Record<string, bigint> => {
   const result = { ...assetsA };
-  for (const tokenId in assetsB) {
+  for (const tokenId of Object.keys(assetsB)) {
     if (result[tokenId] === undefined && assetsB[tokenId] > BigInt(0)) {
       result[tokenId] = BigInt(0);
     }
-    result[tokenId] += assetsB[tokenId];
+    result[tokenId] += BigInt(assetsB[tokenId]);
   }
   return result;
 };
 
-export const mergeAssets = (assetsToMerge: Array<Record<string, bigint>>): Record<string, bigint> => {
+export const mergeAssets = (assetsToMerge: Record<string, bigint>[]): Record<string, bigint> => {
   if (assetsToMerge.length === 0) {
     return {};
   }
   let result = {};
-  for (let i = 0; i < assetsToMerge.length; i++) {
-    result = mergeAssetsSimple(result, assetsToMerge[i]);
+  for (const assets of assetsToMerge) {
+    result = mergeAssetsSimple(result, assets);
   }
   return result;
 }

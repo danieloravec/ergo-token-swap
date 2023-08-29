@@ -1,6 +1,7 @@
 import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
+/* tslint:disable variable-name */
 interface FollowAttributes {
   from_address: string;
   to_address: string;

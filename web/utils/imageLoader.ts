@@ -1,4 +1,4 @@
-import { explorerRequest } from '@ergo/utils';
+import { explorerRequest } from '@utils/utils';
 
 export const loadNftImageUrl = async (
   tokenId: string

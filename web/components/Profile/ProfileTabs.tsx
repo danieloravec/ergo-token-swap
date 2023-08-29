@@ -7,7 +7,7 @@ import { NftList } from '@components/Profile/NftList';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import { type FungibleToken, type Nft } from '@components/Swap/types';
-import { backendRequest } from '@utils/utils';
+import { backendRequest, explorerRequest } from '@utils/utils';
 import {
   type FungibleStats,
   type NftStats,
@@ -15,7 +15,6 @@ import {
 } from '@components/Profile/types';
 import { SwapHistory } from '@components/Profile/SwapHistory';
 import { loadNftImageUrl } from '@utils/imageLoader';
-import { explorerRequest } from '@ergo/utils';
 import { Statistics } from '@components/Profile/Statistics';
 import { type ProfileInfo } from '@data-types/profile';
 import { Follows } from '@components/Profile/Follows';

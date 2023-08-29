@@ -38,6 +38,7 @@ export async function buildUnsignedMultisigSwapTx({
   }
 
   const rewardInputs = addRewards ? await utils.getRewardBoxes(2) : [];
+  console.log(`rewardInputs: ${JSONBig.stringify(rewardInputs)}`);
 
   const inputsA = await utils.getInputs(addressA);
   const inputsB = await utils.getInputs(addressB);
@@ -71,11 +72,11 @@ export async function buildUnsignedMultisigSwapTx({
 
   const outputs = [
     new OutputBuilder(
-      allNanoErgA +
-      nanoErgToReceiveByAFromB -
-      nanoErgToReceiveByBFromA -
-      config.serviceFeeNanoErg +
-      config.minNanoErgValue,
+      BigInt(allNanoErgA) +
+      BigInt(nanoErgToReceiveByAFromB) -
+      BigInt(nanoErgToReceiveByBFromA) -
+      BigInt(config.serviceFeeNanoErg) +
+      BigInt(config.minNanoErgValue),
       addressA
     ).addTokens([
       ...Object.keys(totalAssetsToReceiveByA).map((tokenId) => ({
@@ -84,11 +85,11 @@ export async function buildUnsignedMultisigSwapTx({
       })),
     ]),
     new OutputBuilder(
-      allNanoErgB +
-      nanoErgToReceiveByBFromA -
-      nanoErgToReceiveByAFromB -
-      config.serviceFeeNanoErg +
-      config.minNanoErgValue,
+      BigInt(allNanoErgB) +
+      BigInt(nanoErgToReceiveByBFromA) -
+      BigInt(nanoErgToReceiveByAFromB) -
+      BigInt(config.serviceFeeNanoErg) +
+      BigInt(config.minNanoErgValue),
       addressB
     ).addTokens([
       ...Object.keys(totalAssetsToReceiveByB).map((tokenId) => ({

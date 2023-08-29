@@ -1,6 +1,7 @@
 import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
 
+/* tslint:disable variable-name */
 interface MessageAttributes {
   id: number;
   from_address: string;

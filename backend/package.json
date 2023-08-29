@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild-dev": "tslint -c tslint.json -p tsconfig.json --fix",
     "build-dev": "tsc",
-    "prestart-dev": "npm run build-dev && ts-node -r tsconfig-paths/register src/db/init.ts",
+    "prestart-dev": "npm run build-dev",
     "start-dev": "ts-node -r tsconfig-paths/register .",
     "build": "tsc && tsc-alias",
     "start": "node ."
