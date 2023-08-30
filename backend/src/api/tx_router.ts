@@ -5,10 +5,9 @@ import {SignedInput} from "@fleet-sdk/common";
 import TradingSession from "@db/models/trading_session";
 import {buildUnsignedMultisigSwapTx} from "@ergo/transactions";
 import {config} from "@config";
-import JSONBig from "json-bigint";
+import Reward from "@db/models/rewards";
 
 const txRouter = Router();
-
 
 // Build an unsigned transaction with possibly signed reward inputs
 txRouter.post('/', async (req, res) => {
@@ -41,7 +40,8 @@ txRouter.post('/', async (req, res) => {
     addressB: tradingSession.guest_addr,
     assetsToReceiveByBFromA: body.assetsToReceiveByBFromA,
     nanoErgToReceiveByBFromA: body.nanoErgToReceiveByBFromA,
-    addRewards: config.rewardsCampaignEnabled
+    addRewards: config.rewardsCampaignEnabled,
+    rewardsSessionSecret: body.secret,
   });
 
   const {status: updateStatus, message: updateMessage} = await utils.updateSession(body.secret, {
@@ -168,6 +168,7 @@ txRouter.get('/', async (req, res) => {
   }
 });
 
+// TODO move tx submission to BE
 txRouter.post('/register', async (req, res) => {
   try {
     const bodyIsValid = await utils.validateObject(req.body, types.TxRegisterBodySchema);
@@ -181,6 +182,17 @@ txRouter.post('/register', async (req, res) => {
       submitted_at: new Date(),
       tx_id: body.txId,
     });
+
+    await Reward.update(
+      {
+        giveaway_tx_id: body.txId,
+      },
+      {
+        where: {
+          reserved_session_secret: body.secret
+        }
+      }
+    )
 
     await utils.updateStats(body.secret);
 

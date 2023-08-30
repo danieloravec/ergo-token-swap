@@ -23,6 +23,7 @@ interface ConfigType {
     rewardsWalletMnemonic: string;
     rewardsWalletPassword: string;
     rewardsCampaignEnabled: boolean;
+    rewardReservedForHours: number;
 }
 export const config: ConfigType = {
     blockchainApiUrl: process.env.BLOCKCHAIN_API_URL as string,
@@ -43,4 +44,5 @@ export const config: ConfigType = {
     rewardsWalletMnemonic: process.env.REWARDS_WALLET_MNEMONIC as string,
     rewardsWalletPassword: process.env.REWARDS_WALLET_PASSWORD as string,
     rewardsCampaignEnabled: (process.env.REWARDS_CAMPAIGN_ENABLED as string) === 'true',
+    rewardReservedForHours: Number(process.env.REWARD_RESERVED_FOR_HOURS as string)
 };

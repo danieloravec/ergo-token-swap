@@ -24,9 +24,11 @@ module.exports = {
           type: DataTypes.STRING,
           allowNull: false,
         },
-        available: {
-          type: DataTypes.BOOLEAN,
-          allowNull: false,
+        reserved_at: {
+          type: DataTypes.DATE,
+        },
+        giveaway_tx_id: {
+          type: DataTypes.STRING,
         },
         created_at: {
           allowNull: false,
@@ -49,6 +51,7 @@ module.exports = {
       await queryInterface.removeColumn('trading_sessions', 'input_indices_rewards');
       await queryInterface.removeColumn('trading_sessions', 'signed_rewards_inputs');
 
+      await queryInterface.removeIndex('rewards', ['token_id']);
       await queryInterface.dropTable('rewards');
     }
   )

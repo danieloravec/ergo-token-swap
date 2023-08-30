@@ -4,20 +4,30 @@ import sequelizeConnection from '@db/config'
 /* tslint:disable variable-name */
 interface RewardAttributes {
   token_id: string;
-  available: boolean;
+  reserved_at: Date;
+  reserved_session_secret: string;
+  giveaway_tx_id: string;
 }
 
 class Reward extends Model<RewardAttributes> implements RewardAttributes {
   token_id: string;
-  available: boolean;
+  reserved_at: Date;
+  reserved_session_secret: string;
+  giveaway_tx_id: string;
 }
 
 Reward.init({
   token_id: {
     type: DataTypes.STRING,
   },
-  available: {
-    type: DataTypes.BOOLEAN,
+  reserved_at: {
+    type: DataTypes.DATE,
+  },
+  reserved_session_secret: {
+    type: DataTypes.STRING,
+  },
+  giveaway_tx_id: {
+    type: DataTypes.STRING,
   }
 }, {
   timestamps: true,

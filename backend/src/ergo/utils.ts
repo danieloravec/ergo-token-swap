@@ -2,8 +2,9 @@ import { type NonMandatoryRegisters } from '@fleet-sdk/common';
 import { config } from '@config';
 import {type Amount, type Box, TokenAmount} from '@fleet-sdk/core';
 import sequelizeConnection from "@db/config";
-import {QueryTypes} from "sequelize";
+import {JSONB, Op, QueryTypes} from "sequelize";
 import Reward from "@db/models/rewards";
+import JSONBig from "json-bigint";
 
 export interface AdditionalRegisterObjectRepr {
   serializedValue: string;
@@ -66,21 +67,62 @@ export const getInputs = async (
   });
 };
 
-export const getRewardBoxes = async (amount: number): Promise<Box<Amount>[]> => {
-  // TODO get random available token IDs from DB and get boxes for them (each reward NFT will be in a separate box)
-  const rewards = await Reward.findAll({
-    where: {
-      available: true,
-    },
-    order: [['tokenId', 'DESC']],
-    limit: amount,
-    raw: true
-  });
-  console.log(`\n\nrewards: ${JSON.stringify(rewards)}\n\n`);
-  const tokenIds = rewards.map((reward) => reward.token_id);
-  return await Promise.all(tokenIds.map(async (tokenId) => {
-    return (await explorerRequest(`/boxes/unspent/byTokenId/${tokenId}`, 1)) as Box<Amount>;
-  }));
+// Each reward will be in a separate box
+export const getRewardBoxes = async (amount: number, rewardsSessionSecret: string): Promise<Box<Amount>[]> => {
+  const maxExpiredReservationTime = new Date();
+  maxExpiredReservationTime.setHours(maxExpiredReservationTime.getHours() - config.rewardReservedForHours);
+  const t = await sequelizeConnection.transaction();
+  let rewardTokenIds = [];
+  try {
+    const rewards = await Reward.findAll({
+      where: {
+        [Op.and]: [
+          {giveaway_tx_id: null},
+          {
+            reserved_at: {
+              [Op.or]: [
+                {[Op.is]: null},
+                {[Op.lt]: maxExpiredReservationTime}
+              ]
+            }
+          },
+        ]
+      },
+      order: sequelizeConnection.random(),
+      limit: amount,
+      raw: true,
+      transaction: t
+    });
+    rewardTokenIds = rewards.map((reward) => reward.token_id); // TODO is this correct?
+    await Reward.update(
+      {
+        reserved_session_secret: rewardsSessionSecret,
+        reserved_at: new Date()
+      },
+      {
+        where: {
+          token_id: {
+            [Op.in]: rewardTokenIds
+          }
+        },
+        transaction: t
+      });
+    await t.commit();
+  } catch (err) {
+    await t.rollback();
+    console.error(`Failed to get reward boxes: ${err}\n${JSON.stringify(err)}`);
+    return [];
+  }
+
+  try {
+    return await Promise.all(rewardTokenIds.map(async (tokenId) => {
+      const boxResponse = await explorerRequest(`/boxes/unspent/byTokenId/${tokenId}`, 1);
+      return boxResponse.items[0];
+    }));
+  } catch (err) {
+    console.error(`Failed to get reward boxes: ${err}\n${JSON.stringify(err)}`);
+    return [];
+  }
 };
 
 export const getAssetsFromBox = (box: Box<Amount>): Record<string, bigint> => {
