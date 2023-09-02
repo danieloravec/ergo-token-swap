@@ -44,8 +44,6 @@ const NftCollection = (): JSX.Element => {
 
       const body = mintingTxInfo.body;
 
-      console.log(`mintingTxInfo: ${JSONBig.stringify(mintingTxInfo)}`);
-
       const mintInputsErgoTree =
         body.unsignedTx.inputs[body.inputIndicesMint[0]].ergoTree;
       const userInputIndices = body.unsignedTx.inputs
@@ -68,10 +66,9 @@ const NftCollection = (): JSX.Element => {
 
       const txId = body.unsignedTx.id as string;
       const signedTx: SignedTransaction = {
-        ...body.unsignedTx,
+        dataInputs: [] as DataInput[],
         id: txId,
         inputs: mergedSignedInputs,
-        dataInputs: [] as DataInput[],
         outputs: body.unsignedTx.outputs.map((output, i) => {
           if (output.boxId === undefined) {
             throw new Error('boxId is undefined');

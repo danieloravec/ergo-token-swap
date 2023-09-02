@@ -276,7 +276,13 @@ txRouter.post('/mint/submit', async (req, res) => {
       signedTx: SignedTransaction
     } = req.body;
 
-    const txId = await submitTx(body.signedTx);
+    const {status, message} = await submitTx(body.signedTx);
+
+    if (status !== 200) {
+      res.status(status);
+      res.send({message});
+      return;
+    }
 
     await Reward.update({
       giveaway_tx_submitted_at: new Date(),
@@ -286,10 +292,11 @@ txRouter.post('/mint/submit', async (req, res) => {
       }
     });
 
-    res.status(200);
-    res.send({ txId }); // TODO test this
+    res.status(status);
+    res.send({ message }); // TODO test this
   } catch (err) {
     res.status(500);
+    console.error(`Error while submitting minting tx: ${err}`);
     res.send({
       message: `Server-side error while submitting the transaction: ${err} / ${JSONBig.stringify(err)}`
     })
