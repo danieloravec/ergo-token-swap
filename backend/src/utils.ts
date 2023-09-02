@@ -13,14 +13,10 @@ import User from "@db/models/user";
 import {Transaction} from "sequelize";
 import * as types from "@types";
 import JSONBig from "json-bigint";
-
-export async function explorerRequest(endpoint: string, apiVersion: number = 0): Promise<any> {
-    const res = await fetch(`${config.blockchainApiUrl}/v${apiVersion}${endpoint}`);
-    return await res.json();
-}
+import { explorerRequest } from "@ergo/utils";
 
 export async function getAssetsAndNanoErgByAddress(address: string): Promise<{assets: Asset[], nanoErg: bigint}> {
-    const boxesResponse = await explorerRequest(`/transactions/boxes/byAddress/unspent/${address}`);
+    const boxesResponse = await explorerRequest(`/transactions/boxes/byAddress/unspent/${address}`, 0);
     const assets: Asset[] = [];
     let nanoErg = BigInt(0);
     for (const box of boxesResponse) {

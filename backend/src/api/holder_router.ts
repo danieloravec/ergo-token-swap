@@ -1,5 +1,5 @@
 import Router from 'express'
-import {explorerRequest} from "@utils";
+import {explorerRequest} from "@ergo/utils";
 import User from "@db/models/user";
 
 const holderRouter = Router();

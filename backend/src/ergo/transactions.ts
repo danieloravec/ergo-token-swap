@@ -1,10 +1,11 @@
-import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
+import {Amount, Box, OutputBuilder, TransactionBuilder} from '@fleet-sdk/core';
 import { config } from '@config';
 import {type EIP12UnsignedTransaction, SignedInput} from '@fleet-sdk/common';
 import * as utils from '@ergo/utils';
 import { Loader } from '@ergo/loader';
-import {explorerRequest} from "@utils";
+import {explorerRequest} from "@ergo/utils";
 import JSONBig from "json-bigint";
+import {getRewardBoxes} from "@ergo/utils";
 
 interface BuildMultisigSwapTxParams {
   addressA: string;
@@ -17,7 +18,33 @@ interface BuildMultisigSwapTxParams {
   rewardsSessionSecret: string;
 }
 
+const calculateTxId = async (unsignedTx: EIP12UnsignedTransaction): Promise<string> => {
+  await Loader.load();
+  return Loader.Ergo.UnsignedTransaction.from_json(
+    JSON.stringify(unsignedTx)
+  )
+    .id()
+    .to_str();
+}
+
+const fillBoxIds = async (unsignedTx: EIP12UnsignedTransaction): Promise<string> => {
+  const txId = await calculateTxId(unsignedTx);
+  unsignedTx.outputs.forEach((output, idx) => {
+    unsignedTx.outputs[idx].boxId = Loader.Ergo.ErgoBox.from_json(
+      JSON.stringify({
+        ...output,
+        index: idx,
+        transactionId: txId,
+      })
+    )
+      .box_id()
+      .to_str();
+  });
+  return txId;
+}
+
 const signRewardInputs = async (unsignedTx: EIP12UnsignedTransaction, rewardInputIndices: number[]): Promise<SignedInput[]> => {
+  await Loader.load();
   const seed = Loader.Ergo.Mnemonic.to_seed(
     config.rewardsWalletMnemonic,
     config.rewardsWalletPassword
@@ -66,12 +93,9 @@ export async function buildUnsignedMultisigSwapTx({
   signedRewardsInputs: SignedInput[];
 }> {
   await Loader.load();
-  const creationHeight = (await explorerRequest('/info', 1))?.height;
-  if (!creationHeight) {
-    throw new Error('Could not get current height');
-  }
+  const creationHeight = await utils.getCurrentHeight();
 
-  const rewardInputs = addRewards ? await utils.getRewardBoxes(2, rewardsSessionSecret) : [];
+  const rewardInputs = addRewards ? await utils.getRewardBoxes(2, "reward", rewardsSessionSecret) : [];
 
   const inputsA = await utils.getInputs(addressA);
   const inputsB = await utils.getInputs(addressB);
@@ -132,13 +156,13 @@ export async function buildUnsignedMultisigSwapTx({
     ]),
   ];
 
-  const unsignedTxBuilt = new TransactionBuilder(creationHeight)
+  const unsignedTx = new TransactionBuilder(creationHeight)
     .from([...inputsA, ...inputsB, ...rewardInputs])
     .to(outputs)
     .sendChangeTo(config.serviceFeeAddress) // Only 2 * config.serviceFeeNanoErg will be in change
     .payMinFee()
-    .build();
-  const unsignedTx = unsignedTxBuilt.toEIP12Object();
+    .build()
+    .toEIP12Object();
 
   let inputIndicesRewards = [] as number[];
   let signedRewardsInputs = [] as SignedInput[];
@@ -149,25 +173,7 @@ export async function buildUnsignedMultisigSwapTx({
     signedRewardsInputs = await signRewardInputs(unsignedTx, inputIndicesRewards);
   }
 
-  // Calculate txId from unsignedTx
-  const txId = Loader.Ergo.UnsignedTransaction.from_json(
-    JSON.stringify(unsignedTx)
-  )
-    .id()
-    .to_str();
-
-  // Calculate boxIds
-  unsignedTx.outputs.forEach((output, idx) => {
-    unsignedTx.outputs[idx].boxId = Loader.Ergo.ErgoBox.from_json(
-      JSON.stringify({
-        ...output,
-        index: idx,
-        transactionId: txId,
-      })
-    )
-      .box_id()
-      .to_str();
-  });
+  const txId = await fillBoxIds(unsignedTx); // TODO does this really modify outputs?
 
   const inputIndicesA: number[] = [];
   const inputIndicesB: number[] = [];
@@ -188,5 +194,63 @@ export async function buildUnsignedMultisigSwapTx({
     inputIndicesB,
     inputIndicesRewards,
     signedRewardsInputs
+  };
+}
+
+interface BuildMintTxResult {
+  unsignedTx: EIP12UnsignedTransaction,
+  signedMintInputs: SignedInput[],
+  inputIndicesMint: number[]
+}
+
+export const buildMintTx = async (address: string, amountToMint: number): Promise<BuildMintTxResult> => {
+  const mintInputs = await getRewardBoxes(amountToMint, "mint", address);
+  if (mintInputs.length === 0) {
+    throw new Error('No reward inputs found');
+  }
+
+  const userInputs = await utils.getInputs(address);
+  if (userInputs.length === 0) {
+    throw new Error('No inputs found for at least one of the participants');
+  }
+
+  const mintedAssets = mintInputs.map((input) => {
+    return input.assets;
+  }).flat();
+  const outputs = [
+    new OutputBuilder(
+      BigInt(amountToMint) * config.mintPriceNanoErg,
+      config.serviceFeeAddress
+    ),
+    new OutputBuilder(
+      BigInt(amountToMint) * config.minNanoErgValue,
+      address
+    ).addTokens(mintedAssets)
+  ];
+
+  const creationHeight = await utils.getCurrentHeight();
+
+  const unsignedTx = new TransactionBuilder(creationHeight)
+    .from([...userInputs, ...mintInputs])
+    .to(outputs)
+    .sendChangeTo(address) // We only want the fee. All contents of reward inputs go to user (there's 1 NFT per box)
+    .payMinFee()
+    .build()
+    .toEIP12Object();
+
+  const inputIndicesMint = unsignedTx.inputs.map((input, idx) => {
+    return input.ergoTree === mintInputs[0].ergoTree ? idx : -1;
+  }).filter((idx) => idx !== -1);
+  const signedMintInputs = await signRewardInputs(unsignedTx, inputIndicesMint);
+
+  const txId = await fillBoxIds(unsignedTx); // TODO does this really modify outputs?
+
+  return {
+    unsignedTx: {
+      ...unsignedTx,
+      id: txId,
+    },
+    signedMintInputs,
+    inputIndicesMint,
   };
 }

@@ -1,4 +1,4 @@
-import { type NonMandatoryRegisters } from '@fleet-sdk/common';
+import {type NonMandatoryRegisters, SignedTransaction} from '@fleet-sdk/common';
 import { config } from '@config';
 import {type Amount, type Box, TokenAmount} from '@fleet-sdk/core';
 import sequelizeConnection from "@db/config";
@@ -67,8 +67,9 @@ export const getInputs = async (
   });
 };
 
+// TODO use id instead of rewardsSessionSecret and differentiante based on type between mint and rewards
 // Each reward will be in a separate box
-export const getRewardBoxes = async (amount: number, rewardsSessionSecret: string): Promise<Box<Amount>[]> => {
+export const getRewardBoxes = async (amount: number, type: "mint" | "reward", reservedSessionSecretOrAddress: string): Promise<Box<Amount>[]> => {
   const maxExpiredReservationTime = new Date();
   maxExpiredReservationTime.setHours(maxExpiredReservationTime.getHours() - config.rewardReservedForHours);
   const t = await sequelizeConnection.transaction();
@@ -93,10 +94,16 @@ export const getRewardBoxes = async (amount: number, rewardsSessionSecret: strin
       raw: true,
       transaction: t
     });
-    rewardTokenIds = rewards.map((reward) => reward.token_id); // TODO is this correct?
+    if (rewards.length < amount) {
+      await t.rollback();
+      console.log('Not enough rewards available');
+      return [];
+    }
+    rewardTokenIds = rewards.map((reward) => reward.token_id);
     await Reward.update(
       {
-        reserved_session_secret: rewardsSessionSecret,
+        reserved_session_secret_or_address: reservedSessionSecretOrAddress,
+        type,
         reserved_at: new Date()
       },
       {
@@ -196,4 +203,37 @@ export const mergeAssets = (assetsToMerge: Record<string, bigint>[]): Record<str
     result = mergeAssetsSimple(result, assets);
   }
   return result;
+}
+
+export const getCurrentHeight = async () => {
+  const creationHeight = (await explorerRequest('/info', 1))?.height;
+  if (!creationHeight) {
+    throw new Error('Could not get current height');
+  }
+  return creationHeight;
+}
+
+export const submitTx = async (signedTx: SignedTransaction): Promise<string> => {
+  const submitResult = await fetch(config.graphQlZelcoreUrl, {
+    method: "POST",
+    credentials: "omit",
+    headers: {
+      accept: "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
+      "content-type": "application/json",
+    },
+    body: JSONBig.stringify({
+      operationName: "Mutation",
+      query: "mutation Mutation($signedTransaction: SignedTransaction!) { submitTransaction(signedTransaction: $signedTransaction) }",
+      varibles: {
+        signedTransaction: signedTx
+      }
+    })
+  });
+  const submitData = await submitResult.json();
+
+  console.log(`\n\nSUBMIT TX RESULT: ${JSONBig.stringify(submitResult)}\n\n`);
+
+  const txId = submitData?.data?.submitTransaction;
+  console.log(`\n\nSUBMITTED TX ID: ${txId}`);
+  return txId;
 }
