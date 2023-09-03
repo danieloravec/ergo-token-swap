@@ -1,5 +1,6 @@
 import {
   CenteredDivHorizontal,
+  FlexDiv,
   FlexDivRow,
 } from '@components/Common/Alignment';
 import { Button } from '@components/Common/Button';
@@ -16,19 +17,139 @@ import {
 import { type Amount, type Box } from '@fleet-sdk/core';
 import { Alert } from '@components/Common/Alert';
 import { config } from '@config';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { Spacer } from '@components/Common/Spacer';
+import { spacing } from '@themes/spacing';
+import Image from 'next/image';
+import { useWindowDimensions } from '@components/hooks';
+
+const HeadingContainer = styled(CenteredDivHorizontal)`
+  width: 50%;
+
+  @media (max-width: 1200px) {
+    width: 90%;
+  }
+`;
 
 const NftCollectionHeading = (): JSX.Element => {
   const theme = useTheme();
   return (
-    <FlexDivRow>
-      <CenteredDivHorizontal>
-        {/* <Heading1 style={{fontSize: "60px", color: theme.properties.colorSecondary}}>UTxO Beastz</Heading1> */}
-        <Heading1 style={{ fontSize: '7em' }}>
+    <CenteredDivHorizontal style={{ width: '100%' }}>
+      <HeadingContainer>
+        <Heading1 style={{ fontSize: '6em' }}>
           <span style={{ color: theme.properties.colorSecondary }}>UTxO</span>{' '}
           Beastz
         </Heading1>
-      </CenteredDivHorizontal>
+        <FlexDiv>
+          <p style={{ fontSize: '32px' }}>
+            <strong>
+              Discover the first 10k NFT collection on #Ergo that gives you
+              actual{' '}
+              <span style={{ color: theme.properties.colorSecondary }}>
+                utility
+              </span>
+              . Get discounts on trading by just holding NFTs that you can get
+              for{' '}
+              <span style={{ color: theme.properties.colorSecondary }}>
+                free
+              </span>
+              !
+            </strong>
+          </p>
+
+          <ul style={{ fontSize: '22px' }}>
+            <li>
+              Get an NFT for{' '}
+              <span style={{ color: theme.properties.colorSecondary }}>
+                free
+              </span>{' '}
+              for every swap you perform on single-tx-swap.com
+            </li>
+            <Spacer size={spacing.spacing_s} vertical />
+            <li>
+              The more UTxO Beastz you hold, the bigger the discount on the next
+              swap. Read below for more details!
+            </li>
+            <Spacer size={spacing.spacing_s} vertical />
+            <li>Or directly mint one here for 0.9 $ERG</li>
+          </ul>
+        </FlexDiv>
+      </HeadingContainer>
+    </CenteredDivHorizontal>
+  );
+};
+
+const GalleryImageContainer = styled.div`
+  flex: 1;
+  max-width: 30%;
+  margin: 10px;
+
+  @media (max-width: 1200px) {
+    max-width: 40%;
+  }
+
+  @media (max-width: 450px) {
+    max-width: 90%;
+  }
+`;
+
+const Gallery = (): JSX.Element => {
+  const { width } = useWindowDimensions();
+  const numImages = 6;
+  const imagesPerLine = width < 450 ? 1 : width < 1200 ? 2 : 3;
+  const imageDimension = Math.floor((width / imagesPerLine) * 0.9);
+
+  const images = [
+    <Image
+      src="/beastz-gallery/109.jpg"
+      alt="UTxO Beast"
+      width={imageDimension}
+      height={imageDimension}
+    />,
+    <Image
+      src="/beastz-gallery/9996.jpg"
+      alt="UTxO Beast"
+      width={imageDimension}
+      height={imageDimension}
+    />,
+    <Image
+      src="/beastz-gallery/637.jpg"
+      alt="UTxO Beast"
+      width={imageDimension}
+      height={imageDimension}
+    />,
+    <Image
+      src="/beastz-gallery/9999.jpg"
+      alt="UTxO Beast"
+      width={imageDimension}
+      height={imageDimension}
+    />,
+    <Image
+      src="/beastz-gallery/647.jpg"
+      alt="UTxO Beast"
+      width={imageDimension}
+      height={imageDimension}
+    />,
+    <Image
+      src="/beastz-gallery/9986.jpg"
+      alt="UTxO Beast"
+      width={imageDimension}
+      height={imageDimension}
+    />,
+  ].slice(0, numImages);
+
+  return (
+    <FlexDivRow
+      style={{
+        flexDirection: 'row',
+        minHeight: '400px',
+        justifyContent: 'space-evenly',
+        alignItems: 'flex-start',
+      }}
+    >
+      {images.map((image, idx) => {
+        return <GalleryImageContainer key={idx}>{image}</GalleryImageContainer>;
+      })}
     </FlexDivRow>
   );
 };
@@ -159,6 +280,9 @@ const NftCollection = (): JSX.Element => {
       >
         Mint NFT
       </Button>
+      <FlexDivRow>
+        <Gallery />
+      </FlexDivRow>
     </FlexDivRow>
   );
 };

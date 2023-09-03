@@ -60,7 +60,15 @@ export const useWindowDimensions = (): { width: number; height: number } => {
   useEffect(() => {
     if (hasWindow) {
       const handleResize = (): void => {
-        setWindowDimensions(getWindowDimensions());
+        console.log('handleResize');
+        const { width, height } = getWindowDimensions();
+        if (
+          Math.abs(width - windowDimensions.width) +
+            Math.abs(height - windowDimensions.height) >
+          100
+        ) {
+          setWindowDimensions(getWindowDimensions());
+        }
       };
 
       window.addEventListener('resize', handleResize);

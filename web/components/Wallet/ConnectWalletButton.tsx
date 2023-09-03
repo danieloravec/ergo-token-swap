@@ -27,12 +27,21 @@ export function ConnectWalletButton(): JSX.Element {
   };
 
   useEffect(() => {
-    if (address !== undefined) {
-      setDisplayAddress(shortenString(address, 11));
-      createUserIfNotExists(address).catch(console.error);
-    }
     setConnectedWallet(wallet);
-  }, [address, wallet]);
+  }, [wallet]);
+
+  useEffect(() => {
+    if (address === undefined) {
+      return;
+    }
+
+    const handleAddrChange = async (): Promise<void> => {
+      setDisplayAddress(shortenString(address, 11));
+      await createUserIfNotExists(address);
+    };
+
+    handleAddrChange().catch(console.error);
+  }, [address]);
 
   return connectedWallet === undefined ? (
     <Button
