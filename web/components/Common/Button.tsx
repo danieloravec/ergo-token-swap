@@ -36,3 +36,7 @@ export const ButtonTertiarySquared = styled(Button)`
   color: ${(props) => props.theme.properties.colorBgText};
   border-radius: 10px;
 `;
+
+export const DisabledButton = styled(Button)`
+  background-color: ${(props) => props.theme.properties.colorNavs};
+`;

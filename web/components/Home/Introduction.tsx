@@ -1,6 +1,6 @@
 import { Heading1, OrderedList, StrongBg } from '@components/Common/Text';
 import styled, { useTheme } from 'styled-components';
-import { Button } from '@components/Common/Button';
+import { Button, DisabledButton } from '@components/Common/Button';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
@@ -30,10 +30,6 @@ const startTradingSession = async (wallet: Wallet): Promise<string> => {
   }
   return sessionResponse.body.secret;
 };
-
-const DisabledButton = styled(Button)`
-  background-color: ${(props) => props.theme.properties.colorNavs};
-`;
 
 export function Introduction(): JSX.Element {
   const { wallet } = useWalletStore();

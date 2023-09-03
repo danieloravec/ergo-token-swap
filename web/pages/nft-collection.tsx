@@ -3,9 +3,9 @@ import {
   FlexDiv,
   FlexDivRow,
 } from '@components/Common/Alignment';
-import { Button } from '@components/Common/Button';
+import { Button, DisabledButton } from '@components/Common/Button';
 import { backendRequest } from '@utils/utils';
-import { A, Heading1, Input } from '@components/Common/Text';
+import { A, Heading1, Heading2 } from '@components/Common/Text';
 import { useState } from 'react';
 import { useWalletStore } from '@components/Wallet/hooks';
 import {
@@ -22,6 +22,7 @@ import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
 import Image from 'next/image';
 import { useWindowDimensions } from '@components/hooks';
+import { Select } from '@components/Common/Inputs';
 
 const HeadingContainer = styled(CenteredDivHorizontal)`
   width: 50%;
@@ -31,15 +32,29 @@ const HeadingContainer = styled(CenteredDivHorizontal)`
   }
 `;
 
+const HeadingTextContainer = styled(Heading1)`
+  font-size: 6em;
+
+  @media (max-width: 450px) {
+    font-size: 4em;
+  }
+`;
+
 const NftCollectionHeading = (): JSX.Element => {
   const theme = useTheme();
   return (
-    <CenteredDivHorizontal style={{ width: '100%' }}>
+    <CenteredDivHorizontal
+      style={{
+        width: '100%',
+        color: theme.properties.colorBgText,
+        textAlign: 'center',
+      }}
+    >
       <HeadingContainer>
-        <Heading1 style={{ fontSize: '6em' }}>
-          <span style={{ color: theme.properties.colorSecondary }}>UTxO</span>{' '}
+        <HeadingTextContainer>
+          <span style={{ color: theme.properties.colorPrimary }}>UTxO</span>{' '}
           Beastz
-        </Heading1>
+        </HeadingTextContainer>
         <FlexDiv>
           <p style={{ fontSize: '32px' }}>
             <strong>
@@ -57,22 +72,15 @@ const NftCollectionHeading = (): JSX.Element => {
             </strong>
           </p>
 
-          <ul style={{ fontSize: '22px' }}>
-            <li>
-              Get an NFT for{' '}
-              <span style={{ color: theme.properties.colorSecondary }}>
-                free
-              </span>{' '}
-              for every swap you perform on single-tx-swap.com
-            </li>
-            <Spacer size={spacing.spacing_s} vertical />
-            <li>
-              The more UTxO Beastz you hold, the bigger the discount on the next
-              swap. Read below for more details!
-            </li>
-            <Spacer size={spacing.spacing_s} vertical />
-            <li>Or directly mint one here for 0.9 $ERG</li>
-          </ul>
+          <p style={{ fontSize: '22px' }}>
+            Get an NFT for{' '}
+            <span style={{ color: theme.properties.colorSecondary }}>
+              <strong>free</strong>
+            </span>{' '}
+            for every swap you perform on{' '}
+            <A href={config.ownUrl}>{config.ownUrl.slice('https://'.length)}</A>
+            , or directly mint some here for 0.9 $ERG a piece.
+          </p>
         </FlexDiv>
       </HeadingContainer>
     </CenteredDivHorizontal>
@@ -154,13 +162,77 @@ const Gallery = (): JSX.Element => {
   );
 };
 
+const DiscountsTableContainer = styled(FlexDiv)`
+  width: 50%;
+
+  @media (max-width: 1200px) {
+    width: 90%;
+  }
+`;
+
+const DiscountsTable = (): JSX.Element => {
+  const theme = useTheme();
+
+  const data = [
+    {
+      minBeastzRequirement: 1,
+      discountPercent: 25,
+    },
+    {
+      minBeastzRequirement: 5,
+      discountPercent: 50,
+    },
+    {
+      minBeastzRequirement: 20,
+      discountPercent: 75,
+    },
+  ];
+
+  return (
+    <FlexDivRow>
+      <Heading2>
+        Hold UTxo Beastz to get{' '}
+        <span style={{ color: theme.properties.colorSecondary }}>
+          discounts
+        </span>{' '}
+        on {config.ownUrl.slice('https://'.length)}:
+      </Heading2>
+      {data.map((info, idx) => {
+        return (
+          <FlexDivRow
+            style={{
+              fontSize: '22px',
+              minHeight: '50px',
+              border: `1px solid ${theme.properties.colorBgText}`,
+            }}
+          >
+            <FlexDiv
+              style={{
+                width: '50%',
+                paddingInline: `${spacing.spacing_xs}px`,
+                alignItems: 'center',
+              }}
+            >
+              ≥ {info.minBeastzRequirement} UTxO Beastz
+            </FlexDiv>
+            <FlexDiv style={{ width: '50%', alignItems: 'center' }}>
+              {info.discountPercent}% discount on trading fees
+            </FlexDiv>
+          </FlexDivRow>
+        );
+      })}
+    </FlexDivRow>
+  );
+};
+
 const NftCollection = (): JSX.Element => {
-  const [mintAmount, setMintAmount] = useState<number>(0);
+  const [mintAmount, setMintAmount] = useState<number>(1);
   const [submittedTxId, setSubmittedTxId] = useState<string | undefined>(
     undefined
   );
   const [error, setError] = useState<string | undefined>(undefined);
   const { wallet, address } = useWalletStore();
+  const theme = useTheme();
 
   interface BuildMintTxBodySuccess {
     unsignedTx: EIP12UnsignedTransaction;
@@ -248,13 +320,14 @@ const NftCollection = (): JSX.Element => {
     mintNft(amountToMint).catch(console.error);
   };
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleAmountChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ): void => {
     setMintAmount(Number(e.target.value));
   };
 
   return (
     <FlexDivRow>
-      <NftCollectionHeading />
       {error !== undefined && (
         <Alert type="error" marginSides="0px">
           {error}
@@ -272,14 +345,74 @@ const NftCollection = (): JSX.Element => {
           .
         </Alert>
       )}
-      <Input type="number" onChange={handleAmountChange} />
-      <Button
-        onClick={(e) => {
-          handleMint(mintAmount);
-        }}
-      >
-        Mint NFT
-      </Button>
+
+      <NftCollectionHeading />
+
+      <FlexDivRow>
+        <CenteredDivHorizontal>
+          <span style={{ fontSize: '22px', fontWeight: 'strong' }}>
+            Amount:
+          </span>
+          <Spacer size={spacing.spacing_xxs} vertical={false} />
+          <Select onChange={handleAmountChange}>
+            {[
+              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+              20,
+            ].map((amount) => {
+              return (
+                <option key={amount} value={amount}>
+                  {amount}
+                </option>
+              );
+            })}
+          </Select>
+          <Spacer size={spacing.spacing_xxs} vertical={false} />
+          {address !== undefined ? (
+            <Button
+              style={{ fontSize: '16px' }}
+              onClick={(e) => {
+                handleMint(mintAmount);
+              }}
+            >
+              Mint
+            </Button>
+          ) : (
+            <DisabledButton disabled>Wallet not connected</DisabledButton>
+          )}
+        </CenteredDivHorizontal>
+      </FlexDivRow>
+
+      <Spacer size={spacing.spacing_xxxl} vertical />
+      <CenteredDivHorizontal>
+        <DiscountsTableContainer>
+          <DiscountsTable />
+        </DiscountsTableContainer>
+      </CenteredDivHorizontal>
+
+      <Spacer size={spacing.spacing_xxxl} vertical />
+      <FlexDivRow>
+        <CenteredDivHorizontal>
+          <FlexDiv style={{ width: '50%' }}>
+            <p style={{ fontSize: '22px', textAlign: 'center' }}>
+              Each UTxO Beast NFT represents a{' '}
+              <span style={{ color: theme.properties.colorSecondary }}>
+                transaction
+              </span>{' '}
+              in the UTxO model. A transaction eats some{' '}
+              <span style={{ color: theme.properties.colorSecondary }}>
+                inputs
+              </span>{' '}
+              and produces{' '}
+              <span style={{ color: theme.properties.colorSecondary }}>
+                outputs
+              </span>{' '}
+              in exchange.
+            </p>
+          </FlexDiv>
+        </CenteredDivHorizontal>
+      </FlexDivRow>
+
+      <Spacer size={spacing.spacing_xxxl} vertical />
       <FlexDivRow>
         <Gallery />
       </FlexDivRow>
