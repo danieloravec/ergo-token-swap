@@ -42,6 +42,10 @@ const HeadingTextContainer = styled(Heading1)`
 
 const NftCollectionHeading = (): JSX.Element => {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
+  const exampleBeastDimension =
+    width < 450 ? width * 0.9 : width < 1200 ? width * 0.6 : width * 0.4;
+
   return (
     <CenteredDivHorizontal
       style={{
@@ -58,19 +62,22 @@ const NftCollectionHeading = (): JSX.Element => {
         <FlexDiv>
           <p style={{ fontSize: '32px' }}>
             <strong>
-              Discover the first 10k NFT collection on #Ergo that gives you
-              actual{' '}
-              <span style={{ color: theme.properties.colorSecondary }}>
-                utility
-              </span>
-              . Get discounts on trading by just holding NFTs that you can get
-              for{' '}
+              Get discounts on trading by holding NFTs that you can get for{' '}
               <span style={{ color: theme.properties.colorSecondary }}>
                 free
               </span>
-              !
+              ! Scroll down to learn more...
             </strong>
           </p>
+
+          <CenteredDivHorizontal>
+            <Image
+              src="/golden-beast-small.png"
+              alt="utxo-beast-golden"
+              width={exampleBeastDimension}
+              height={exampleBeastDimension}
+            />
+          </CenteredDivHorizontal>
 
           <p style={{ fontSize: '22px' }}>
             Get an NFT for{' '}
@@ -79,7 +86,11 @@ const NftCollectionHeading = (): JSX.Element => {
             </span>{' '}
             for every swap you perform on{' '}
             <A href={config.ownUrl}>{config.ownUrl.slice('https://'.length)}</A>
-            , or directly mint some here for 0.9 $ERG a piece.
+            , or directly mint some here for{' '}
+            <span style={{ color: theme.properties.colorSecondary }}>
+              <strong>0.9 $ERG</strong>
+            </span>{' '}
+            a piece.
           </p>
         </FlexDiv>
       </HeadingContainer>
@@ -195,7 +206,7 @@ const DiscountsTable = (): JSX.Element => {
         <span style={{ color: theme.properties.colorSecondary }}>
           discounts
         </span>{' '}
-        on {config.ownUrl.slice('https://'.length)}:
+        on <A href={config.ownUrl}>{config.ownUrl.slice('https://'.length)}</A>:
       </Heading2>
       {data.map((info, idx) => {
         return (
