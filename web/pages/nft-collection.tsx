@@ -72,8 +72,8 @@ const NftCollectionHeading = (): JSX.Element => {
 
           <CenteredDivHorizontal>
             <Image
-              src="/golden-beast-small.png"
-              alt="utxo-beast-golden"
+              src="/transparent-beast-small.png"
+              alt="utxo-beast-example"
               width={exampleBeastDimension}
               height={exampleBeastDimension}
             />
