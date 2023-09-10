@@ -6,14 +6,15 @@ import {Request, Response} from "express";
 import fetch from "cross-fetch";
 import * as jwt from "jsonwebtoken";
 import {JwtPayload} from "jsonwebtoken";
-import {ErgoAddress, TokenAmount} from "@fleet-sdk/core";
-import {EIP12UnsignedTransaction} from "@fleet-sdk/common";
+import {Amount, Box, ErgoAddress, TokenAmount} from "@fleet-sdk/core";
+import {EIP12UnsignedTransaction, SignedTransaction} from "@fleet-sdk/common";
 import UserAssetStats from "@db/models/user_asset_stats";
 import User from "@db/models/user";
 import {Transaction} from "sequelize";
 import * as types from "@types";
 import JSONBig from "json-bigint";
 import { explorerRequest } from "@ergo/utils";
+import {Loader} from "@ergo/loader";
 
 export async function getAssetsAndNanoErgByAddress(address: string): Promise<{assets: Asset[], nanoErg: bigint}> {
     const boxesResponse = await explorerRequest(`/transactions/boxes/byAddress/unspent/${address}`, 0);
@@ -250,12 +251,40 @@ export const verifyJwt = (address: string, jwtStr: string): boolean => {
     }
 }
 
-export const verifySignature = (data: string, signature?: string): boolean => {
-    if (signature === undefined) {
+export const verifySignature = async (address: string, signedTx: SignedTransaction): Promise<boolean> => {
+    if (signedTx === undefined) {
         return false;
     }
-    // const serializedData = toHex(JSON.stringify(data));
-    return true; // TODO implement signature verification once dApp connector's sign_data is available
+
+    await Loader.load();
+    let txIdFromDb: string;
+    let boxToValidateFromDb: string;
+    try {
+        const user = await User.findOne({
+            where: {address},
+            raw: true
+        });
+        txIdFromDb = user?.auth_tx_id;
+        boxToValidateFromDb = user?.auth_tx_box_to_validate;
+    } catch (err) {
+        console.log('Failed to get the user from DB');
+        return false;
+    }
+    if (txIdFromDb === undefined) {
+        console.log('User has no auth tx id in DB');
+        return false;
+    }
+
+    if (signedTx?.id !== txIdFromDb) {
+        return false;
+    }
+
+    const txWasm = Loader.Ergo.Transaction.from_json(JSONBig.stringify(signedTx));
+    const boxToValidate = Loader.Ergo.ErgoBox.from_json(boxToValidateFromDb); // TODO is this correct?
+    const signatureValid = txWasm.verify_p2pk_input(boxToValidate);
+    console.log(`signatureValid: ${signatureValid}`);
+
+    return signatureValid;
 }
 
 export const assetSum = (assetAmounts: TokenAmount<string>[]): TokenAmount<string>[] => {
@@ -301,7 +330,11 @@ export const ensureAuth = (req: Request, res: Response, address?: string): boole
     if (!address) {
         return false;
     }
-    const token = req.header("Authorization");
+    const tokenTokenized = req.header("Authorization").split(' ');
+    if (tokenTokenized.length < 2) {
+        return false;
+    }
+    const token = tokenTokenized[1];
     if(token === undefined || !verifyJwt(address, token)) {
         res.status(401);
         res.send("Unauthorized");

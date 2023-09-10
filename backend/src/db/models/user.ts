@@ -1,5 +1,7 @@
-import {DataTypes, Model, Optional} from 'sequelize'
+import {DataTypes, Model} from 'sequelize'
 import sequelizeConnection from '@db/config'
+import {EIP12UnsignedTransaction} from "@fleet-sdk/common";
+import {Amount, Box} from "@fleet-sdk/core";
 
 /* tslint:disable variable-name */
 interface UserAttributes {
@@ -10,7 +12,8 @@ interface UserAttributes {
   twitter: string;
   allow_messages: boolean;
   created_at: Date;
-  auth_secret?: string;
+  auth_tx_id?: string;
+  auth_tx_box_to_validate: string;
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
@@ -21,7 +24,8 @@ class User extends Model<UserAttributes> implements UserAttributes {
   twitter: string;
   username: string;
   public readonly created_at!: Date;
-  auth_secret?: string;
+  auth_tx_id: string;
+  auth_tx_box_to_validate: string;
 }
 
 User.init({
@@ -48,8 +52,11 @@ User.init({
   created_at: {
     type: DataTypes.DATE,
   },
-  auth_secret: {
+  auth_tx_id: {
     type: DataTypes.STRING,
+  },
+  auth_tx_box_to_validate: {
+    type: DataTypes.JSONB,
   }
 }, {
   timestamps: true,

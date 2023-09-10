@@ -21,7 +21,7 @@ interface BuildMultisigSwapTxParams {
 const calculateTxId = async (unsignedTx: EIP12UnsignedTransaction): Promise<string> => {
   await Loader.load();
   return Loader.Ergo.UnsignedTransaction.from_json(
-    JSON.stringify(unsignedTx)
+    JSONBig.stringify(unsignedTx)
   )
     .id()
     .to_str();
@@ -31,7 +31,7 @@ const fillBoxIds = async (unsignedTx: EIP12UnsignedTransaction): Promise<string>
   const txId = await calculateTxId(unsignedTx);
   unsignedTx.outputs.forEach((output, idx) => {
     unsignedTx.outputs[idx].boxId = Loader.Ergo.ErgoBox.from_json(
-      JSON.stringify({
+      JSONBig.stringify({
         ...output,
         index: idx,
         transactionId: txId,
@@ -243,7 +243,7 @@ export const buildMintTx = async (address: string, amountToMint: number): Promis
   }).filter((idx) => idx !== -1);
   const signedMintInputs = await signRewardInputs(unsignedTx, inputIndicesMint);
 
-  const txId = await fillBoxIds(unsignedTx); // TODO does this really modify outputs?
+  const txId = await fillBoxIds(unsignedTx);
 
   return {
     unsignedTx: {
@@ -252,5 +252,43 @@ export const buildMintTx = async (address: string, amountToMint: number): Promis
     },
     signedMintInputs,
     inputIndicesMint,
+  };
+}
+
+export const buildAuthTx = async (address: string): Promise<{
+  unsignedAuthTx: EIP12UnsignedTransaction,
+  boxToValidate: Box<Amount>
+}> => {
+  const userInputs = await utils.getInputs(address);
+  if (userInputs.length === 0) {
+    throw new Error('User has to have at least 1 UTxO in the wallet to authenticate');
+  }
+
+  const creationHeight = await utils.getCurrentHeight();
+
+  const outputs = [
+    new OutputBuilder(
+      config.mintPriceNanoErg,
+      address
+    ),
+  ];
+
+  const unsignedTx = new TransactionBuilder(creationHeight)
+    .from(userInputs)
+    .to(outputs)
+    .sendChangeTo(address)
+    .payMinFee()
+    .build()
+    .toEIP12Object();
+
+  const boxToValidate = unsignedTx.inputs[0];
+
+  const txId = await fillBoxIds(unsignedTx);
+  return {
+    unsignedAuthTx: {
+      ...unsignedTx,
+      id: txId,
+    },
+    boxToValidate
   };
 }

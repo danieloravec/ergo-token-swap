@@ -3,13 +3,13 @@ import * as utils from "@utils";
 import User from "@db/models/user";
 import TradingSession from "@db/models/trading_session";
 import {Op, QueryTypes} from "sequelize";
-import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 import {config} from "@config";
 import {ensureAuth, verifyJwt} from "@utils";
 import sequelizeConnection from "@db/config";
-import * as types from "@types";
 import Follow from "@db/models/follow";
+import {buildAuthTx} from "@ergo/transactions";
+import JSONBig from "json-bigint";
 
 const userRouter = Router();
 
@@ -33,7 +33,6 @@ userRouter.get('/', async (req, res) => {
 });
 
 // For creating and updating users
-// TODO incorporate auth flow into this
 userRouter.post('/', async (req, res) => {
   try {
     const t = await sequelizeConnection.transaction();
@@ -62,16 +61,8 @@ userRouter.post('/', async (req, res) => {
     }
 
     if(user) {
-      if(!req.body?.signature) {
+      if (!utils.ensureAuth(req, res, data.address)) {
         await t.rollback();
-        res.status(200);
-        res.send(user);
-        return;
-      }
-      if (!utils.verifySignature(JSON.stringify(data), req.body.signature)) {
-        await t.rollback();
-        res.status(400);
-        res.send('Invalid data signature');
         return;
       }
       try {
@@ -106,7 +97,7 @@ userRouter.post('/', async (req, res) => {
         }, {transaction: t});
       } catch (e) {
         await t.rollback();
-        console.error(JSON.stringify(e));
+        console.error(JSONBig.stringify(e));
         res.status(500);
         res.send("Error while creating the user");
         return;
@@ -168,7 +159,7 @@ userRouter.get('/history', async (req, res) => {
             tx_id: null
           }
         },
-        order: [['submittedAt', 'DESC']],
+        order: [['submitted_at', 'DESC']],
       },
     );
     res.send(userSwapHistory);
@@ -182,22 +173,27 @@ userRouter.get('/history', async (req, res) => {
 userRouter.get('/auth', async (req, res) => {
   try {
     if (!utils.ensureAddressValid(req, res, req.query?.address as string | undefined)) {
+      console.log('[GET] /auth: Address invalid');
       return;
     }
     const user = await utils.getUserOrSend400(req, res, req.query!.address as string);
     if (!user) {
+      console.log('[GET] /auth: User not found');
       return;
     }
-    const secret = crypto.randomBytes(16).toString('hex');
+
+    const { unsignedAuthTx, boxToValidate } = await buildAuthTx(user.address);
+
     await User.update(
       {
-        ...user,
-        auth_secret: secret,
+        auth_tx_id: unsignedAuthTx.id,
+        auth_tx_box_to_validate: JSONBig.stringify(boxToValidate)
       },
-      {where: {address: req.query!.address as string}}
+      {where: {address: user.address}}
     );
+
     res.status(200);
-    res.send({secret});
+    res.send({unsignedAuthTx});
   } catch (err) {
     console.log(err);
     res.status(500);
@@ -208,13 +204,15 @@ userRouter.get('/auth', async (req, res) => {
 userRouter.post('/auth', async (req, res) => {
   try {
     if (!utils.ensureAddressValid(req, res, req.body?.address)) {
+      console.log('[POST] /auth: Address invalid');
       return;
     }
     const user = await utils.getUserOrSend400(req, res, req.body!.address);
     if (!user) {
+      console.log('[POST] /auth: User not found');
       return;
     }
-    if (!utils.verifySignature(user.auth_secret, req.body.signature)) {
+    if (!(await utils.verifySignature(req.body.address, req.body.signedTx))) {
       res.status(400);
       res.send("Invalid signature");
       return;

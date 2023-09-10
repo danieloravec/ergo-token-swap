@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { ButtonSecondary } from '@components/Common/Button';
 import { backendRequest } from '@utils/utils';
 import { useWalletStore } from '@components/Wallet/hooks';
+import { useJwtAuth } from '@components/hooks';
+import { obtainJwt } from '@utils/authUtils';
 
 const EditProfileFormContainer = styled.div`
   width: 100%;
@@ -22,7 +24,7 @@ const FormAlert = styled(Alert)`
 `;
 
 export const EditProfileForm = (): JSX.Element => {
-  const { address } = useWalletStore();
+  const { address, wallet } = useWalletStore();
 
   const [displayFormAlerts, setDisplayFormAlerts] = React.useState(false);
   const [discord, setDiscord] = React.useState<string | undefined>(undefined);
@@ -41,6 +43,8 @@ export const EditProfileForm = (): JSX.Element => {
   const [saveMessage, setSaveMessage] = React.useState<
     { message: string; type: 'success' | 'error' } | undefined
   >(undefined);
+
+  const { jwt, setJwt } = useJwtAuth();
 
   useEffect(() => {
     setIsMounted(true);
@@ -118,15 +122,32 @@ export const EditProfileForm = (): JSX.Element => {
       return;
     }
     const submitData = async (): Promise<void> => {
+      if (address === undefined || wallet === undefined) {
+        console.log('No address or wallet');
+        return;
+      }
+
+      let currentJwt = jwt;
+      if (currentJwt === undefined) {
+        const obtainedJwt = await obtainJwt(wallet, address);
+        if (obtainedJwt === undefined) {
+          console.log('Cannot obtain JWT');
+          return;
+        }
+        setJwt(obtainedJwt);
+        currentJwt = obtainedJwt;
+      }
+
       const body = {
         address,
         discord,
         twitter,
         username,
-        signature: 'DUMMY_SIGNATURE',
       }; // TODO add email
       try {
-        const response = await backendRequest('/user', 'POST', body);
+        const response = await backendRequest('/user', 'POST', body, {
+          Authorization: `Bearer ${currentJwt}`,
+        });
         if (response?.status !== 200) {
           setSaveMessage({
             message: `Error saving profile: ${response.message}`,
