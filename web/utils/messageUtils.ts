@@ -9,7 +9,7 @@ export const markMessage = async (
     `/message/seen?id=${messageId}`,
     'PUT',
     { seen },
-    { Authorization: jwt }
+    { Authorization: `Bearer ${jwt}` }
   );
   return markRes.status === 200;
 };

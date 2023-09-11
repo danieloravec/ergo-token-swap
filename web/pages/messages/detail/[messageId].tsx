@@ -48,30 +48,33 @@ export const MessageDetail = (): JSX.Element => {
   >(undefined);
 
   const replyAddress =
-    message?.fromAddress === address
-      ? message?.toAddress
-      : message?.fromAddress;
+    message?.from_address === address
+      ? message?.to_address
+      : message?.from_address;
 
   useEffect(() => {
-    loadMessages(
-      address,
-      setJwt,
-      wallet,
-      (messages: MessageStructure) => {
-        for (const m of messages.sent.concat(messages.received)) {
-          if (String(m.id) === messageId) {
-            setMessage(m);
-            break;
+    const initialize = async (): Promise<void> => {
+      await loadMessages(
+        address,
+        setJwt,
+        wallet,
+        (messages: MessageStructure) => {
+          for (const m of messages.sent.concat(messages.received)) {
+            if (String(m.id) === messageId) {
+              setMessage(m);
+              break;
+            }
           }
-        }
-        setIsLoaded(true);
-      },
-      jwt
-    ).catch(console.error);
-    if (message !== undefined) {
-      markMessage(message.id, true, jwt ?? '').catch(console.error);
-    }
-  }, [isLoaded]);
+          setIsLoaded(true);
+        },
+        jwt
+      );
+      if (message !== undefined) {
+        await markMessage(message.id, true, jwt ?? '');
+      }
+    };
+    initialize().catch(console.error);
+  }, [address, isLoaded]);
 
   if (!isLoaded) {
     return <Text>Loading...</Text>;
@@ -104,7 +107,7 @@ export const MessageDetail = (): JSX.Element => {
           <Spacer size={spacing.spacing_m} vertical={false} />
           <StrongBg>From: </StrongBg>
           <Spacer size={spacing.spacing_xxs} vertical={false} />
-          <Text>{message.fromAddress}</Text>
+          <Text>{message.from_address}</Text>
         </FlexDiv>
         <Spacer size={spacing.spacing_xs} vertical />
 
@@ -112,7 +115,7 @@ export const MessageDetail = (): JSX.Element => {
           <Spacer size={spacing.spacing_m} vertical={false} />
           <StrongBg>To: </StrongBg>
           <Spacer size={spacing.spacing_xxs} vertical={false} />
-          <Text>{message.toAddress}</Text>
+          <Text>{message.to_address}</Text>
         </FlexDiv>
 
         <hr style={{ width: '100%', color: theme.properties.colorBgText }} />
@@ -127,7 +130,7 @@ export const MessageDetail = (): JSX.Element => {
         {replyAddress !== undefined && (
           <FlexDiv style={{ width: '100%' }}>
             <FlexDiv style={{ marginLeft: 'auto' }}>
-              {address === message.toAddress && (
+              {address === message.to_address && (
                 <ButtonTertiarySquared
                   onClick={() => {
                     const markAndSetMessage = async (): Promise<void> => {

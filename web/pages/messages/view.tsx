@@ -64,7 +64,7 @@ const ViewMessages = (): JSX.Element => {
         'PUT',
         undefined,
         {
-          Authorization: jwt,
+          Authorization: `Bearer ${jwt}`,
         }
       );
       if (archivationResult.status !== 200) {

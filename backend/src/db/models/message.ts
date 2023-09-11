@@ -11,6 +11,8 @@ interface MessageAttributes {
   subject: string;
   text: string;
   seen: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 class Message extends Model<MessageAttributes> implements MessageAttributes {
@@ -22,6 +24,8 @@ class Message extends Model<MessageAttributes> implements MessageAttributes {
   subject: string;
   text: string;
   seen: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 Message.init({
@@ -56,6 +60,16 @@ Message.init({
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
   }
 }, {
   timestamps: true,

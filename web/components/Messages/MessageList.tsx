@@ -23,12 +23,12 @@ const MessageListItem = (props: {
   const theme = useTheme();
   const router = useRouter();
 
-  const date = new Date(props.message.createdAt).toLocaleDateString();
-  const time = new Date(props.message.createdAt).toLocaleTimeString();
+  const date = new Date(props.message.created_at).toLocaleDateString();
+  const time = new Date(props.message.created_at).toLocaleTimeString();
 
   const displayAddress = props.isReceivedList
-    ? props.message.fromAddress
-    : props.message.toAddress;
+    ? props.message.from_address
+    : props.message.to_address;
 
   const handleOpenMessage = (): void => {
     router.push(`/messages/detail/${props.message.id}`).catch(console.error);
@@ -50,7 +50,7 @@ const MessageListItem = (props: {
           </A>
           <Spacer size={spacing.spacing_xxs} vertical={false} />
           <Text style={{ fontWeight: 'lighter' }}>
-            {shortenString(displayAddress, 16)}
+            {shortenString(displayAddress ?? 'unknown', 16)}
           </Text>
         </FlexDiv>
         <Spacer size={spacing.spacing_m} vertical={false} />
@@ -92,14 +92,16 @@ export const MessageList = (props: {
   }
   return (
     <FlexDiv style={{ width: '100%' }}>
-      {props.messages.map((message, i) => (
-        <MessageListItem
-          message={message}
-          isReceivedList={props.isReceivedList}
-          messageArchiveFn={props.messageArchiveFn}
-          key={i}
-        />
-      ))}
+      {props.messages.map((message, i) => {
+        return (
+          <MessageListItem
+            message={message}
+            isReceivedList={props.isReceivedList}
+            messageArchiveFn={props.messageArchiveFn}
+            key={i}
+          />
+        );
+      })}
     </FlexDiv>
   );
 };

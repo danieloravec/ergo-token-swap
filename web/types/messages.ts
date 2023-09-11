@@ -1,12 +1,12 @@
 export interface Message {
   id: number;
-  fromAddress: string;
-  toAddress: string;
+  from_address: string;
+  to_address: string;
   subject: string;
   text: string;
   seen: boolean;
   archived: boolean;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface MessageStructure {

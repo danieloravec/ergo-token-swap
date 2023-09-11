@@ -2,6 +2,7 @@ import { config } from '@config';
 import { type Wallet } from '@ergo/wallet';
 import { type ProfileInfo } from '@data-types/profile';
 import JSONBig from 'json-bigint';
+import { obtainJwt } from '@utils/authUtils';
 
 export const backendRequest = async (
   endpoint: string,
@@ -49,7 +50,7 @@ export const authenticate = async (
   setJwt: (token: string) => void,
   jwt?: string,
   wallet?: Wallet
-): Promise<boolean> => {
+): Promise<string | undefined> => {
   if (wallet === undefined) {
     throw new Error('WALLET_UNDEFINED');
   }
@@ -58,7 +59,7 @@ export const authenticate = async (
     await createUserIfNotExists(address);
   } catch (err) {
     console.error(`Creating user failed: ${JSON.stringify(err)}`);
-    return false;
+    return undefined;
   }
 
   if (jwt !== undefined) {
@@ -72,34 +73,21 @@ export const authenticate = async (
     );
     if (isAuthenticatedRes.status !== 200) {
       console.error(isAuthenticatedRes);
-      return false; // Cannot authenticate, server unavailable, etc
+      return undefined; // Cannot authenticate, server unavailable, etc
     }
     if (isAuthenticatedRes.body?.isAuthenticated === true) {
-      return true;
+      return jwt;
     }
   }
 
-  // User not authenticated, yet, let's generate them a jwt
-  const secretRes = await backendRequest(
-    `/user/auth?address=${address}`,
-    'GET'
-  );
-  if (secretRes.status !== 200 || secretRes.body?.secret === undefined) {
-    console.error(secretRes);
-    return false;
+  // User not authenticated yet, let's generate them a jwt
+  const obtainedJwt = await obtainJwt(wallet, address);
+  console.log(`OBTAINED JWT: ${obtainedJwt}`);
+  if (obtainedJwt === undefined) {
+    return undefined;
   }
-  const secret = secretRes.body.secret as string;
-  const signedSecret = await wallet.signData(address, secret);
-  const jwtRes = await backendRequest('/user/auth', 'POST', {
-    address,
-    signature: signedSecret,
-  });
-  if (jwtRes.status !== 200 || jwtRes.body?.jwt === undefined) {
-    console.error(jwtRes);
-    return false;
-  }
-  setJwt(jwtRes.body.jwt as string);
-  return true;
+  setJwt(obtainedJwt);
+  return obtainedJwt;
 };
 
 export const createUserIfNotExists = async (
@@ -134,4 +122,9 @@ export const jsonStringifyBig = (obj: object): string => {
   return JSON.stringify(obj, (key, value) =>
     typeof value === 'bigint' ? value.toString() : value
   );
+};
+
+export const sleep = async (ms: number): Promise<void> => {
+  // eslint-disable-next-line promise/param-names
+  await new Promise((r) => setTimeout(r, ms));
 };

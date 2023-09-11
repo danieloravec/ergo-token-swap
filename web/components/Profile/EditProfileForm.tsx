@@ -4,10 +4,9 @@ import React, { useEffect } from 'react';
 import { Alert } from '@components/Common/Alert';
 import styled from 'styled-components';
 import { ButtonSecondary } from '@components/Common/Button';
-import { backendRequest } from '@utils/utils';
+import { authenticate, backendRequest } from '@utils/utils';
 import { useWalletStore } from '@components/Wallet/hooks';
 import { useJwtAuth } from '@components/hooks';
-import { obtainJwt } from '@utils/authUtils';
 
 const EditProfileFormContainer = styled.div`
   width: 100%;
@@ -127,15 +126,10 @@ export const EditProfileForm = (): JSX.Element => {
         return;
       }
 
-      let currentJwt = jwt;
-      if (currentJwt === undefined) {
-        const obtainedJwt = await obtainJwt(wallet, address);
-        if (obtainedJwt === undefined) {
-          console.log('Cannot obtain JWT');
-          return;
-        }
-        setJwt(obtainedJwt);
-        currentJwt = obtainedJwt;
+      const workingJwt = await authenticate(address, setJwt, jwt, wallet);
+      if (workingJwt === undefined) {
+        console.log('Cannot authenticate');
+        return;
       }
 
       const body = {
@@ -146,7 +140,7 @@ export const EditProfileForm = (): JSX.Element => {
       }; // TODO add email
       try {
         const response = await backendRequest('/user', 'POST', body, {
-          Authorization: `Bearer ${currentJwt}`,
+          Authorization: `Bearer ${workingJwt}`,
         });
         if (response?.status !== 200) {
           setSaveMessage({

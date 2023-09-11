@@ -77,11 +77,11 @@ export const ProfileHeader = (props: {
         '/user/follow',
         action === 'ADD' ? 'POST' : 'DELETE',
         {
-          fromAddress: address,
-          toAddress: props.data.address,
+          from_address: address,
+          to_address: props.data.address,
         },
         {
-          Authorization: jwt ?? '',
+          Authorization: `Bearer ${jwt}`,
         }
       );
       if (addOrRemoveFavouriteResponse.status !== 200) {

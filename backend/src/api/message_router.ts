@@ -14,10 +14,7 @@ messageRouter.get('/', async (req, res) => {
       res.send("Invalid address");
       return;
     }
-    const jwt = req.header("Authorization");
-    if(jwt === undefined || !utils.verifyJwt(req.query.address, jwt)) {
-      res.status(401);
-      res.send("Unauthorized");
+    if (!utils.ensureAuth(req, res, req.query.address)) {
       return;
     }
 
@@ -32,7 +29,7 @@ messageRouter.get('/', async (req, res) => {
         to_address: req.query.address,
         receiver_archived: false
       },
-      order: [['createdAt', 'DESC']],
+      order: [['created_at', 'DESC']],
       raw: true
     });
     const sentMessages = await Message.findAll({
@@ -40,7 +37,7 @@ messageRouter.get('/', async (req, res) => {
         from_address: req.query.address,
         sender_archived: false,
       },
-      order: [['createdAt', 'DESC']],
+      order: [['created_at', 'DESC']],
       raw: true
     });
     res.send({
@@ -73,10 +70,7 @@ messageRouter.post('/', async (req, res) => {
       res.send("Invalid address");
       return;
     }
-    const jwt = req.header("Authorization");
-    if(jwt === undefined || !utils.verifyJwt(body.fromAddress, jwt)) {
-      res.status(401);
-      res.send("Unauthorized");
+    if (!utils.ensureAuth(req, res, body.fromAddress)) {
       return;
     }
     const fromUser = await User.findOne({where: {address: body.fromAddress}});
@@ -126,10 +120,7 @@ messageRouter.delete('/', async (req, res) => {
       return;
     }
 
-    const jwt = req.header("Authorization");
-    if(jwt === undefined || !utils.verifyJwt(message.to_address, jwt)) {
-      res.status(401);
-      res.send("Unauthorized");
+    if (!utils.ensureAuth(req, res, message.to_address)) {
       return;
     }
 
@@ -160,9 +151,15 @@ messageRouter.put('/archive', async (req, res) => {
       return;
     }
 
-    const jwt = req.header("Authorization");
-    const senderIsAuthorized = jwt !== undefined && utils.verifyJwt(message.from_address, jwt);
-    const receiverIsAuthorized = jwt !== undefined && utils.verifyJwt(message.to_address, jwt);
+    const authorizationTokenized = req.header("Authorization")?.split(' ');
+    if (authorizationTokenized.length < 2) {
+      res.status(400);
+      res.send("Invalid authorization header");
+      return;
+    }
+    const jwt = authorizationTokenized[1];
+    const senderIsAuthorized = utils.verifyJwt(message.from_address, jwt);
+    const receiverIsAuthorized = utils.verifyJwt(message.to_address, jwt);
     if(!senderIsAuthorized && !receiverIsAuthorized) {
       res.status(401);
       res.send("Unauthorized");
@@ -201,10 +198,7 @@ messageRouter.put('/seen', async (req, res) => {
       return;
     }
 
-    const jwt = req.header("Authorization");
-    if(jwt === undefined || !utils.verifyJwt(message.to_address, jwt)) {
-      res.status(401);
-      res.send("Unauthorized");
+    if (!utils.ensureAuth(req, res, message.to_address)) {
       return;
     }
 

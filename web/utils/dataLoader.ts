@@ -12,8 +12,8 @@ export const loadMessages = async (
   if (address === undefined) {
     return;
   }
-  const authSuccessful = await authenticate(address, setJwt, jwt, wallet);
-  if (!authSuccessful) {
+  const workingJwt = await authenticate(address, setJwt, jwt, wallet);
+  if (workingJwt === undefined) {
     console.error('Authentication failed');
     return;
   }
@@ -21,7 +21,7 @@ export const loadMessages = async (
     `/message?address=${address}`,
     'GET',
     undefined,
-    { Authorization: jwt }
+    { Authorization: `Bearer ${workingJwt}` }
   );
   if (messages.status !== 200 || messages.body === undefined) {
     console.error('MESSAGE_LOADING_FAILED');

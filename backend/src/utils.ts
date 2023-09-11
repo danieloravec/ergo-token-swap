@@ -330,7 +330,7 @@ export const ensureAuth = (req: Request, res: Response, address?: string): boole
     if (!address) {
         return false;
     }
-    const tokenTokenized = req.header("Authorization").split(' ');
+    const tokenTokenized = req.header("Authorization")?.split(' ');
     if (tokenTokenized.length < 2) {
         return false;
     }

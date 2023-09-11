@@ -63,19 +63,6 @@ const SendMessagePage = (): JSX.Element => {
     }
   });
 
-  useEffect(() => {
-    const performAuth = async (): Promise<void> => {
-      if (address === undefined) {
-        return;
-      }
-      const authSuccessful = await authenticate(address, setJwt, jwt, wallet);
-      if (!authSuccessful) {
-        setError('Authentication failed');
-      }
-    };
-    performAuth().catch(console.error);
-  });
-
   if (address === undefined) {
     return (
       <NoSsr>
@@ -88,6 +75,12 @@ const SendMessagePage = (): JSX.Element => {
     setSuccess(undefined);
     setError(undefined);
 
+    const workingJwt = await authenticate(address, setJwt, jwt, wallet);
+    if (workingJwt === undefined) {
+      setError('Authentication failed');
+      return;
+    }
+
     const messageSendRes = await backendRequest(
       '/message',
       'POST',
@@ -98,7 +91,7 @@ const SendMessagePage = (): JSX.Element => {
         text: message,
       },
       {
-        Authorization: jwt,
+        Authorization: `Bearer ${workingJwt}`,
       }
     );
     if (messageSendRes.status !== 200) {
