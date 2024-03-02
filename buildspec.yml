@@ -18,4 +18,6 @@ artifacts:
     - package.json
     - package-lock.json
     - 'dist/**/*'
+    - '.ebextensions/**/*'
+    - '.platform/**/*'
   base-directory: ./backend

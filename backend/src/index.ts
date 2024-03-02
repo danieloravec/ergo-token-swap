@@ -24,6 +24,10 @@ app.get('/', (req, res) => {
     res.send("Ergo token swap API /");
 });
 
-app.listen(config.backendPort, () => {
-    console.log(`server running on port ${config.backendPort}`);
+// app.listen(config.backendPort, () => {
+//     console.log(`server running on port ${config.backendPort}`);
+// });
+// TODO the port needs to be hardcoded here, otherwise https redirection does not work
+app.listen(8081, () => {
+    console.log(`server running on port 8081`);
 });
