@@ -19,8 +19,8 @@ export const FungibleTokenImage = (props: {
           : `/icons/${assetIconMap[props.fungibleToken.tokenId]}`
       }
       alt={props.fungibleToken.name ?? 'token-image'}
-      width={80}
-      height={80}
+      width={50}
+      height={50}
     />
   );
 };

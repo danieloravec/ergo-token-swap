@@ -85,6 +85,7 @@ export const SwapButton = (props: {
 
   return (
     <Button
+      style={{ width: '98%' }}
       disabled={isWaitingForGuestSignature || isWaitingForHostSignature}
       onClick={() => {
         (async () => {

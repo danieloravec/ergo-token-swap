@@ -135,7 +135,8 @@ export function TokenSelection(props: {
       selectedFungibleDetails
     );
   };
-  const width = props.width ?? 420;
+  // const width = props.width ?? 420;
+  const width = props.width ?? 640;
   return (
     <Div>
       <FlexDiv style={{ justifyContent: 'space-between' }}>
@@ -173,7 +174,7 @@ export function TokenSelection(props: {
             />
           ))
         ) : (
-          <Div>
+          <FlexDiv style={{ justifyContent: 'space-between' }}>
             <FungibleTokenDisplay
               fungibleToken={{
                 name: 'Ergo',
@@ -196,7 +197,7 @@ export function TokenSelection(props: {
                 }}
               />
             ))}
-          </Div>
+          </FlexDiv>
         )}
       </TokenSelectionBody>
     </Div>
