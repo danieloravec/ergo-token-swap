@@ -6,11 +6,11 @@ import { getMintAddressByTokenId } from '@utils/verifyUtils';
 import { backendRequest } from '@utils/utils';
 import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
 import { A, StrongBg, Text, TextNavs } from '@components/Common/Text';
-import Image from 'next/image';
 import { spacing } from '@themes/spacing';
 import { config } from '@config';
 import { ExternalLink } from '@components/Icons/ExternalLink';
 import { Spacer } from '@components/Common/Spacer';
+import ImageWithFallback from '@components/Common/ImageWithFallback';
 
 const ImageSelectedOverlay = styled(CenteredDiv)<{ imgSize: number }>`
   backdrop-filter: blur(4px) grayscale(100%) brightness(0.4);
@@ -215,8 +215,9 @@ export const NftDisplay = (props: {
         </TextNavs>
       </CenteredDiv>
     ) : (
-      <Image
+      <ImageWithFallback
         src={imageUrl}
+        fallbackSrc="/icons/couldnt-load-image.svg"
         alt={props.nft.name ?? 'nft-image'}
         width={props.imgSize}
         height={props.imgSize}

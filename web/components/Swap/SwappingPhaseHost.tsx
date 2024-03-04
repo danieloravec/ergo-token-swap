@@ -1,4 +1,9 @@
-import { CenteredDiv, Div, FlexDiv } from '@components/Common/Alignment';
+import {
+  CenteredDiv,
+  Div,
+  FlexDiv,
+  CenteredDivHorizontal,
+} from '@components/Common/Alignment';
 import { TokenSelection } from '@components/Swap/TokenSelection';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
@@ -100,31 +105,6 @@ export function SwappingPhaseHost(props: {
           }}
         />
         <Spacer size={spacing.spacing_xxxl} vertical={false} />
-        <Div>
-          <CenteredDiv style={{ height: '100%' }}>
-            <SwapButton
-              tradingSessionId={props.tradingSessionId}
-              wallet={props.wallet}
-              hostInfo={props.hostInfo}
-              guestInfo={props.guestInfo}
-              selectedNftsA={selectedNftsA}
-              selectedNftsADetails={selectedNftsADetails}
-              selectedFungibleTokensA={selectedFungibleTokensA}
-              selectedFungibleTokensADetails={selectedFungibleTokensADetails}
-              selectedNanoErgA={selectedNanoErgA}
-              selectedNftsB={selectedNftsB}
-              selectedNftsBDetails={selectedNftsBDetails}
-              selectedFungibleTokensB={selectedFungibleTokensB}
-              selectedFungibleTokensBDetails={selectedFungibleTokensBDetails}
-              selectedNanoErgB={selectedNanoErgB}
-              notifyAwaitingGuestSignature={(isAwaiting: boolean) => {
-                setAwaitingGuestSignature(isAwaiting);
-              }}
-              setTxId={setTxId}
-            />
-          </CenteredDiv>
-        </Div>
-        <Spacer size={spacing.spacing_xxxl} vertical={false} />
         <TokenSelection
           description="GUEST WALLET"
           headingNft={
@@ -156,6 +136,31 @@ export function SwappingPhaseHost(props: {
           }}
         />
       </CenteredDiv>
+      <Spacer size={spacing.spacing_xxl} vertical />
+      <Div style={{ width: '100%' }}>
+        <CenteredDivHorizontal style={{ height: '100%' }}>
+          <SwapButton
+            tradingSessionId={props.tradingSessionId}
+            wallet={props.wallet}
+            hostInfo={props.hostInfo}
+            guestInfo={props.guestInfo}
+            selectedNftsA={selectedNftsA}
+            selectedNftsADetails={selectedNftsADetails}
+            selectedFungibleTokensA={selectedFungibleTokensA}
+            selectedFungibleTokensADetails={selectedFungibleTokensADetails}
+            selectedNanoErgA={selectedNanoErgA}
+            selectedNftsB={selectedNftsB}
+            selectedNftsBDetails={selectedNftsBDetails}
+            selectedFungibleTokensB={selectedFungibleTokensB}
+            selectedFungibleTokensBDetails={selectedFungibleTokensBDetails}
+            selectedNanoErgB={selectedNanoErgB}
+            notifyAwaitingGuestSignature={(isAwaiting: boolean) => {
+              setAwaitingGuestSignature(isAwaiting);
+            }}
+            setTxId={setTxId}
+          />
+        </CenteredDivHorizontal>
+      </Div>
     </FlexDiv>
   );
 }
