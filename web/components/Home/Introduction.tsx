@@ -4,7 +4,7 @@ import { Button } from '@components/Common/Button';
 import { CenteredDivHorizontal, FlexDiv } from '@components/Common/Alignment';
 import { Spacer } from '@components/Common/Spacer';
 import { spacing } from '@themes/spacing';
-import { useWalletStore } from '@components/Wallet/hooks';
+import { useWalletConnect, useWalletStore } from '@components/Wallet/hooks';
 import { type Wallet } from '@ergo/wallet';
 import { backendRequest } from '@utils/utils';
 import { useRouter } from 'next/router';
@@ -37,14 +37,20 @@ const DisabledButton = styled(Button)`
 
 export function Introduction(): JSX.Element {
   const { wallet } = useWalletStore();
+  const { connect, disconnect } = useWalletConnect();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { width } = useWindowDimensions();
   const theme = useTheme();
 
   useEffect(() => {
-    setIsMounted(true);
-  });
+    const reconnect = async (): Promise<void> => {
+      disconnect();
+      await connect('nautilus').catch(console.error);
+      setIsMounted(true);
+    };
+    reconnect().catch(console.error);
+  }, []);
 
   return (
     <IntroductionContainer>
