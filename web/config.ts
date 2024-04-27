@@ -11,6 +11,8 @@ interface ConfigType {
   defaultThemeName: SupportedThemeName;
   minNanoErgValue: bigint;
   ergTokenId: string;
+  customVerification: boolean;
+  specialOnly: boolean;
 }
 
 export const config: ConfigType = {
@@ -27,4 +29,6 @@ export const config: ConfigType = {
   minNanoErgValue: BigInt(process.env.NEXT_PUBLIC_MIN_NANO_ERG_VALUE as string),
   ergTokenId:
     '0000000000000000000000000000000000000000000000000000000000000000',
+  customVerification: process.env.NEXT_PUBLIC_CUSTOM_VERIFICATION === 'true',
+  specialOnly: process.env.NEXT_PUBLIC_SPECIAL_ONLY === 'true',
 };

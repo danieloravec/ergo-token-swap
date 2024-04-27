@@ -56,10 +56,8 @@ export const useWalletConnect = () => {
   };
 
   const reconnect = async (): Promise<void> => {
-    if (walletName !== undefined) {
-      disconnect();
-      await connect(walletName);
-    }
+    disconnect();
+    await connect(walletName ?? 'nautilus');
   };
 
   return { connect, disconnect, reconnect };

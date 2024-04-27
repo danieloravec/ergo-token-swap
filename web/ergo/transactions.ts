@@ -1,4 +1,7 @@
-import { OutputBuilder, TransactionBuilder } from '@fleet-sdk/core';
+import {
+  OutputBuilder,
+  TransactionBuilder,
+} from '@fleet-sdk/core';
 import { type Wallet } from '@ergo/wallet';
 import { config } from '@config';
 import { type EIP12UnsignedTransaction } from '@fleet-sdk/common';
@@ -92,7 +95,8 @@ export async function buildUnsignedMultisigSwapTx({
     .to(outputs)
     .sendChangeTo(config.serviceFeeAddress) // Only 2 * config.serviceFeeNanoErg will be in change
     .payMinFee()
-    .build('EIP-12');
+    .build()
+    .toEIP12Object();
 
   // Calculate txId from unsignedTx
   const txId = Loader.Ergo.UnsignedTransaction.from_json(

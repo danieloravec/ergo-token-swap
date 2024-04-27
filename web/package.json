@@ -24,22 +24,22 @@
     "@react-spring/types": "^9.7.2",
     "@react-spring/web": "^9.7.2",
     "@types/styled-components": "^5.1.26",
-    "ergo-lib-wasm-browser": "^0.23.0",
+    "ergo-lib-wasm-browser": "^0.26.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "fs": "^0.0.1-security",
     "install": "^0.13.0",
     "next": "^13.1.6",
     "npm": "^8.19.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "sharp": "^0.31.3",
     "styled-components": "^5.3.6",
     "zustand": "^4.3.2"
   },
   "devDependencies": {
     "@types/node": "18.11.7",
-    "@types/react": "18.0.24",
-    "@types/react-dom": "18.0.8",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "eslint": "^8.0.1",
     "eslint-config-next": "13.0.0",
@@ -53,5 +53,8 @@
     "lint-staged": "^13.1.0",
     "prettier": "2.8.3",
     "typescript": "*"
+  },
+  "resolutions": {
+    "@types/react": "17.0.43"
   }
 }
