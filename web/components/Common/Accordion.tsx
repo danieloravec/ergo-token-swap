@@ -18,20 +18,6 @@ const SvgMaybeRotated = styled.svg<{ rotated: boolean }>`
   fill: ${(props) => props.theme.properties.colorBgText};
 `;
 
-const Arrow = (props: { rotated: boolean }): JSX.Element => {
-  return (
-    <SvgMaybeRotated
-      rotated={props.rotated}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 6 10"
-      width="24"
-      height="24"
-    >
-      <path d="m1 0l5 5-5 5-1-1 4-4-4-4" />
-    </SvgMaybeRotated>
-  );
-};
-
 const AccordionContainer = styled.div<{ width?: string }>`
   width: ${(props) => props.width ?? '100%'};
   color: ${(props) => props.theme.properties.colorBgText};
@@ -88,7 +74,15 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
           >
             <HeadingArrowWrapper>
               <Heading3>{entry.question}</Heading3>
-              <Arrow rotated={idx === openIndex} />
+              <SvgMaybeRotated
+                rotated={idx === openIndex}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 6 10"
+                width="24"
+                height="24"
+              >
+                <path d="m1 0l5 5-5 5-1-1 4-4-4-4" />
+              </SvgMaybeRotated>
             </HeadingArrowWrapper>
             <animated.div style={openAnimation}>
               <div ref={contentRef}>{entry.answer}</div>

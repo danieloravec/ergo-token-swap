@@ -11,6 +11,7 @@ import { config } from '@config';
 import { ExternalLink } from '@components/Icons/ExternalLink';
 import { Spacer } from '@components/Common/Spacer';
 import ImageWithFallback from '@components/Common/ImageWithFallback';
+import { blitzData } from '@utils/special/blitz';
 
 const ImageSelectedOverlay = styled(CenteredDiv)<{ imgSize: number }>`
   backdrop-filter: blur(4px) grayscale(100%) brightness(0.4);
@@ -88,6 +89,14 @@ export const NftDisplay = (props: {
   >('nobody');
 
   useEffect(() => {
+    if (props.nft.tokenId in blitzData) {
+      setVerificationType('single-tx-swap.com');
+      setCollectionName('Blitz TCG');
+      setCollectionNameLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (imageUrl === undefined) {
       const loadImage = async (): Promise<void> => {
         const url = await loadNftImageUrl(props.nft.tokenId);
@@ -120,6 +129,10 @@ export const NftDisplay = (props: {
     }
 
     const getCollectionFromSkyHarbor = async (): Promise<boolean> => {
+      if (config.specialOnly) {
+        return false;
+      }
+
       const skyHarborResponse = await fetch(
         `${config.skyHarborApiUrl}/rest/verified/address/${mintAddress}`,
         {
@@ -180,7 +193,7 @@ export const NftDisplay = (props: {
 
     getCollectionFromSkyHarbor()
       .then((isVerified: boolean) => {
-        if (!isVerified) {
+        if (config.customVerification && !isVerified) {
           fetchVerifiedMintAddress().catch(console.error);
         }
       })
@@ -226,6 +239,12 @@ export const NftDisplay = (props: {
         }}
       />
     );
+
+  // Only allow Blitz NFTs
+  if (!(props.nft.tokenId in blitzData)) {
+    return <></>;
+  }
+
   return (
     <div
       style={{

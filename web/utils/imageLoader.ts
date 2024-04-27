@@ -1,8 +1,18 @@
 import { explorerRequest } from '@ergo/utils';
+import { blitzData } from '@utils/special/blitz';
+import { config } from '@config';
 
 export const loadNftImageUrl = async (
   tokenId: string
 ): Promise<string | undefined> => {
+  // Specific
+  if (tokenId in blitzData) {
+    return blitzData[tokenId].image;
+  }
+  if (config.specialOnly) {
+    return undefined;
+  }
+  // General
   const issuingBoxResponse = await explorerRequest(
     `/assets/${tokenId}/issuingBox`,
     0

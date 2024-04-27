@@ -1,6 +1,6 @@
-import styled from 'styled-components';
-import { Heading3, TextNavs } from '@components/Common/Text';
-import React, { type ReactNode, useState } from 'react';
+import styled, { useTheme } from 'styled-components';
+import { Heading1, Heading3, TextNavs } from '@components/Common/Text';
+import React, { type ReactNode, useMemo, useState } from 'react';
 import { Div, FlexDiv } from '@components/Common/Alignment';
 import { spacing } from '@themes/spacing';
 import { Toggle } from '@components/Common/Toggle';
@@ -9,6 +9,7 @@ import { NftDisplay } from '@components/Tokens/NftDisplay';
 import { FungibleTokenDisplay } from '@components/Tokens/FungibleTokenDisplay';
 import ColouredHeading from '@components/Swap/ColouredHeading';
 import { config } from '@config';
+import { blitzData } from '@utils/special/blitz';
 
 const TokenSelectionBody = styled.div<{ width: number }>`
   display: flex;
@@ -62,6 +63,12 @@ export function TokenSelection(props: {
     FungibleToken[]
   >([]);
   const [showNftSelect, setShowNftSelect] = useState(true);
+  const filteredNfts = useMemo(
+    () => props.nfts.filter((nft) => nft.tokenId in blitzData),
+    [props.nfts]
+  );
+  const theme = useTheme();
+
   const toggleNftSelected = (nft: Nft): void => {
     if (selectedNftIds.includes(nft.tokenId)) {
       const newSelectedNftIds = selectedNftIds.filter(
@@ -162,17 +169,36 @@ export function TokenSelection(props: {
       </ColouredHeading>
       <TokenSelectionBody width={width}>
         {showNftSelect ? (
-          props.nfts.map((nft) => (
-            <NftDisplay
-              nft={nft}
-              imgSize={180}
-              key={nft.tokenId}
-              onClick={() => {
-                toggleNftSelected(nft);
-              }}
-              isSelected={selectedNftIds.includes(nft.tokenId)}
-            />
-          ))
+          <FlexDiv>
+            {filteredNfts.length === 0 && (
+              <FlexDiv>
+                <Heading1>
+                  <span style={{ color: theme.properties.colorPrimary }}>
+                    Blitz TCG
+                  </span>{' '}
+                  only event!
+                </Heading1>
+                <span>
+                  But you can still swap{' '}
+                  <span style={{ color: theme.properties.colorSecondary }}>
+                    fungible tokens
+                  </span>{' '}
+                  for Blitz cards using the <strong>Fungible tab</strong>!
+                </span>
+              </FlexDiv>
+            )}
+            {filteredNfts.map((nft) => (
+              <NftDisplay
+                nft={nft}
+                imgSize={180}
+                key={nft.tokenId}
+                onClick={() => {
+                  toggleNftSelected(nft);
+                }}
+                isSelected={selectedNftIds.includes(nft.tokenId)}
+              />
+            ))}
+          </FlexDiv>
         ) : (
           <FlexDiv style={{ justifyContent: 'space-between' }}>
             <FungibleTokenDisplay

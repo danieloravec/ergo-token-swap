@@ -24,6 +24,7 @@
       "@public/*": ["public/*"],
       "@mappers/*": ["mappers/*"],
       "@data-types/*": ["types/*"],
+      "react": [ "./node_modules/@types/react" ]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
